@@ -111,7 +111,9 @@ io.on("connection", (socket) => {
   });
 
 
-
+  socket.on('disconnect', () => {
+    console.log('Socket desconectado');
+  });
 
 });
 
@@ -169,6 +171,8 @@ app.get("/Dashboard", function (peticion, respuesta) {
   }
 });
 
+
+
 app.get("/NuevoPaciente", function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     respuesta.render("NuevoPaciente.ejs",{
@@ -215,7 +219,6 @@ app.get("/NuevoPaciente", function (peticion, respuesta) {
 
 
 
-
 //==================================================================================================
 //  Logica del Sitio Web (Backend)
 //==================================================================================================
@@ -236,9 +239,10 @@ app.post("/login", async (req, res) => {
       req.session.idClaseUsuario = resultado.TipoUsuario;
       req.session.estiloweb = resultado.WebStyle;
       req.session.rol = resultado.rol;
+      //En caso de tener sucursal, la guardamos en la sesión
       req.session.Sucursal = resultado.Sucursal;
-      
-      req.session.visitas = req.session.visitas ? ++req.session.visitas : 1;
+      // Test de sesiones o recargas de la pagina
+      // req.session.visitas = req.session.visitas ? ++req.session.visitas : 1;
       // console.log(req.session);
       // Y buscamos su información en la base de datos, asi como si es o no doctor
       const InfoUsuario = await UsuarioyProfesion(resultado.idUsuario);
@@ -259,6 +263,7 @@ app.get("/logout", function (peticion, respuesta) {
     if (error) {
       console.log(error);
     } else {
+      
       respuesta.redirect("/");
     }
   });
@@ -293,7 +298,7 @@ app.get("/DashboardDoc", async (peticion, respuesta) => {
 // Ruta para obtener los datos del Dashboard para los recepcionistas
 app.get("/DashboardRecepcion", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
-    const PacientesEspera = await DashRecepcion(FechaHora().FormatoDia);
+    const PacientesEspera = await DashRecepcion(peticion.session.Sucursal,FechaHora().FormatoDia);
     respuesta.end(JSON.stringify(PacientesEspera));
   } else {
     respuesta.redirect("/");

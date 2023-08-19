@@ -1,5 +1,3 @@
-let socket = io();
-
 //==================================================================================================
 // Pacientes en Espera
 //==================================================================================================
@@ -340,3 +338,8 @@ socket.on("OtrosConsultorios", function (data) {
 });
 
 // Socket para actualizar Citas Hoy- Otros Consultorios
+
+
+
+
+

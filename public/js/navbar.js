@@ -1,4 +1,9 @@
+// ================================================================================
+// Habilitamos el Socket.IO en todos los Dashboards
+// ================================================================================
+let socket = io();
 
+// ================================================================================
 // Logo Carga
 $(window).on("load", function () {
   $("#LoadingLogo").fadeOut("slow");
@@ -59,6 +64,36 @@ $(document).ready(function () {
 
 
 
+  // ==================================================================================================
+  // Sesiones del Socket.IO
+  // ==================================================================================================
+
+
+  // Nos aseguramos de que se cierre sesion en el socket al cerrar sesion en el sitio web
+  const BotonEnd = document.getElementById('CerrarSesion');
+  if (BotonEnd){
+    BotonEnd.addEventListener('click', (event) => {
+      event.preventDefault();
+      socket.disconnect(); // Desconecta el socket
+      console.log('Sesión de Socket.IO cerrada');
+      // Para posterioremente borrar las Cookies de la sesion
+      window.location.href = "/logout";
+    });
+  }
+
+  // Cerramos la sesion temporalmente al crear un nuevo usuario
+  const NuevoPaciente = document.getElementById('NuevoPaciente');
+  if (NuevoPaciente) {
+    NuevoPaciente.addEventListener('click', (event) => {
+      event.preventDefault();
+      socket.disconnect(); // Desconecta el socket
+      window.location.href = "/NuevoPaciente";
+    });
+  }
+
+
 
 
 });
+
+

@@ -195,7 +195,6 @@ async function DashDoc(idDoctor, Fecha) {
     ORDER BY c.HoraLlegada ASC;`;
 
     const [rowsOtros, fieldsEspera] = await connection.execute(consultaOtrosConsultorios,[idDoctor]);
-    console.log(rowsOtros);
     if (rowsOtros.length > 0) {
       OtrosConsultorios = rowsOtros.map((elemento) => {
           return {
@@ -205,6 +204,7 @@ async function DashDoc(idDoctor, Fecha) {
             HoraCita: elemento.HoraCita,
             HoraLlegada: elemento.HoraLlegada,
             StatusPaciente: elemento.idStatusPaciente,
+            Consultorio: elemento.idConsultorio,
           };
         });
       connection.end();
@@ -239,7 +239,7 @@ async function DashDoc(idDoctor, Fecha) {
 //==================================================================================================
 // Función para obtener la informacion del Dashboard de recpecion (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
 //==================================================================================================
-async function DashRecepcion(Fecha) {
+async function DashRecepcion(Sucursal,Fecha) {
   let PacientesEsperaR = [];
   let CitasDoctoresHoy = [];
   let OtrosConsultoriosR = [];
@@ -253,10 +253,10 @@ async function DashRecepcion(Fecha) {
     INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas 
     INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente 
     INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
-    WHERE c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? 
+    WHERE c.idSucursal = ? AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? 
     ORDER BY c.HoraCita ASC;`;
 
-    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [Fecha]);
+    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [Sucursal,Fecha]);
 
     if (rowsHoy.length > 0) {
       CitasDoctoresHoy = rowsHoy.map((elemento) => {
@@ -292,9 +292,7 @@ async function DashRecepcion(Fecha) {
   WHERE c.idStatusPaciente = 2 AND DATE(c.HoraCita) = ?
   ORDER BY c.HoraLlegada ASC;`;
 
-    const [rowsEspera, fieldsHoy] = await connection.execute(consultaHoy, [
-      Fecha,
-    ]);
+    const [rowsEspera, fieldsHoy] = await connection.execute(consultaHoy, [Fecha,]);
 
     if (rowsEspera.length > 0) {
       PacientesEsperaR = rowsEspera.map((elemento) => {

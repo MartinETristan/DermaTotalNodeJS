@@ -1,7 +1,6 @@
 //==================================================================================================
 // Mostrar la Info en las tablas una vez que se cargue la pagina (Para Recepcion)
 //==================================================================================================
-let socket = io();
 $.ajax({
   url: "/DashboardRecepcion",
   method: "GET",
