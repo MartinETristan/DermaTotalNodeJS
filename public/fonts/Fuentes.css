@@ -1,0 +1,83 @@
+ /* Louis George Café*/
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src: url("/fonts/LouisGeorgeCafé/LouisGeorgeCafe.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 400;
+    /* Regular*/
+  }
+
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src: url("/fonts/LouisGeorgeCafé/LouisGeorgeCafeBold.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 700;
+    /* Negritas*/
+}
+
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src: url("/fonts/LouisGeorgeCafé/LouisGeorgeCafeItalic.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 500;
+    /* Italic*/
+}
+  
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src: url("/fonts/LouisGeorgeCafé/LouisGeorgeCafeLight.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 300;
+    /* Light*/
+}
+
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src: url("/fonts/LouisGeorgeCafé/LouisGeorgeCafeBoldItalic.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 600;
+    /* Negritas Italic*/
+}
+  
+@font-face {
+    font-family: 'LouisGeorgeCafé';
+    src:  url("/fonts/LouisGeorgeCafé/LouisGeorgeCafeLightItalic.ttf") format("opentype");
+    font-style: normal;
+    font-weight: 350
+    /* Light Italic*/
+}
+
+
+/* Liberation Serif*/
+@font-face {
+    font-family: 'LiberationSerif';
+    src: url("/fonts/LiberationSerif/LiberationSerif-Regular.ttf");
+    font-style: normal;
+    font-weight: 400;
+     /* Normal*/
+}
+
+@font-face {
+    font-family: 'LiberationSerif';
+    src: url("/fonts/LiberationSerif/LiberationSerif-Bold.ttf");
+    font-style: normal;
+    font-weight: 700;
+     /* Negritas*/
+}
+
+@font-face {
+    font-family: 'LiberationSerif';
+    src: url("/fonts/LiberationSerif/LiberationSerif-BoldItalic.ttf");
+    font-style: normal;
+    font-weight: 600;
+     /* Negritas Italic*/
+}
+
+@font-face {
+    font-family: 'LiberationSerif';
+    src: url("/fonts/LiberationSerif/LiberationSerif-Italic.ttf");
+    font-style: normal;
+    font-weight: 500;
+     /* Italic*/
+}
+

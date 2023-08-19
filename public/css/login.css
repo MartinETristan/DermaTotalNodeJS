@@ -1,0 +1,239 @@
+/* Aplicaicones Globales */
+* {
+    margin: 0px;
+    outline: none;
+  }
+  
+  /* Animacion de Fondo */
+  .bg {
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: linear-gradient(-45deg, #249DD9, #004368);
+    background-size: 600%;
+    -webkit-animation: anime 16s linear infinite;
+    animation: anime 16s linear infinite;
+  }
+  
+  /* Fuentes de texto  */
+  body,
+  input,
+  button {
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+  }
+  
+  /* Tarjeta de Inicio de Sesion  */
+  #cover {
+    width: auto;
+    height: auto;
+    margin: 0;
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Posicionamiento del Form  */
+  #form-ui,
+  form,
+  #close-form {
+    position: relative;
+  }
+  
+  form {
+    width: 262px;
+    height: 500px;
+    padding: 25px;
+    background-color: #fff;
+    box-shadow: 0px 15px 160px #00446833;
+    border-radius: 20px;
+  }
+  
+  #close-form {
+    position: absolute;
+    top: 23px;
+    right: 25px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  
+  
+  #form-body {
+    position: absolute;
+    top: 38%;
+    right: 25px;
+    left: 25px;
+    width: 230px;
+    margin: -156px auto 0 auto;
+  }
+  
+  /* Estilo de Logo y texto en tarjeta */
+  #welcome-lines {
+    text-align: center;
+    line-height: 1;
+  }
+  
+  /* Primera linea de texto de bienvenida  */
+  #w-line-1 {
+    color: #249DD9;
+    font-size: 35px;
+    font-weight: 700;
+  }
+  
+  /* Segunda Linea de texto de bienvenida */
+  #w-line-2 {
+    color: #b0b0b0;
+    font-size: 28px;
+    margin-top: 17px;
+  }
+  
+  /*Entrada de Usuario y Contraseña */
+  #input-area {
+    margin-top: 20px;
+  }
+  
+  .f-inp:hover {
+    border: 1px solid #004368;
+  }
+  
+  .f-inp {
+    padding: 11px 25px;
+    border: 1px solid #e3e3e3;
+    line-height: 1;
+    border-radius: 20px;
+  }
+  
+  .f-inp:first-child {
+    margin-bottom: 15px;
+  }
+  
+  .f-inp input {
+    width: 100%;
+    font-size: 13.4px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  
+  .f-inp input::placeholder {
+    color: #b9b9b9;
+  }
+  
+  
+  /*Boton de Inicio de Sesion */
+  #submit-button-cvr {
+    margin-top: 20px;
+  }
+  
+  #submit-button {
+    display: block;
+    width: 100%;
+    color: #fff;
+    font-size: 14px;
+    margin: 0;
+    padding: 14px 13px 12px 13px;
+    border: 0;
+    background-color: #249DD9;
+    border-radius: 25px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  #submit-button:hover {
+    background-color: #004368;
+  }
+  
+  
+  /* Boton de olvido de contraseña */
+  #forgot-pass {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  #forgot-pass a {
+    color: #868686;
+    font-size: 12px;
+    text-decoration: none;
+  }
+  
+  #forgot-pass a:hover {
+    color: #004368;
+    font-size: 12px;
+    text-decoration: none;
+  }
+  
+  /* Respuesta del inicio de sesion correcto  o incorecta */
+  .respuesta{
+    text-align: center;
+    margin-top: 10px;
+    color: red;
+    font-size: 18px;
+  }
+  
+  
+  /* Adorno de barra Inferior */
+  #bar {
+    position: absolute;
+    left: 50%;
+    bottom: -25px;
+    width: 28px;
+    height: 8px;
+    margin-left: -33px;
+    background-color: #dfdfdf;
+    border-radius: 10px;
+  }
+  
+  #bar:before,
+  #bar:after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #ececec;
+    border-radius: 50%;
+  }
+  
+  #bar:before {
+    right: -20px;
+  }
+  
+  #bar:after {
+    right: -38px;
+  }
+  
+  
+  
+  /* Animacion de Fondo */
+  @-webkit-keyframes anime {
+    0% {
+      background-position: 0% 50%;
+    }
+  
+    50% {
+      background-position: 100% 50%;
+    }
+  
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  @keyframes anime {
+    0% {
+      background-position: 0% 50%;
+    }
+  
+    50% {
+      background-position: 100% 50%;
+    }
+  
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  

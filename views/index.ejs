@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - DermaTotal</title>
+    <link rel="icon" href="/img/favicon.ico" />
+    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/fonts/Fuentes.css" />
+  </head>
+  
+  <body>
+    <div class="bg">
+      <div id="cover">
+        <div id="form-ui">
+          <form id="loginForm" method="post">
+            <div id="form-body">
+              <div id="welcome-lines">
+                <img src="/img/Logo.svg" alt="DermaTotal Logo" />
+                <div id="w-line-1">DermaTotal</div>
+                <div id="w-line-2">
+                  <span><%=saludo%></span>
+                  <br/>Inicia Sesión
+                </div>
+              </div>
+              <div id="input-area">
+                <div class="f-inp">
+                  <input
+                    type="text"
+                    placeholder="Usuario"
+                    name="NombreUsuario"
+                  />
+                </div>
+                <div class="f-inp">
+                  <input
+                    type="password"
+                    placeholder="Constraseña"
+                    name="Contrasena"
+                  />
+                </div>
+              </div>
+              <div id="submit-button-cvr">
+                <button type="submit" id="submit-button">Iniciar Sesión</button>
+              </div>
+              <div id="forgot-pass">
+                <!-- Boton de recuperar contraseña -->
+                <a href="/">¿Olvidaste la contraseña?</a>
+              </div>
+              <div id="bar"></div>
+              <div class="respuesta"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="footer" style="color: white; position: absolute; bottom: 0; right: 0;">
+        <b>
+          <%=Copy+" "+NombreE+" "+Año+" "+Ver%>
+        </b>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/login.js"></script>
+  </body>
+</html>
+

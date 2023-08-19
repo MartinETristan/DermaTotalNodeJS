@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="619px" height="525px" viewBox="0 0 619 525" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>MapaDermaTotal</title>   
+    <link rel="stylesheet" href="/Users/Vistas/Dashboard/Assets/Css/DashboardEstilos.css" />
+    <g class="MapaDT" id="MapaDT" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect class="C1" id="C1" stroke="#6EC773" stroke-width="4" fill="#3CBB3E" x="5" y="365" width="163" height="155"></rect>
+        <rect id="C2" stroke="#C76E6E" stroke-width="4" fill="#BB3C3C" x="5" y="194" width="163" height="163"></rect>
+        <rect id="C3" stroke="#6EC773" stroke-width="4" fill="#3CBB3E" x="5" y="5" width="187" height="145"></rect>
+        <path d="M320,194 L320,384 L232.178483,384 L232.178483,328.971154 L219,328.971154 L219,194 L320,194 Z" id="C4" stroke="#6EC773" stroke-width="4" fill="#3CBB3E"></path>
+        <rect id="SalaDeEspera" stroke="#E19E0A" stroke-width="4" fill="#F9C121" x="324" y="194" width="290" height="326"></rect>
+        <rect id="OtroConsultorio2" stroke="#A0A0A0" stroke-width="4" fill="#C8C8C8" x="196" y="5" width="124" height="145"></rect>
+        <rect id="Recepcion" stroke="#A0A0A0" stroke-width="4" fill="#C8C8C8" x="324" y="5" width="202" height="145"></rect>
+        <path d="M232.178483,388 L320,388 L320,523 L172,523 L172,422 L232.178483,422 L232.178483,388 Z" id="OtroConsultorio1" stroke="#A0A0A0" stroke-width="4" fill="#C8C8C8"></path>
+        <rect id="OtroConsultorio3" stroke="#A0A0A0" stroke-width="4" fill="#C8C8C8" x="530" y="5" width="84" height="145"></rect>
+        <rect id="Pasillo" stroke="#979797" fill="#979797" x="0.5" y="152.5" width="618" height="39"></rect>
+        <polygon id="Pasillo" fill="#979797" points="170 152 217 152 217 330.971154 230.178483 330.971154 230.178483 420 170 420"></polygon>
+        <rect id="muro" fill="#979797" transform="translate(86.500000, 361.000000) scale(-1, 1) translate(-86.500000, -361.000000) " x="3" y="359" width="167" height="4"></rect>
+        <rect id="Bordes" stroke="#979797" stroke-width="3" x="1.5" y="1.5" width="616" height="522"></rect>
+    </g>
+</svg>

@@ -1,0 +1,96 @@
+.ZonaDeFoto {
+    float: left;
+    width: 16em;
+    padding: 15px;
+    border: 3px  rgba(0,0,0,0.06);
+    background: rgba(0,0,0,0.06);
+    border-radius: 10px;
+  }
+  #ElecciondeFoto {
+    border: 2px dashed #fff;
+    -webkit-border-radius: 5px;
+    border-radius: 15px;
+    padding: 50px;
+    text-align: center;
+    font: 21pt bold arial;
+    color: #fff;
+  }
+
+  #ElecciondeFoto a {
+    color: #004368;
+  }
+
+  .NuevoUsuario>*{
+    margin: 10px;
+  }
+
+  .NuevoUsuario{
+    width: 70%;
+    /* display: block; */
+    align-items: center;
+  }
+
+  input{
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+    padding: 10px;
+    margin: 5px;
+  }
+
+.TipoDeUsuario{
+    display: flex;
+    align-items: center;
+}
+
+.DatosGenerales{
+    margin-top: 15px;
+    display: block;
+}
+
+.DatosGeneralesInputs{
+    position: relative;
+    top: -10px;
+}
+
+.DatosDeSeleccion{
+    display: flex;
+    align-items: center;
+}
+
+select{
+    font-size: small;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+    margin: 10px;
+    padding: 3px;
+}
+
+button{
+    border-radius: 5px;
+    border: 1px solid #249DD9;
+    padding: 10px;
+    background-color: #249DD9;
+    color: white;
+    font-size: medium;
+    margin: 15px;
+    float: right;
+}
+button:hover{
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+    border: 1px solid #004368;
+    background-color: #004368;
+}
+
+
+/* Estilos del Footer Sticky */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #29abe2;
+    color: white;
+    padding: 15px;
+    text-align: center;
+  }
+  

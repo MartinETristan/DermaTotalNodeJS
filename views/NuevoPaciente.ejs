@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DashBoard - DermaTotal</title>
+    <link rel="stylesheet" href="/fonts/Fuentes.css" />
+    <link rel="stylesheet" href="/css/NuevoPaciente.css" />
+    <link rel="stylesheet" href="/css/EstiloGlobal.css" />
+    <link rel="icon" href="/img/favicon.ico" />
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/navbar.js"></script>
+  </head>
+
+  <body>
+    <%
+    //==================================================================================================
+    //La vista de carga
+    //==================================================================================================
+    %>
+    <div id="LoadingLogo">
+      <img src="/img/Logo.svg" alt="DermaTotal Logo" />
+    </div>
+    <%
+    //==================================================================================================
+    //El nav superior para todos
+    //==================================================================================================
+    %>
+    <div class="main-header">
+      <a href="/Dashboard"><img src="/img/LogoB.svg" alt="" class="Logo" /></a>
+    </div>
+    <div class="DropMenu">
+      <div class="Perfil" id="Perfil">
+        <img src="/img/UserIco.webp" alt="/img/UserIco.webp" />
+      </div>
+      <div class="Menu" id="Menu">
+        <div class="UserMenu">
+          <h2><%=Nombre%></h2>
+          <b><%=TipUser%></b><br />
+          <span><%=Empresa%></span>
+        </div>
+        <ul>
+          <li><a href="#">Perfil</a></li>
+          <li><a href="#">Tema</a></li>
+          <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <%//Hacemos el cambio del primer nav dependiendo del tipo de usuario%> <%
+    switch (ClaseUsuario){
+    //==================================================================================================
+    // Nav-SuperAdmin-->
+    //==================================================================================================
+    case 1: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="Agenda">
+        <h2 class="nav-2">
+          <img src="/img/Icons/Agenda.svg" class="icono" /> Agenda
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+      <!-- Inventario -->
+      <div style="cursor: pointer" id="Inventario">
+        <h2 class="nav-4">
+          <img src="/img/Icons/Inventario.svg" class="icono" />
+          Inventario
+        </h2>
+      </div>
+      <!-- Ventas  -->
+      <div style="cursor: pointer" id="Cortes">
+        <h2 class="nav-5">
+          <img src="/img/Icons/Corte.svg" class="icono" /> Cortes
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Admin-->
+    //==================================================================================================
+    case 2: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="Agenda">
+        <h2 class="nav-2">
+          <img src="/img/Icons/Agenda.svg" class="icono" /> Agenda
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+      <!-- Ventas  -->
+      <div style="cursor: pointer" id="Cortes">
+        <h2 class="nav-5">
+          <img src="/img/Icons/Corte.svg" class="icono" /> Cortes
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Doctor-->
+    //==================================================================================================
+    case 3: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="Agenda">
+        <h2 class="nav-2">
+          <img src="/img/Icons/Agenda.svg" class="icono" /> Agenda
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Recepcionista-->
+    //==================================================================================================
+    case 4: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="Agenda">
+        <h2 class="nav-2">
+          <img src="/img/Icons/Agenda.svg" class="icono" /> Agenda
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+      <!-- Inventario -->
+      <div style="cursor: pointer" id="Inventario">
+        <h2 class="nav-4">
+          <img src="/img/Icons/Inventario.svg" class="icono" />
+          Inventario
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Recepcinista(Lite)-->
+    //==================================================================================================
+    case 5: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="Agenda">
+        <h2 class="nav-2">
+          <img src="/img/Icons/Agenda.svg" class="icono" /> Agenda
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Asociado-->
+    //==================================================================================================
+    case 6: %>
+    <!-- Barra Sticky -->
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" />
+          Dashboard
+        </h2>
+      </div>
+      <!-- Pacientes -->
+      <div style="cursor: pointer" id="Pacientes">
+        <h2 class="nav-3">
+          <img src="/img/Icons/Lupa.svg" class="icono" /> Pacientes
+        </h2>
+      </div>
+    </section>
+    <% break;
+    //==================================================================================================
+    // Nav-Coalquier otro usuario (Paciente)-->
+    //==================================================================================================
+    default:%>
+    <section class="nav-bar">
+      <!-- Dashboard -->
+      <div style="cursor: pointer" id="Dashboard">
+        <h2 class="nav-1">
+          <img src="/img/Icons/DashBoard.svg" class="icono" /> Inicio
+        </h2>
+      </div>
+      <!-- Agenda -->
+      <div style="cursor: pointer" id="HistorialVistaPaciente">
+        <h2 class="nav-2">
+          <img src="/img/Icons/HistorialClinico.svg" class="icono" />
+          Historial Clinico
+        </h2>
+      </div>
+    </section>
+    <%break; }
+    //==================================================================================================
+    // Contenido Creacion de Paciente
+    //==================================================================================================
+    %>
+    <h1>Nuevo Paciente</h1>
+    <div class="NuevoUsuario">
+      <hr />
+      <div class="ZonaDeFoto">
+        <div id="ElecciondeFoto">
+          <b>Tomar foto o</b>
+          <a href="#">selecciona el archivo</a>
+        </div>
+      </div>
+      <div class="DatosGenerales">
+        <h2>Datos Generales:</h2>
+        <div class="DatosGeneralesInputs">
+          <input type="text" id="Nombre" placeholder="Nombre*" />
+          <input type="text" id="ApellidoP" placeholder="Apellido Paterno" />
+          <input type="text" id="ApellidoM" placeholder="Apellido Materno" />
+          <input type="text" id="Telefono" placeholder="Teléfono" />
+          <input type="text" id="Telefono2" placeholder="Teléfono Secundario" />
+          <input type="text" id="Correo" placeholder="Correo" />
+        </div>
+        <div class="DatosDeSeleccion">
+          <div class="FechaDeNacimiento">
+            <b>Fecha de Nacimiento:</b>
+            <input type="date" id="FechaDeNacimiento" value="" />
+          </div>
+          <div class="Sexo">
+            <b>Sexo:</b>
+            <select name="" id="Sexo">
+              <option value="1">Masculino</option>
+              <option value="2">Femenino</option>
+            </select>
+          </div>
+          <div class="Sucursal">
+            <b>Sucursal:</b>
+            <select name="" id="Sucursal">
+              <option value="1">Sucursal 1</option>
+              <option value="2">Sucursal 2</option>
+              <option value="3">Sucursal 3</option>
+            </select>
+          </div>
+        </div>
+        <div id="InfoAdicional">
+          <!-- Aquí va el contenido extra en caso de que sea otro tipo de usuario -->
+        </div>
+        <button type="button" id="submit-button">Crear Nuevo Paciente</button>
+      </div>
+    </div>
+    <!-- Copyright -->
+    <div class="footer">
+      <b> <%=Copy+" "+Empresa+" "+" "+Año+" v"+Ver %> </b>
+    </div>
+  </body>
+</html>
