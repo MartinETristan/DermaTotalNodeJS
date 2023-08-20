@@ -39,25 +39,21 @@ $(document).ready(function () {
   });
   // Carga la vista de la agenda
   $("#Agenda").click(function () {
-    socket.disconnect();
     window.location.href = "/Agenda";
   });
 
   // Carga la vista de la busqueda de pacientes
   $("#Pacientes").click(function () {
-    socket.disconnect();
     window.location.href = "/Busqueda";
   });
 
   // Carga la vista de Inventario
   $("#Inventario").click(function () {
-    socket.disconnect();
     window.location.href = "/Inventario";
   });
 
   // Carga la vista de Cortes de Caja
   $("#Cortes").click(function () {
-    socket.disconnect();
     window.location.href = "/Cortes";
   });
 
