@@ -89,11 +89,15 @@ io.on("connection", (socket) => {
   }
 
 
-
+// Cambios realizados en el dashboard por recepcionistas
   socket.on("CambioEstadoPaciente", (data) => {
     switch (data.idStatus) {
       case 1:
-        Hoy_Espera(data.Cita, data.idStatus,FechaHora().HoraS1);
+        if(socket.request.session.Sucursal == 1){
+          Hoy_Espera(data.Cita, data.idStatus,FechaHora().HoraS1);
+        }else{
+          Hoy_Espera(data.Cita, data.idStatus,FechaHora().HoraS2);
+        }
         io.to("Doctor"+data.Doctor).emit("Hoy/Espera");
         socket.except("Doctor"+data.Doctor).emit("OtrosConsultorios");
         break;
@@ -170,6 +174,33 @@ app.get("/Dashboard", function (peticion, respuesta) {
     respuesta.redirect("/");
   }
 });
+
+app.get("/Busqueda", function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+    respuesta.render("Busqueda.ejs",{
+      // Clase de usuario en Numero 
+      ClaseUsuario:peticion.session.idClaseUsuario,
+      // ID de la TABLA de donde es el usuario
+      ID:peticion.session.idTipoDeUsuario,
+      // Estilo de la web
+      EstiloWeb:peticion.session.estiloweb,
+      // Nombre del usuario
+      Nombre:peticion.session.Nombres,
+      // Rol del usuario en TEXTO
+      TipUser:peticion.session.rol,
+      // InfoDelSistema
+      Empresa:Copyright().NombreEmpresa,
+      saludo:Saludo(),
+      Copy:Copyright().Copyright,
+      Año:FechaHora().Año,
+      Ver:Copyright().Version,
+      Fecha:FechaHora().FormatoDia,
+    });
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
 
 
 

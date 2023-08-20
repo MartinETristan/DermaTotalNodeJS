@@ -3,6 +3,7 @@
 // ================================================================================
 let socket = io();
 
+
 // ================================================================================
 // Logo Carga
 $(window).on("load", function () {
@@ -38,30 +39,30 @@ $(document).ready(function () {
   });
   // Carga la vista de la agenda
   $("#Agenda").click(function () {
+    socket.disconnect();
     window.location.href = "/Agenda";
   });
 
   // Carga la vista de la busqueda de pacientes
   $("#Pacientes").click(function () {
-    window.location.href = "/Pacientes";
+    socket.disconnect();
+    window.location.href = "/Busqueda";
   });
 
   // Carga la vista de Inventario
   $("#Inventario").click(function () {
+    socket.disconnect();
     window.location.href = "/Inventario";
   });
 
   // Carga la vista de Cortes de Caja
   $("#Cortes").click(function () {
+    socket.disconnect();
     window.location.href = "/Cortes";
   });
 
 
-  // Carga la vista de Historial de los Pacientes
-  $("#HistorialVistaPaciente").click(function () {
-    window.location.href = "/InfoPaciente";
-  });
-
+  
 
 
   // ==================================================================================================
@@ -85,8 +86,6 @@ $(document).ready(function () {
   const NuevoPaciente = document.getElementById('NuevoPaciente');
   if (NuevoPaciente) {
     NuevoPaciente.addEventListener('click', (event) => {
-      event.preventDefault();
-      socket.disconnect(); // Desconecta el socket
       window.location.href = "/NuevoPaciente";
     });
   }

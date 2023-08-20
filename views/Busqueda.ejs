@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crear Paciente - DermaTotal</title>
+    <title>Busqueda - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
-    <link rel="stylesheet" href="/css/NuevoPaciente.css" />
+    <link rel="stylesheet" href="/css/Busqueda.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
     <link rel="icon" href="/img/favicon.ico" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
-    <script src="/js/nuevoPaciente.js"></script>
+    <script src="/js/busqueda.js"></script>
   </head>
 
   <body>
@@ -255,53 +255,24 @@
     </section>
     <%break; }
     //==================================================================================================
-    // Contenido Creacion de Paciente
+    // Contenido Busqueda de pacientes
     //==================================================================================================
     %>
-    <h1>Nuevo Paciente</h1>
-    <div class="NuevoUsuario">
-      <hr />
-      <div class="ZonaDeFoto">
-        <div id="ElecciondeFoto">
-          <b>Tomar foto o</b>
-          <a href="#">selecciona el archivo</a>
-        </div>
-      </div>
-      <div class="DatosGenerales">
-        <h2>Datos Generales:</h2>
-        <div class="DatosGeneralesInputs">
-          <input type="text" id="Nombre" placeholder="Nombre*" />
-          <input type="text" id="ApellidoP" placeholder="Apellido Paterno" />
-          <input type="text" id="ApellidoM" placeholder="Apellido Materno" />
-          <input type="text" id="Telefono" placeholder="Teléfono" />
-          <input type="text" id="Telefono2" placeholder="Teléfono Secundario" />
-          <input type="text" id="Correo" placeholder="Correo" />
-        </div>
-        <div class="DatosDeSeleccion">
-          <div class="FechaDeNacimiento">
-            <b>Fecha de Nacimiento:</b>
-            <input type="date" id="FechaDeNacimiento" value="" />
-          </div>
-          <div class="Sexo">
-            <b>Sexo:</b>
-            <select name="" id="Sexo">
-              <option value="1">Masculino</option>
-              <option value="2">Femenino</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <h2>Crear cita: <input type="checkbox"></h2>
-          <div id="NuevoPacienteyCita">
-            <!-- Aquí va el contenido extra en caso de que quiera agendar una cita tambien -->
-          </div>
-        </div>
-        <button type="button" id="submit-button">Crear Nuevo Paciente</button>
-      </div>
+    <h1>Busqueda Pacientes:</h1>
+    <div class="input-area">
+      <input name="BNombre" id="BNombre" type="text" placeholder="Nombre" class="f-inp" />
+      <input name="BApellido" id="BApellido" type="text" placeholder="Apellido" class="f-inp" />
+      <input name="BTelefono" id="BTelefono" type="text" placeholder="Correo / Teléfono" class="f-inp" />
+      <button type="button" id="submit-button">Buscar</button>
     </div>
+    <div id="ResultadosBusqueda">
+        <!-- Aqui van los resultados de la busqueda en la base de datos -->
+    </div><br><br>
+  
+
     <!-- Copyright -->
     <div class="footer">
-      <b> <%=Copy+" "+Empresa+" "+" "+Año+" v"+Ver %> </b>
+        <b> <%=Copy+" "+Empresa+" "+" "+Año+" v"+Ver %> </b>
     </div>
   </body>
 </html>
