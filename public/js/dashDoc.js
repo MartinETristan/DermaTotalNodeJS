@@ -1,122 +1,109 @@
+
 //==================================================================================================
 // Pacientes en Espera
 //==================================================================================================
 function PacientesEnEspera(datos) {
-  // Contadores de Pacientes en espera:
-  var NumPacientesEspera = document.querySelector(".NumeroPacientesEspera");
+  const NumPacientesEspera = document.querySelector(".NumeroPacientesEspera");
   NumPacientesEspera.textContent = datos.length;
+  console.log(datos);
+  const PacientesEspera = document.querySelector(".PacientesEnEspera");
+  PacientesEspera.innerHTML = '';
 
-  // Vaciar el contenido anterior en el contenedor "PacientesEspera"
-  var PacientesEspera = document.querySelector(".PacientesEnEspera");
-  while (PacientesEspera.firstChild) {
-    PacientesEspera.removeChild(PacientesEspera.firstChild);
+  if (datos.length === 0) {
+    const NoPacientes = document.createElement("h2");
+    NoPacientes.textContent = "No hay pacientes en espera.";
+    NoPacientes.classList.add("NoPacientes");
+    PacientesEspera.appendChild(NoPacientes);
+    return;
   }
 
-  // Creacion de contendio en la pagina para los pacientes en espera
-  if (datos.length != 0) {
-    datos.forEach((Paciente) => {
-      var ElementoPaciente = document.createElement("div");
-      ElementoPaciente.classList.add("Paciente");
-      ElementoPaciente.id = Paciente.idPaciente;
+  datos.forEach((Paciente) => {
+    const ElementoPaciente = document.createElement("div");
+    ElementoPaciente.classList.add("Paciente");
+    ElementoPaciente.id = Paciente.idPaciente;
 
-      var HeaderPaciente = document.createElement("div");
-      HeaderPaciente.classList.add("HeaderPaciente");
+    const HeaderPaciente = document.createElement("div");
+    HeaderPaciente.classList.add("HeaderPaciente");
 
-      var ContenedorImagenPaciente = document.createElement("div");
-      ContenedorImagenPaciente.classList.add("FotoPaciente");
-      var ImagenPaciente = document.createElement("img");
-      if (Paciente.Foto == null) {
-        ImagenPaciente.src = "/img/UserIco.webp";
-      }else{
-        ImagenPaciente.src = Paciente.Foto;
-      }
+    const ContenedorImagenPaciente = document.createElement("div");
+    ContenedorImagenPaciente.classList.add("FotoPaciente");
+    const ImagenPaciente = document.createElement("img");
+    ImagenPaciente.src = Paciente.Foto || "/img/UserIco.webp";
+    ContenedorImagenPaciente.appendChild(ImagenPaciente);
 
-      ContenedorImagenPaciente.appendChild(ImagenPaciente);
+    const HeaderInfoPaciente = document.createElement("div");
+    HeaderInfoPaciente.classList.add("HeaderInfoPaciente");
 
-      var HeaderInfoPaciente = document.createElement("div");
-      HeaderInfoPaciente.classList.add("HeaderInfoPaciente");
+    const NombrePaciente = document.createElement("div");
+    NombrePaciente.classList.add("NombrePaciente");
+    NombrePaciente.textContent = Paciente.NombresPacientes;
 
-      var NombrePaciente = document.createElement("div");
-      NombrePaciente.classList.add("NombrePaciente");
-      NombrePaciente.textContent = Paciente.NombresPacientes;
+    const ApellidosPaciente = document.createElement("div");
+    ApellidosPaciente.classList.add("ApellidosPaciente");
+    ApellidosPaciente.textContent = Paciente.ApellidosPacientes;
 
-      var ApellidosPaciente = document.createElement("div");
-      ApellidosPaciente.classList.add("ApellidosPaciente");
-      ApellidosPaciente.textContent = Paciente.ApellidosPacientes;
+    HeaderInfoPaciente.appendChild(NombrePaciente);
+    HeaderInfoPaciente.appendChild(ApellidosPaciente);
 
-      HeaderInfoPaciente.appendChild(NombrePaciente);
-      HeaderInfoPaciente.appendChild(ApellidosPaciente);
+    HeaderPaciente.appendChild(ContenedorImagenPaciente);
+    HeaderPaciente.appendChild(HeaderInfoPaciente);
+    ElementoPaciente.appendChild(HeaderPaciente);
 
-      HeaderPaciente.appendChild(ContenedorImagenPaciente);
-      HeaderPaciente.appendChild(HeaderInfoPaciente);
+    const InfoLlegadaPaciente = [
+      { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita },
+      { TituloInfo: "Hora Llegada", SourceInfo: Paciente.HoraLlegada },
+    ];
 
-      ElementoPaciente.appendChild(HeaderPaciente);
+    InfoLlegadaPaciente.forEach((Info) => {
+      const CitaInfo = document.createElement("div");
+      CitaInfo.classList.add("CitaInfo");
 
-      var InfoLlegadaPaciente = [
-        { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita },
-        { TituloInfo: "Hora Llegada", SourceInfo: Paciente.HoraLlegada },
-      ];
+      const TituloInfoPaciente = document.createElement("span");
+      TituloInfoPaciente.classList.add("TituloInfoCita");
+      TituloInfoPaciente.textContent = Info.TituloInfo;
 
-      InfoLlegadaPaciente.forEach((Info) => {
-        var CitaInfo = document.createElement("div");
-        CitaInfo.classList.add("CitaInfo");
+      const DatoInfoPaciente = document.createElement("span");
+      DatoInfoPaciente.classList.add("DatoInfoCita");
+      DatoInfoPaciente.textContent = Info.SourceInfo;
 
-        var TituloInfoPaciente = document.createElement("span");
-        TituloInfoPaciente.classList.add("TituloInfoCita");
-        TituloInfoPaciente.textContent = Info.TituloInfo;
-
-        var DatoInfoPaciente = document.createElement("span");
-        DatoInfoPaciente.classList.add("DatoInfoCita");
-        DatoInfoPaciente.textContent = Info.SourceInfo;
-
-        CitaInfo.appendChild(TituloInfoPaciente);
-        CitaInfo.appendChild(DatoInfoPaciente);
-
-        ElementoPaciente.appendChild(CitaInfo);
-      });
-
-      var ContenedorBotones = document.createElement("div");
-      ContenedorBotones.classList.add("BotonesDeAccion");
-
-      if (Paciente.StatusPaciente == 3) {
-        var BotonFinalizar = document.createElement("button");
-        BotonFinalizar.classList.add("BotonFinalizar");
-        BotonFinalizar.textContent = "Finalizar";
-        ContenedorBotones.appendChild(BotonFinalizar);
-        BotonFinalizar.addEventListener("click", function (event) {
-          alert("Finalizar");
-          event.stopPropagation();
-        });
-      } else {
-          var BotonPedir = document.createElement("button");
-          BotonPedir.classList.add("BotonPedir");
-          BotonPedir.textContent = "Pedir";
-          ContenedorBotones.appendChild(BotonPedir);
-          BotonPedir.addEventListener("click", function (event) {
-            console.log(Paciente);
-            alert("El paciente que se esta pidiendo es: "+Paciente.idPaciente+" con el doctor con el id: "+Paciente.idDoctor);
-            event.stopPropagation();
-          });
-      }
-      ElementoPaciente.appendChild(ContenedorBotones);
-      PacientesEspera.appendChild(ElementoPaciente);
+      CitaInfo.appendChild(TituloInfoPaciente);
+      CitaInfo.appendChild(DatoInfoPaciente);
+      ElementoPaciente.appendChild(CitaInfo);
     });
-    
-    PacientesEspera.addEventListener("click", function (event) {
-      var pacienteElement = event.target.closest(".Paciente");
+
+    const ContenedorBotones = document.createElement("div");
+    ContenedorBotones.classList.add("BotonesDeAccion");
+
+    const Boton = document.createElement("button");
+    Boton.classList.add(Paciente.StatusPaciente === 3 ? "BotonFinalizar" : "BotonPedir");
+    Boton.textContent = Paciente.StatusPaciente === 3 ? "Finalizar" : "Pedir";
+
+    Boton.addEventListener("click", function (event) {
+      const action = Paciente.StatusPaciente === 3 ? "Finalizar" : "Pedir";
+      const message = action === "Finalizar"
+        ? `El paciente se está finalizando.`
+        : `El paciente que se está pidiendo es: ${Paciente.idPaciente} con el doctor con el id: ${Paciente.idDoctor}`;
+      
+      alert(message);
+      event.stopPropagation();
+    });
+
+    ContenedorBotones.appendChild(Boton);
+    ElementoPaciente.appendChild(ContenedorBotones);
+
+    ElementoPaciente.addEventListener("click", function (event) {
+      const pacienteElement = event.target.closest(".Paciente");
       if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
-        var idPaciente = pacienteElement.id;
+        const idPaciente = pacienteElement.id;
         alert(idPaciente);
         console.log("El id del paciente seleccionado es:", idPaciente);
       }
     });
-  } else {
-    var NoPacientes = document.createElement("h2");
-    NoPacientes.textContent = "No hay pacientes en espera.";
-    NoPacientes.classList.add("NoPacientes");
-    PacientesEspera.appendChild(NoPacientes);
-  }
+
+    PacientesEspera.appendChild(ElementoPaciente);
+  });
 }
+
 
 //==================================================================================================
 // Citas del día

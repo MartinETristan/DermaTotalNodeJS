@@ -1,3 +1,4 @@
 /node_modules
 /.env
 /docker-compose.yml
+/public/private/src/img

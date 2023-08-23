@@ -30,24 +30,25 @@ async function VerificarUsuario(usuario, contrasena) {
     ];
 
     for (const tabla of tablas) {
-      const consulta = `SELECT * FROM ${tabla} WHERE Usuario = ? AND Contraseña = ?`;
-      const [rows, fields] = await connection.execute(consulta, [
-        usuario,
-        contrasena,
-      ]);
-      // si se obrtiene un resultado
+      const consulta = `SELECT * FROM ${tabla} WHERE Usuario = ?`;
+      const [rows, fields] = await connection.execute(consulta, [usuario]);
+      // Si encontro un usuario
       if (rows.length > 0) {
-        connection.end();
-        const InfoSession = {
-          verificacion: "ReadyUser",
-          idTipoDeUsuario: Object.values(rows[0])[0],
-          TipoUsuario: rows[0].idTipoDeUsuario,
-          idUsuario: rows[0].idUsuario,
-          WebStyle: rows[0].EstiloWeb,
-          rol: tabla,
-          Sucursal: rows[0].idSucursal,
-        };
-        return InfoSession;
+        const hashedPassword = rows[0].Contraseña;
+        // Compara la contraseña encrpitada
+        if (bcrypt.compareSync(contrasena, hashedPassword)) {
+          connection.end();
+          const InfoSession = {
+            verificacion: "ReadyUser",
+            idTipoDeUsuario: Object.values(rows[0])[0],
+            TipoUsuario: rows[0].idTipoDeUsuario,
+            idUsuario: rows[0].idUsuario,
+            WebStyle: rows[0].EstiloWeb,
+            rol: tabla,
+            Sucursal: rows[0].idSucursal,
+          };
+          return InfoSession;
+        }
       }
     }
     connection.end();
@@ -105,10 +106,9 @@ async function DashDoc(idDoctor, Fecha) {
   try {
     const connection = await mysql.createConnection(db);
     const consultaEspera = `SELECT p.idPaciente, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,
-        DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada, c.idStatusPaciente
+        DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada, c.idStatusPaciente, u.RutaFoto
         FROM Citas c
-        INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas 
-        INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente 
+        INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
         INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
         WHERE c.idDoctor = ? AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 AND DATE(c.HoraCita) = ? 
         ORDER BY c.HoraLlegada ASC;`;
@@ -127,6 +127,7 @@ async function DashDoc(idDoctor, Fecha) {
           HoraCita: elemento.HoraCita,
           HoraLlegada: elemento.HoraLlegada,
           StatusPaciente: elemento.idStatusPaciente,
+          RutaFoto: elemento.RutaFoto,
         };
       });
     }
@@ -144,15 +145,17 @@ async function DashDoc(idDoctor, Fecha) {
   // Citas del dia
   try {
     const connection = await mysql.createConnection(db);
-    const consultaHoy = `SELECT p.idPaciente, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita
+    const consultaHoy = `SELECT p.idPaciente, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, u.RutaFoto
         FROM Citas c
-        INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas 
-        INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente 
+        INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
         INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
         WHERE c.idDoctor = ? AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? AND c.idEstadoCita = 1
         ORDER BY c.HoraCita ASC;`;
 
-    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [idDoctor,Fecha,]);
+    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [
+      idDoctor,
+      Fecha,
+    ]);
 
     if (rowsHoy.length > 0) {
       CitasHoy = rowsHoy.map((elemento) => {
@@ -161,17 +164,19 @@ async function DashDoc(idDoctor, Fecha) {
           NombresPacientes: elemento.Nombres,
           ApellidosPacientes: elemento.Apellidos,
           HoraCita: elemento.HoraCita,
+          RutaFoto: elemento.RutaFoto,
         };
       });
     }
 
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error en la consulta de citas del día:",error);
+    console.error(
+      "Ha ocurrido un error en la consulta de citas del día:",
+      error
+    );
     return "Ha ocurrido un error.";
   }
-
-
 
   //==================================================================================================
   // Otros consultorios
@@ -182,10 +187,9 @@ async function DashDoc(idDoctor, Fecha) {
     CONCAT(ud.Nombres) AS NombreDoctor,
     DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,
     DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada,
-    c.idStatusPaciente, s.idConsultorio 
+    c.idStatusPaciente, s.idConsultorio, up.RutaFoto
     FROM Citas c
-    INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas
-    INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente
+    INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
     INNER JOIN Usuarios up ON p.idUsuario = up.idUsuario 
     INNER JOIN Doctor d ON c.idDoctor = d.idDoctor
     INNER JOIN Usuarios ud ON d.idUsuario = ud.idUsuario
@@ -194,26 +198,30 @@ async function DashDoc(idDoctor, Fecha) {
     AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 
     ORDER BY c.HoraLlegada ASC;`;
 
-    const [rowsOtros, fieldsEspera] = await connection.execute(consultaOtrosConsultorios,[idDoctor]);
+    const [rowsOtros, fieldsEspera] = await connection.execute(
+      consultaOtrosConsultorios,
+      [idDoctor]
+    );
     if (rowsOtros.length > 0) {
       OtrosConsultorios = rowsOtros.map((elemento) => {
-          return {
-            idPaciente: elemento.idPaciente,
-            NombresPacientes: elemento.Nombres,
-            ApellidosPacientes: elemento.Apellidos,
-            HoraCita: elemento.HoraCita,
-            HoraLlegada: elemento.HoraLlegada,
-            StatusPaciente: elemento.idStatusPaciente,
-            Consultorio: elemento.idConsultorio,
-          };
-        });
+        return {
+          idPaciente: elemento.idPaciente,
+          NombresPacientes: elemento.Nombres,
+          ApellidosPacientes: elemento.Apellidos,
+          HoraCita: elemento.HoraCita,
+          HoraLlegada: elemento.HoraLlegada,
+          StatusPaciente: elemento.idStatusPaciente,
+          Consultorio: elemento.idConsultorio,
+          RutaFoto: elemento.RutaFoto,
+        };
+      });
       connection.end();
     }
-
-
-
   } catch (error) {
-    console.error("Ha ocurrido un error en la consulta de otros consultorios:",error);
+    console.error(
+      "Ha ocurrido un error en la consulta de otros consultorios:",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 
@@ -226,20 +234,10 @@ async function DashDoc(idDoctor, Fecha) {
   return InfoDashDoc;
 }
 
-
-
-
-
-
-
-
-
-
-
 //==================================================================================================
 // Función para obtener la informacion del Dashboard de recpecion (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
 //==================================================================================================
-async function DashRecepcion(Sucursal,Fecha) {
+async function DashRecepcion(Sucursal, Fecha) {
   let PacientesEsperaR = [];
   let CitasDoctoresHoy = [];
   let OtrosConsultoriosR = [];
@@ -248,15 +246,17 @@ async function DashRecepcion(Sucursal,Fecha) {
     //==================================================================================================
     // Citas del dia
     const connection = await mysql.createConnection(db);
-    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita
+    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,u.RutaFoto
     FROM Citas c
-    INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas 
-    INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente 
+    INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
     INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
     WHERE c.idSucursal = ? AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? 
     ORDER BY c.HoraCita ASC;`;
 
-    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [Sucursal,Fecha]);
+    const [rowsHoy, fieldsHoy] = await connection.execute(consultaHoy, [
+      Sucursal,
+      Fecha,
+    ]);
 
     if (rowsHoy.length > 0) {
       CitasDoctoresHoy = rowsHoy.map((elemento) => {
@@ -267,6 +267,7 @@ async function DashRecepcion(Sucursal,Fecha) {
           NombresPacientes: elemento.Nombres,
           ApellidosPacientes: elemento.Apellidos,
           HoraCita: elemento.HoraCita,
+          RutaFoto: elemento.RutaFoto,
         };
       });
     }
@@ -284,15 +285,16 @@ async function DashRecepcion(Sucursal,Fecha) {
     //==================================================================================================
     // Sala de espera
     const connection = await mysql.createConnection(db);
-    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada
+    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada, u.RutaFoto
   FROM Citas c
-  INNER JOIN Citas_Paciente cp ON c.idCitas = cp.idCitas 
-  INNER JOIN Paciente p ON cp.idPaciente = p.idPaciente 
+  INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
   INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
   WHERE c.idStatusPaciente = 2 AND DATE(c.HoraCita) = ?
   ORDER BY c.HoraLlegada ASC;`;
 
-    const [rowsEspera, fieldsHoy] = await connection.execute(consultaHoy, [Fecha,]);
+    const [rowsEspera, fieldsHoy] = await connection.execute(consultaHoy, [
+      Fecha,
+    ]);
 
     if (rowsEspera.length > 0) {
       PacientesEsperaR = rowsEspera.map((elemento) => {
@@ -304,6 +306,7 @@ async function DashRecepcion(Sucursal,Fecha) {
           ApellidosPacientes: elemento.Apellidos,
           HoraCita: elemento.HoraCita,
           HoraLlegada: elemento.HoraLlegada,
+          RutaFoto: elemento.RutaFoto,
         };
       });
     }
@@ -326,77 +329,84 @@ async function DashRecepcion(Sucursal,Fecha) {
     PacientesEspera: PacientesEsperaR,
     CitasFinalizadas: CitasFinalizadasR,
     OtrosConsultorios: OtrosConsultoriosR,
+    RutaFoto: elemento.RutaFoto,
   };
   return InfoDashRecep;
 }
-
-
 
 //==================================================================================================
 // Creaciones  / Assets
 //==================================================================================================
 
-async function NuevoPaciente(Nombres,ApellidoP,ApellidoM,idSexo,Correo,Telefono,TelefonoSecundario,FechaNacimiento,RutaFoto) {
-  try{
+async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto) {
+  try {
     const connection = await mysql.createConnection(db);
-    const NuevoPaciente = `INSERT INTO Usuarios
-    (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta, RutaFoto)
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?);
+    await connection.beginTransaction();
 
-    SET @last_user_id = LAST_INSERT_ID();
+    const queryUsuario = `INSERT INTO Usuarios
+      (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta, RutaFoto)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)`;
 
-    INSERT INTO Paciente
-    (idUsuario, Usuario, Contraseña)
-    VALUES(@last_user_id, ?, ?);
-    `;
-    const usuario = Nombres + ApellidoP + ApellidoM;
-    const [rowsEspera, fieldsHoy] = await connection.execute(NuevoPaciente, [Nombres,ApellidoP,ApellidoM,idSexo,Correo,Telefono,TelefonoSecundario,FechaNacimiento,RutaFoto]);
+    const queryPaciente = `INSERT INTO Paciente
+      (idUsuario, Usuario, Contraseña)
+      VALUES(LAST_INSERT_ID(), ?, ?)`;
 
+    //Obtenemos la fecha de hoy
+    const fechaActual = new Date();
+    // Y generamos el nombre de usuario con base a su nombre, el dia de registro y un numero aleatorio de 2 digitos
+    const usuario = Nombres.substring(0, 3)+fechaActual.getDate()+(Math.floor(Math.random() * 90) + 10);
+    console.log("El usuario/clave normal es: ",usuario);
+    // Encriptamos el usuario para generar la clave
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(usuario, salt);
+    console.log("Clave SuperAdmin:")
+    const [resultUsuario] = await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
 
-  }catch (error) {
-    console.error("Ha ocurrido un error en la creacion de un nuevo paciente:",error);
+    // Utilizamos el ID insertado en la primera consulta para la segunda consulta
+    const [resultPaciente] = await connection.execute(queryPaciente, [usuario, password]);
+
+    await connection.commit();
+    connection.end();
+
+    console.log("Nuevo paciente agregado con éxito");
+
+  } catch (error) {
+    console.error("Ha ocurrido un error en la creacion de un nuevo paciente:", error);
+    connection.rollback();
+    connection.end();
     return "Ha ocurrido un error.";
   }
-
-}
-
-async function NuevaCita(idPaciente,idSucursal,idProcedimineto,idDoctor,idAsociado,HoraCita,FinCita) {
-
-
-}
-
-async function Busqueda(idPaciente,idSucursal,idProcedimineto,idDoctor,idAsociado,HoraCita,FinCita) {
-
-
 }
 
 
+async function NuevaCita(
+  idPaciente,
+  idSucursal,
+  idProcedimineto,
+  idDoctor,
+  idAsociado,
+  HoraCita,
+  FinCita
+) {}
 
-
+async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
 
 //==================================================================================================
 // Updates estados Pacientes / Citas
 //==================================================================================================
 
-async function Hoy_Espera(idCita, idStatusPaciente,HoraLlegada) {
+async function Hoy_Espera(idCita, idStatusPaciente, HoraLlegada) {
   try {
     const connection = await mysql.createConnection(db);
     idStatusPaciente = idStatusPaciente + 1;
     const consulta = `UPDATE Citas SET idStatusPaciente = ?, HoraLlegada = CONCAT(CURDATE()," ", ?) WHERE idCitas = ?;`;
-    connection.execute(consulta, [idStatusPaciente,HoraLlegada,idCita]);
+    connection.execute(consulta, [idStatusPaciente, HoraLlegada, idCita]);
     connection.end();
   } catch (error) {
     console.error("Ha ocurrido un error en la actualizacion:", error);
     return "Ha ocurrido un error.";
   }
 }
-
-
-
-
-
-
-
 
 // Test de Encriptación de Contraseña
 // app.post("/login", async (req, res) => {
@@ -433,4 +443,11 @@ async function Hoy_Espera(idCita, idStatusPaciente,HoraLlegada) {
 //   }
 // });
 
-export { VerificarUsuario, UsuarioyProfesion, DashDoc, DashRecepcion,Hoy_Espera};
+export {
+  VerificarUsuario,
+  UsuarioyProfesion,
+  DashDoc,
+  DashRecepcion,
+  Hoy_Espera,
+  NuevoPaciente,
+};

@@ -24,6 +24,103 @@ $(window).bind("scroll", function () {
   }
 });
 
+function getUserRole() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: '/InfoSesion',
+      method: 'GET',
+      dataType: 'json',
+      success: function (respuesta) {
+        resolve(respuesta);
+      },
+      error: function (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
+
+// Estos son los apartados del NavBar que se mostraran con base al tipo de usuario
+const ItemsNavBar = {
+  1: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Agenda', icon: '/img/Icons/Agenda.svg', text: 'Agenda', className: 'nav-2' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' },
+    { class: 'Inventario', icon: '/img/Icons/Inventario.svg', text: 'Inventario', className: 'nav-4' },
+    { class: 'Cortes', icon: '/img/Icons/Corte.svg', text: 'Cortes', className: 'nav-5' }
+  ],
+  2: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Agenda', icon: '/img/Icons/Agenda.svg', text: 'Agenda', className: 'nav-2' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' },
+    { class: 'Cortes', icon: '/img/Icons/Corte.svg', text: 'Cortes', className: 'nav-4' }
+  ],
+  3: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Agenda', icon: '/img/Icons/Agenda.svg', text: 'Agenda', className: 'nav-2' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' }
+  ],
+  4: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Agenda', icon: '/img/Icons/Agenda.svg', text: 'Agenda', className: 'nav-2' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' },
+    { class: 'Inventario', icon: '/img/Icons/Inventario.svg', text: 'Inventario', className: 'nav-4' },
+  ],
+  5: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Agenda', icon: '/img/Icons/Agenda.svg', text: 'Agenda', className: 'nav-2' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' }
+  ],
+  6: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+    { class: 'Pacientes', icon: '/img/Icons/Lupa.svg', text: 'Pacientes', className: 'nav-3' }
+  ],
+  7: [
+    { class: 'Dashboard', icon: '/img/Icons/DashBoard.svg', text: 'Dashboard', className: 'nav-1' },
+  ]
+};
+
+
+// Creacion del NavBar con base al tipo de usuario
+async function CrearItemsNavBar() {
+  
+  const section = document.querySelector('.nav-bar');
+  while (section.firstChild) {
+    section.removeChild(section.firstChild);
+  }
+  const userRole = await getUserRole();
+
+  const itemsToShow = ItemsNavBar[userRole];
+  itemsToShow.forEach(item => {
+    const div = document.createElement('div');
+    div.className = item.class;
+
+    const h2 = document.createElement('h2');
+    h2.className = item.className;
+
+    const img = document.createElement('img');
+    img.src = item.icon;
+    img.className = 'icono';
+
+    const text = document.createTextNode(item.text);
+
+    h2.appendChild(img);
+    h2.appendChild(text);
+    div.appendChild(h2);
+
+    section.appendChild(div);
+  });
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  CrearItemsNavBar();
+});
+
+
+// Una vez que el documento se cree con exito se ejecutara el codigo
 $(document).ready(function () {
   // Al darle click a la foto de perfil del usuario se despliega el menu
   $("#Perfil").click(function () {
@@ -32,30 +129,33 @@ $(document).ready(function () {
   });
 
 
-  // Carga el DashBoard del usuario Doctor
-  $("#Dashboard").click(function () {
+  // Redirecciones del NavBar
+  // Carga la vista del Dashboard
+  $('.nav-bar').on('click', '.Dashboard', function() {
     window.location.href = "/Dashboard";
-    
   });
+
   // Carga la vista de la agenda
-  $("#Agenda").click(function () {
+  $('.nav-bar').on('click', '.Agenda', function() {
     window.location.href = "/Agenda";
   });
 
   // Carga la vista de la busqueda de pacientes
-  $("#Pacientes").click(function () {
+  $('.nav-bar').on('click', '.Pacientes', function() {
     window.location.href = "/Busqueda";
   });
 
   // Carga la vista de Inventario
-  $("#Inventario").click(function () {
+  $('.nav-bar').on('click', '.Inventario', function() {
     window.location.href = "/Inventario";
   });
 
   // Carga la vista de Cortes de Caja
-  $("#Cortes").click(function () {
+  $('.nav-bar').on('click', '.Cortes', function() {
     window.location.href = "/Cortes";
   });
+
+
 
 
   
@@ -91,4 +191,7 @@ $(document).ready(function () {
 
 });
 
-
+// Y desconcectamos al usuario del socket al cerrar la ventana
+window.addEventListener('beforeunload', function(event) {
+  socket.disconnect();
+});

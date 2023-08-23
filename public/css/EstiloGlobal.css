@@ -207,6 +207,10 @@ h1, h2 {
   transition: all .2s linear;
 }
 
+.nav-bar>div{
+  cursor: pointer;
+}
+
 
 .nav-1 {
   transition: margin-right .5s ease;
