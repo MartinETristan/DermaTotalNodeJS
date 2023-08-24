@@ -56,6 +56,10 @@ const sessionMiddleware = session({
   secret: "secret",
   resave: true,
   saveUninitialized: true,
+  cookie: {
+    // Caducidad de 12 horas de la cookie o "Sesión" en milisegundos
+    maxAge: 43200000
+  }
 });
 
 app.use(sessionMiddleware);
@@ -124,6 +128,246 @@ io.on("connection", (socket) => {
     console.log("Socket desconectado");
   });
 });
+
+
+//==================================================================================================
+//  TESTING
+//==================================================================================================
+
+
+
+
+//==================================================================================================
+//  Logica del Sitio Web (Backend)
+//==================================================================================================
+// Ruta de autenticación de usuario
+app.post("/login", async (req, res) => {
+  const { usuario, contrasena } = req.body;
+
+  if (!usuario || !contrasena) {
+    res.send("Falta llenar algún campo.");
+  } else {
+    const resultado = await VerificarUsuario(usuario, contrasena);
+    // Visualizar array Obtenido en la tabla donde se inicia sesion
+    // console.log(resultado);
+    if (resultado.verificacion === "ReadyUser") {
+      // Guargamos la info del tipo de usuario en la sesión
+      req.session.idusuario = resultado.idUsuario;
+      req.session.idTipoDeUsuario = resultado.idTipoDeUsuario;
+      req.session.idClaseUsuario = resultado.TipoUsuario;
+      req.session.estiloweb = resultado.WebStyle;
+      req.session.rol = resultado.rol;
+      //En caso de tener sucursal, la guardamos en la sesión
+      req.session.Sucursal = resultado.Sucursal;
+      // Test de sesiones o recargas de la pagina
+      // req.session.visitas = req.session.visitas ? ++req.session.visitas : 1;
+      // console.log(req.session);
+      // Y buscamos su información en la base de datos, asi como si es o no doctor
+      const InfoUsuario = await UsuarioyProfesion(resultado.idUsuario);
+      req.session.Nombres = InfoUsuario.Nombre;
+      req.session.EsDoctor = InfoUsuario.EsDoctor;
+      // console.log(InfoUsuario);
+      res.send("ReadyUser");
+    } else {
+      res.send("Usuario y/o contraseña incorrectos.");
+    }
+  }
+});
+
+// Ruta para cerrar sesión
+app.get("/logout", function (peticion, respuesta) {
+  peticion.session.destroy(function (error) {
+    if (error) {
+      console.log(error);
+    } else {
+      respuesta.redirect("/");
+    }
+  });
+});
+
+app.get("/InfoSesion", function (peticion, respuesta) {
+  const DatosSistema = {
+    ClaseUsuario: peticion.session.idClaseUsuario,
+    Copy: Copyright().Copyright,
+    Empresa: Copyright().NombreEmpresa,
+    Año: FechaHora().Año,
+    Ver: Copyright().Version,
+  };
+  respuesta.end(JSON.stringify(DatosSistema));
+});
+
+app.get("/DatosSistema", function (peticion, respuesta) {
+  const DatosSistema = {
+    Copy: Copyright().Copyright,
+    Empresa: Copyright().NombreEmpresa,
+    Año: FechaHora().Año,
+    Ver: Copyright().Version,
+  };
+  respuesta.end(JSON.stringify(DatosSistema));
+});
+
+
+
+// Ruta para obtener los datos del Dashboard para los Doctores
+app.get("/DashboardDoc", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+    if (peticion.session.EsDoctor) {
+      const PacientesEspera = await DashDoc(
+        peticion.session.idTipoDeUsuario,
+        FechaHora().FormatoDia
+      );
+      respuesta.end(JSON.stringify(PacientesEspera));
+    } else {
+      const PacientesEspera = {
+        PacientesEspera: [],
+        CitasHoy: [],
+        OtrosConsultorios: [],
+        CitasFinalizadas: [],
+      };
+      respuesta.end(JSON.stringify(PacientesEspera));
+    }
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+// Ruta para obtener los datos del Dashboard para los recepcionistas
+app.get("/DashboardRecepcion", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+    const PacientesEspera = await DashRecepcion(
+      peticion.session.Sucursal,
+      FechaHora().FormatoDia
+    );
+    respuesta.end(JSON.stringify(PacientesEspera));
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+
+
+
+
+
+//Variable para el almacenamiento de imagenes con multer
+const almacenamiento = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+      const rutaDestino = await CarpetaPersonal(req.body.Protocolo, req.body.Nombres);
+      cb(null, rutaDestino);
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname);
+    const nombreArchivo = `${req.body.Nombres}_${Date.now("YYYY-MM-DD")}${extension}`;
+    cb(null, nombreArchivo);
+  },
+});
+
+
+const Resizer = (Archivo,Ruta, porcentaje) => {
+  return sharp(Archivo)
+  .resize(porcentaje)
+  .toFile(Ruta, (err, info) => {
+    if (err){
+      console.log(err);
+    }
+  });
+};
+
+
+
+const subirfoto = multer({ storage: almacenamiento });
+
+// Funcion de apoyo para la creacion de pacientes
+async function CrearPaciente(req, res) {
+  try {
+    await new Promise((resolve, reject) => {
+      subirfoto.single('file')(req, res, function (err) {
+        if (err) {
+          console.error("Error al subir la imagen:", err);
+          return res.status(500).json({ mensaje: 'Error al subir la imagen' });
+        }
+        resolve();
+      });
+    });
+
+    // Verificar si se proporcionó una imagen
+    let rutaImagen = null;
+    if (req.file) {
+      rutaImagen = req.file.destination;
+      // Unicamente si el protocolo es perfil crea la miniatura para mostrar en todo el sitio 
+      if(req.body.Protocolo == "Perfil"){
+        Resizer(req.file.path,req.file.destination+`/Pequeño-${req.file.filename}`, 50);
+      }
+    }
+
+    // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
+    await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
+      req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
+      req.body.Telefono, req.body.TelefonoSecundario, 
+      req.body.FechaNacimiento, rutaImagen);
+
+    if (req.file) {
+      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente con foto' });
+    } else {
+      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente (sin foto)' });
+    }
+  } catch (error) {
+    console.error("Error en la creación de paciente:", error);
+    return res.status(500).json({ mensaje: 'Ha ocurrido un error en la creación de paciente' });
+  }
+}
+
+
+// Ruta para la creacion de pacientes
+app.post("/CrearPaciente", CrearPaciente);
+
+
+
+
+// Funcion para la creacion de carpetas de usuarios
+async function crearCarpeta(Ruta, Protocolo, id) {
+  try {
+    await fs.mkdir(Ruta, { recursive: true });
+    console.log("Carpeta creada exitosamente.");
+    CarpetaPersonal(Protocolo, id);
+  } catch (error) {
+    console.error("Error al crear la carpeta:", error);
+  }
+}
+
+// Funcion de adminisrtacion de carpetas personales (historial y perfil)
+async function CarpetaPersonal(Protocolo, id) {
+  //Verifica que existan los argumentos
+  if (!Protocolo || !id) {
+    console.log("Faltan argumentos para construir la ruta.");
+    throw new Error("Faltan argumentos para construir la ruta.");
+  }
+  //Genera la ruta de la carpeta
+  const Ruta = path.join(__dirname, "public/private/src/img", Protocolo, id.toString());
+
+  //Verifica que el protocolo sea valido
+  if (Protocolo == "Perfil" || Protocolo == "Historial") {
+    //Verifica que la carpeta exista
+    try {
+      await fs.access(Ruta, constants.F_OK);
+      console.log("La carpeta del usuario ",id," se creó o ya existe.");
+      return Ruta;
+    } catch (error) {
+      // Si no existe, la crea
+      await crearCarpeta(Ruta, Protocolo, id);
+      return Ruta;
+    }
+  } else {
+    console.log("El protocolo no es valido.");
+    throw new Error("El protocolo no es valido.");
+  }
+}
+
+
 
 //==================================================================================================
 //  Vistas del sitio Web (Frontend)
@@ -206,7 +450,7 @@ app.get("/Busqueda", function (peticion, respuesta) {
 });
 
 app.get("/NuevoPaciente", function (peticion, respuesta) {
-  if (peticion.session.idusuario) {
+  if (peticion.session.idusuario && peticion.session.idClaseUsuario <= 5) {
     respuesta.render("NuevoPaciente.ejs", {
       // ID del usuario en la TABLA USUARIOS
       idUsuario: peticion.session.idusuario,
@@ -237,210 +481,4 @@ app.get("/NuevoPaciente", function (peticion, respuesta) {
 // app.use((req, res) => {
 //   res.render("404.ejs");
 // });
-
-//==================================================================================================
-//  TESTING
-//==================================================================================================
-
-
-
-
-//==================================================================================================
-//  Logica del Sitio Web (Backend)
-//==================================================================================================
-// Ruta de autenticación de usuario
-app.post("/login", async (req, res) => {
-  const { usuario, contrasena } = req.body;
-
-  if (!usuario || !contrasena) {
-    res.send("Falta llenar algún campo.");
-  } else {
-    const resultado = await VerificarUsuario(usuario, contrasena);
-    // Visualizar array Obtenido en la tabla donde se inicia sesion
-    // console.log(resultado);
-    if (resultado.verificacion === "ReadyUser") {
-      // Guargamos la info del tipo de usuario en la sesión
-      req.session.idusuario = resultado.idUsuario;
-      req.session.idTipoDeUsuario = resultado.idTipoDeUsuario;
-      req.session.idClaseUsuario = resultado.TipoUsuario;
-      req.session.estiloweb = resultado.WebStyle;
-      req.session.rol = resultado.rol;
-      //En caso de tener sucursal, la guardamos en la sesión
-      req.session.Sucursal = resultado.Sucursal;
-      // Test de sesiones o recargas de la pagina
-      // req.session.visitas = req.session.visitas ? ++req.session.visitas : 1;
-      // console.log(req.session);
-      // Y buscamos su información en la base de datos, asi como si es o no doctor
-      const InfoUsuario = await UsuarioyProfesion(resultado.idUsuario);
-      req.session.Nombres = InfoUsuario.Nombre;
-      req.session.EsDoctor = InfoUsuario.EsDoctor;
-      // console.log(InfoUsuario);
-      res.send("ReadyUser");
-    } else {
-      res.send("Usuario y/o contraseña incorrectos.");
-    }
-  }
-});
-
-// Ruta para cerrar sesión
-app.get("/logout", function (peticion, respuesta) {
-  peticion.session.destroy(function (error) {
-    if (error) {
-      console.log(error);
-    } else {
-      respuesta.redirect("/");
-    }
-  });
-});
-
-app.get("/InfoSesion", function (peticion, respuesta) {
-  respuesta.end(JSON.stringify(peticion.session.idClaseUsuario));
-});
-
-app.get("/CrearPaciente", function (peticion, respuesta) {});
-
-// Ruta para obtener los datos del Dashboard para los Doctores
-app.get("/DashboardDoc", async (peticion, respuesta) => {
-  if (peticion.session.idusuario) {
-    if (peticion.session.EsDoctor) {
-      const PacientesEspera = await DashDoc(
-        peticion.session.idTipoDeUsuario,
-        FechaHora().FormatoDia
-      );
-      respuesta.end(JSON.stringify(PacientesEspera));
-    } else {
-      const PacientesEspera = {
-        PacientesEspera: [],
-        CitasHoy: [],
-        OtrosConsultorios: [],
-        CitasFinalizadas: [],
-      };
-      respuesta.end(JSON.stringify(PacientesEspera));
-    }
-  } else {
-    respuesta.redirect("/");
-  }
-});
-
-// Ruta para obtener los datos del Dashboard para los recepcionistas
-app.get("/DashboardRecepcion", async (peticion, respuesta) => {
-  if (peticion.session.idusuario) {
-    const PacientesEspera = await DashRecepcion(
-      peticion.session.Sucursal,
-      FechaHora().FormatoDia
-    );
-    respuesta.end(JSON.stringify(PacientesEspera));
-  } else {
-    respuesta.redirect("/");
-  }
-});
-
-
-
-
-
-
-
-const almacenamiento = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    try {
-      const rutaDestino = await CarpetaPersonal(req.body.Protocolo, req.body.Nombres);
-      cb(null, rutaDestino);
-    } catch (error) {
-      cb(error);
-    }
-  },
-  filename: (req, file, cb) => {
-    const extension = path.extname(file.originalname);
-    const nombreArchivo = `${req.body.Nombres}_${Date.now("YYYY-MM-DD")}${extension}`;
-    cb(null, nombreArchivo);
-  },
-});
-
-
-
-const subirfoto = multer({ storage: almacenamiento });
-
-async function CrearPaciente(req, res) {
-  try {
-    await new Promise((resolve, reject) => {
-      subirfoto.single('file')(req, res, function (err) {
-        if (err) {
-          console.error("Error al subir la imagen:", err);
-          return res.status(500).json({ mensaje: 'Error al subir la imagen' });
-        }
-        resolve();
-      });
-    });
-
-    // Verificar si se proporcionó una imagen
-    let rutaImagen = null;
-    if (req.file) {
-      rutaImagen = req.file.destination;
-    }
-
-    // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
-    await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
-      req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
-      req.body.Telefono, req.body.TelefonoSecundario, 
-      req.body.FechaNacimiento, rutaImagen);
-
-    if (req.file) {
-      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente con foto' });
-    } else {
-      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente (sin foto)' });
-    }
-  } catch (error) {
-    console.error("Error en la creación de paciente:", error);
-    return res.status(500).json({ mensaje: 'Ha ocurrido un error en la creación de paciente' });
-  }
-}
-
-
-
-app.post("/CrearPaciente", CrearPaciente);
-
-
-
-
-
-
-// Funcion para la creacion de carpetas de usuarios
-async function crearCarpeta(Ruta, Protocolo, id) {
-  try {
-    await fs.mkdir(Ruta, { recursive: true });
-    console.log("Carpeta creada exitosamente.");
-    CarpetaPersonal(Protocolo, id);
-  } catch (error) {
-    console.error("Error al crear la carpeta:", error);
-  }
-}
-
-// Funcion de adminisrtacion de carpetas personales (historial y perfil)
-async function CarpetaPersonal(Protocolo, id) {
-  //Verifica que existan los argumentos
-  if (!Protocolo || !id) {
-    console.log("Faltan argumentos para construir la ruta.");
-    throw new Error("Faltan argumentos para construir la ruta.");
-  }
-  //Genera la ruta de la carpeta
-  const Ruta = path.join(__dirname, "public/private/src/img", Protocolo, id);
-
-  //Verifica que el protocolo sea valido
-  if (Protocolo == "Perfil" || Protocolo == "Historial") {
-    //Verifica que la carpeta exista
-    try {
-      await fs.access(Ruta, constants.F_OK);
-      console.log("La carpeta del usuario ",id," se creó o ya existe.");
-      return Ruta;
-    } catch (error) {
-      // Si no existe, la crea
-      await crearCarpeta(Ruta, Protocolo, id);
-      return Ruta;
-    }
-  } else {
-    console.log("El protocolo no es valido.");
-    throw new Error("El protocolo no es valido.");
-  }
-}
 

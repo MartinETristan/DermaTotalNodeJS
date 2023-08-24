@@ -329,7 +329,6 @@ async function DashRecepcion(Sucursal, Fecha) {
     PacientesEspera: PacientesEsperaR,
     CitasFinalizadas: CitasFinalizadasR,
     OtrosConsultorios: OtrosConsultoriosR,
-    RutaFoto: elemento.RutaFoto,
   };
   return InfoDashRecep;
 }
@@ -359,7 +358,7 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
     // Encriptamos el usuario para generar la clave
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(usuario, salt);
-    console.log("Clave SuperAdmin:")
+
     const [resultUsuario] = await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
 
     // Utilizamos el ID insertado en la primera consulta para la segunda consulta
@@ -367,9 +366,8 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
 
     await connection.commit();
     connection.end();
-
     console.log("Nuevo paciente agregado con éxito");
-
+    return resultPaciente.insertId;
   } catch (error) {
     console.error("Ha ocurrido un error en la creacion de un nuevo paciente:", error);
     connection.rollback();

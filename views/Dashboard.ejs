@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <% //Este es el tiempo antes de que se actualice la pagina automaticamente (1hora) %>
+    <meta http-equiv="refresh" content="3600">
     <title>DashBoard - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
     <link rel="stylesheet" href="/css/Dashboard.css" />
@@ -37,9 +39,9 @@
       </div>
       <div class="Menu" id="Menu">
         <div class="UserMenu">
-          <h2><%=Nombre%></h2>
-          <b><%=TipUser%></b><br />
-          <span><%=Empresa%></span>
+          <h2 class="NombreUsuario"><%=Nombre%></h2>
+          <b class="TipoUsuario"><%=TipUser%></b><br />
+          <span class="Empresa"><%=Empresa%></span>
         </div>
         <ul>
           <li><a href="#">Perfil</a></li>
@@ -58,7 +60,7 @@
     //==================================================================================================
     switch (ClaseUsuario){ case 1: case 2: case 3:%>
     <script src="/js/dashDoc.js"></script>
-    <h1>¡<%=saludo+" "+Nombre%>!</h1>
+    <h1 class="saludo"></h1>
     <div class="contenido">
       <!-- Contenido de la Izquierda  -->
       <div class="Izquierda">
@@ -110,23 +112,27 @@
 
     <% break; case 4: %>
     <script src="/js/dashRecep.js"></script>
-    <h1>¡<%=saludo+" "+Nombre%>!</h1>
+    <h1 class="saludo"></h1>
     <a href="#" id="NuevoPaciente">NuevoPaciente</a>
     <h2>Pacientes Confirmados para hoy:</h2>
     <div class="ContenidoCitasHoyR"></div>
 
     <% break; case 5: %>
     <script src="/js/dashRecep.js"></script>
-    <h1>¡<%=saludo+" "+Nombre%>!</h1>
+    <h1 class="saludo"></h1>
     <a href="#" id="NuevoPaciente">NuevoPaciente</a>
     <h2>Pacientes Confirmados para hoy:</h2>
     <div class="ContenidoCitasHoyR"></div>
 
-    <% break; case 6: %> <% break; default: %> <% break; }%>
-
+    <% break; case 6: %> 
+    <h1 class="saludo"></h1>
+    <% break; default: %> 
+    
+    <h1 class="saludo"></h1>
+    <% break; }%>
     <!-- Copyright -->
     <div class="footer">
-      <b> <%=Copy+" "+Empresa+" "+" "+Año+" v"+Ver %> </b>
+      <!-- Aqui va el contenido del Footer -->
     </div>
   </body>
 </html>
