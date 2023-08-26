@@ -305,18 +305,25 @@ async function CrearPaciente(req, res) {
       }
 
     }
+    // Si el usuario es doctor, le pasamos el id del doctor, si no, le pasamos el id del recepcionista
+    const idDoctor = req.session.EsDoctor ? req.session.idDoctor : null;
+    const idTipoDeUsuario = req.session.EsDoctor ? null : req.session.idTipoDeUsuario;
+    
     // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
-    if(req.session.EsDoctor){
-      await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
-        req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
-        req.body.Telefono, req.body.TelefonoSecundario, 
-        req.body.FechaNacimiento, rutaImagen,req.session.idDoctor,null);
-    }else{
-      await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
-        req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
-        req.body.Telefono, req.body.TelefonoSecundario, 
-        req.body.FechaNacimiento, rutaImagen,null,req.session.idTipoDeUsuario);
-    }
+    await NuevoPaciente(
+      req.body.Nombres,
+      req.body.ApellidoP,
+      req.body.ApellidoM,
+      req.body.idSexo,
+      req.body.Correo,
+      req.body.Telefono,
+      req.body.TelefonoSecundario,
+      req.body.FechaNacimiento,
+      rutaImagen,
+      idDoctor,
+      idTipoDeUsuario
+    );
+    
 
     return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente' });
 

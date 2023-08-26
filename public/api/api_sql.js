@@ -70,12 +70,11 @@ async function UsuarioyProfesion(idUsuario) {
     // Verificacion de Doctor
     const veriDoc = `SELECT * FROM Doctor WHERE idUsuario = ?`;
     const [rowsDoc, fieldsDoc] = await connection.execute(veriDoc, [idUsuario]);
-    var EsDoctor = false;
-    if (rowsDoc.length > 0) {
-      var EsDoctor = true;
-    }
+
     if (rows.length > 0) {
       connection.end();
+      const EsDoctor = rowsDoc.length > 0;
+      const idDoctor = EsDoctor ? rowsDoc[0].idDoctor : null;
       // Visualizar array Obtenido de la tabla de Usuarios
       // console.log(rows);
       const InfoUsuario = {
@@ -83,7 +82,7 @@ async function UsuarioyProfesion(idUsuario) {
         ApellidoP: rows[0].ApellidoP,
         ApellidoM: rows[0].ApellidoM,
         EsDoctor: EsDoctor,
-        idDoctor:rowsDoc[0].idDoctor,
+        idDoctor:idDoctor,
       };
       return InfoUsuario;
     }
