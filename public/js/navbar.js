@@ -336,3 +336,9 @@ $(document).ready(function () {
 window.addEventListener("beforeunload", function (event) {
   socket.disconnect();
 });
+
+if (window.location.href.indexOf('/Dashboard') === -1) {
+  socket.disconnect();
+}
+
+
