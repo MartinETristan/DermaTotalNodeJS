@@ -30,7 +30,6 @@ function getUserRole() {
       method: "GET",
       dataType: "json",
       success: function (respuesta) {
-        console.log(respuesta);
         resolve(respuesta);
       },
       error: function (error) {
@@ -42,12 +41,11 @@ function getUserRole() {
 
 getUserRole()
   .then(resultado => {
-    console.log("Resultado de la petición:", resultado);
     // Almacenar el resultado en una variable
-    const ClaseUsuario = resultado.ClaseUsuario;
+    const Clase = resultado.ClaseUsuario;
 
     // Llamar a otra función con el resultado
-    CrearItemsNavBar(ClaseUsuario)
+    CrearItemsNavBar(Clase)
   })
 
 
@@ -210,9 +208,8 @@ async function CrearItemsNavBar(ClaseUsuario) {
   while (section.firstChild) {
     section.removeChild(section.firstChild);
   }
-  const userRole = await ClaseUsuario;
 
-  const itemsToShow = ItemsNavBar[ClaseUsuario];
+  const itemsToShow = await ItemsNavBar[ClaseUsuario];
   itemsToShow.forEach((item) => {
     const div = document.createElement("div");
     div.className = item.class;
@@ -251,8 +248,6 @@ function datosSistema() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Creacion del NavBar con base al tipo de usuario
-  CrearItemsNavBar();
   // Generacion  del saludo para todos los usuarios
   const saludo = document.querySelector(".saludo");
   if (saludo) {

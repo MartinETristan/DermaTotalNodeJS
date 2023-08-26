@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <% //Este es el tiempo antes de que se actualice la pagina automaticamente (10 min.) %>
-    <meta http-equiv="refresh" content="600">
+    <meta http-equiv="refresh" content="600" />
     <title>Crear Paciente - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
     <link rel="stylesheet" href="/css/NuevoPaciente.css" />
@@ -14,7 +14,6 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
-    <script src="/js/nuevoPaciente.js"></script>
   </head>
 
   <body>
@@ -59,51 +58,68 @@
     <!-- ================================================================================================== -->
     <!-- Contenido Creacion de Paciente -->
     <!-- ================================================================================================== -->
-    
+
     <h1>Nuevo Paciente</h1>
     <div class="NuevoUsuario">
-      <hr />
+      <hr/>
+      <form id="DatosGenerales" class="DatosGenerales" method="post" enctype="multipart/form-data">
       <div class="ZonaDeFoto">
         <div id="ElecciondeFoto">
-          <b>Tomar foto o</b>
-          <a href="#">selecciona el archivo</a>
+          <img src="/img/UserIco.webp" alt="" id="img">
         </div>
+        <input name="file" type="file" id="SubirFoto" hidden />
+        <label for="SubirFoto" class="Selecciona">Seleccionar foto</label>
       </div>
-      <div class="DatosGenerales">
         <h2>Datos Generales:</h2>
         <div class="DatosGeneralesInputs">
-          <input type="text" id="Nombre" placeholder="Nombre*" />
-          <input type="text" id="ApellidoP" placeholder="Apellido Paterno" />
-          <input type="text" id="ApellidoM" placeholder="Apellido Materno" />
-          <input type="text" id="Telefono" placeholder="Teléfono" />
-          <input type="text" id="Telefono2" placeholder="Teléfono Secundario" />
-          <input type="text" id="Correo" placeholder="Correo" />
+          <input type="text" id="Nombres" name="Nombres" placeholder="Nombre*" />
+          <input type="text" id="ApellidoP" name="ApellidoP" placeholder="Apellido Paterno" />
+          <input type="text" id="ApellidoM" name="ApellidoM" placeholder="Apellido Materno" />
+          <input type="text" id="Telefono" name="Telefono" placeholder="Teléfono" />
+          <input type="text" id="TelefonoSecundario" name="TelefonoSecundario" placeholder="Teléfono Secundario" />
+          <input type="text" id="Correo" name="Correo" placeholder="Correo" />
+          <input type="text" id="Protocolo" name="Protocolo" value="Perfil" hidden>
         </div>
         <div class="DatosDeSeleccion">
           <div class="FechaDeNacimiento">
             <b>Fecha de Nacimiento:</b>
-            <input type="date" id="FechaDeNacimiento" value="" />
+            <input type="date" id="FechaNacimiento" name="FechaNacimiento" id="FechaNacimiento" value="" />
           </div>
           <div class="Sexo">
             <b>Sexo:</b>
-            <select name="" id="Sexo">
-              <option value="1">Masculino</option>
-              <option value="2">Femenino</option>
+            <select name="idSexo" id="Sexo">
+              <!-- Esto es generaco con AJAX -->
             </select>
           </div>
         </div>
         <div>
-          <h2>Crear cita: <input type="checkbox"></h2>
+          <h2>Crear cita: <input type="checkbox" /></h2>
           <div id="NuevoPacienteyCita">
             <!-- Aquí va el contenido extra en caso de que quiera agendar una cita tambien -->
           </div>
         </div>
-        <button type="button" id="submit-button">Crear Nuevo Paciente</button>
+        <button type="submit" id="submit-button">Crear Nuevo Paciente</button>
+      </form>
+    </div>
+    
+    <div class="BGExito">
+      <div class="wrapper">
+        <h2>Paciente creado con exito</h2>
+        <svg width="100px" height="100px" viewBox="0 0 390 251" xmlns="http://www.w3.org/2000/svg" class="animate">
+        <g transform="translate(0 1)" fill="none" fill-rule="evenodd">
+        <path class="animate-wow" d="M183 45c-46.316 0-84 37.68-84 84s37.684 84 84 84 84-37.68 84-84-37.684-84-84-84zm46.83 55.986l-51.692 58.154a6.452 6.452 0 0 1-4.834 2.168 6.456 6.456 0 0 1-4.035-1.415l-32.307-25.847a6.462 6.462 0 0 1-1.008-9.081 6.46 6.46 0 0 1 9.081-1.011l27.517 22.01 47.618-53.569c2.365-2.668 6.455-2.907 9.12-.536a6.466 6.466 0 0 1 .54 9.127z" fill-rule="nonzero" fill="#4CD964"/>
+        </g>
+        </svg>
       </div>
     </div>
+
+
+
+
     <!-- Copyright -->
     <div class="footer">
-        <!-- Aqui va el contenido del Footer -->
+      <!-- Aqui va el contenido del Footer -->
     </div>
+    <script src="/js/nuevoPaciente.js"></script>
   </body>
 </html>

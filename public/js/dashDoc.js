@@ -5,7 +5,6 @@
 function PacientesEnEspera(datos) {
   const NumPacientesEspera = document.querySelector(".NumeroPacientesEspera");
   NumPacientesEspera.textContent = datos.length;
-  console.log(datos);
   const PacientesEspera = document.querySelector(".PacientesEnEspera");
   PacientesEspera.innerHTML = '';
 

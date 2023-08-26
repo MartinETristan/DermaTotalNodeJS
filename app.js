@@ -7,9 +7,9 @@ import session from "express-session";
 import http from "http";
 import { Server } from "socket.io";
 import { promises as fs, constants } from "fs";
-import cors from "cors";
 import multer from "multer";
 import sharp from "sharp";
+
 
 // Importacion de API's
 import {
@@ -19,6 +19,7 @@ import {
   DashRecepcion,
   Hoy_Espera,
   NuevoPaciente,
+  InfoRegistros,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -28,8 +29,6 @@ import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 //Arreglo de __dirname y __filename
 import path from "path";
 import { fileURLToPath } from "url";
-import { log } from "console";
-import e from "express";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -73,6 +72,10 @@ app.use(express.static("public"));
 //Configuracion Express-session-socket.io
 io.engine.use(sessionMiddleware);
 
+// //Aumentamos el limite del servidor
+// app.use(express.json({limit: '50mb'}));
+// app.use(express.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
+
 //==================================================================================================
 // WebSockets
 //==================================================================================================
@@ -105,6 +108,7 @@ io.on("connection", (socket) => {
   socket.on("CambioEstadoPaciente", (data) => {
     switch (data.idStatus) {
       case 1:
+        //Registrar hora de llegada con base a la hora del recepcionista
         if (socket.request.session.Sucursal == 1) {
           Hoy_Espera(data.Cita, data.idStatus, FechaHora().HoraS1);
         } else {
@@ -166,6 +170,7 @@ app.post("/login", async (req, res) => {
       const InfoUsuario = await UsuarioyProfesion(resultado.idUsuario);
       req.session.Nombres = InfoUsuario.Nombre;
       req.session.EsDoctor = InfoUsuario.EsDoctor;
+      req.session.idDoctor = InfoUsuario.idDoctor;
       // console.log(InfoUsuario);
       res.send("ReadyUser");
     } else {
@@ -196,6 +201,7 @@ app.get("/InfoSesion", function (peticion, respuesta) {
   respuesta.end(JSON.stringify(DatosSistema));
 });
 
+// Ruta para obtener los datos de la Compañia/CopyRight
 app.get("/DatosSistema", function (peticion, respuesta) {
   const DatosSistema = {
     Copy: Copyright().Copyright,
@@ -206,6 +212,11 @@ app.get("/DatosSistema", function (peticion, respuesta) {
   respuesta.end(JSON.stringify(DatosSistema));
 });
 
+// Ruta para obtener las opciones de cualqueir tipo de registro 
+app.get("/InfoRegistros", async (req, res) => {
+  const resultado = await InfoRegistros();
+  res.end(JSON.stringify(resultado));
+});
 
 
 // Ruta para obtener los datos del Dashboard para los Doctores
@@ -253,7 +264,9 @@ app.get("/DashboardRecepcion", async (peticion, respuesta) => {
 const almacenamiento = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
+      //Creamos la carpeta del paciente
       const rutaDestino = await CarpetaPersonal(req.body.Protocolo, req.body.Nombres);
+      // Y utilizamos la ruta donde se creó la carpeta
       cb(null, rutaDestino);
     } catch (error) {
       cb(error);
@@ -266,7 +279,7 @@ const almacenamiento = multer.diskStorage({
   },
 });
 
-
+// Aqui está la configuracion del Resaizer (para los diferentes tamaños)
 const Resizer = (Archivo,Ruta, porcentaje) => {
   return sharp(Archivo)
   .resize(porcentaje)
@@ -277,23 +290,11 @@ const Resizer = (Archivo,Ruta, porcentaje) => {
   });
 };
 
-
-
 const subirfoto = multer({ storage: almacenamiento });
 
 // Funcion de apoyo para la creacion de pacientes
 async function CrearPaciente(req, res) {
-  try {
-    await new Promise((resolve, reject) => {
-      subirfoto.single('file')(req, res, function (err) {
-        if (err) {
-          console.error("Error al subir la imagen:", err);
-          return res.status(500).json({ mensaje: 'Error al subir la imagen' });
-        }
-        resolve();
-      });
-    });
-
+  try {    
     // Verificar si se proporcionó una imagen
     let rutaImagen = null;
     if (req.file) {
@@ -302,19 +303,23 @@ async function CrearPaciente(req, res) {
       if(req.body.Protocolo == "Perfil"){
         Resizer(req.file.path,req.file.destination+`/Pequeño-${req.file.filename}`, 50);
       }
-    }
 
+    }
     // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
-    await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
-      req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
-      req.body.Telefono, req.body.TelefonoSecundario, 
-      req.body.FechaNacimiento, rutaImagen);
-
-    if (req.file) {
-      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente con foto' });
-    } else {
-      return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente (sin foto)' });
+    if(req.session.EsDoctor){
+      await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
+        req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
+        req.body.Telefono, req.body.TelefonoSecundario, 
+        req.body.FechaNacimiento, rutaImagen,req.session.idDoctor,null);
+    }else{
+      await NuevoPaciente(req.body.Nombres, req.body.ApellidoP, 
+        req.body.ApellidoM, req.body.idSexo, req.body.Correo, 
+        req.body.Telefono, req.body.TelefonoSecundario, 
+        req.body.FechaNacimiento, rutaImagen,null,req.session.idTipoDeUsuario);
     }
+
+    return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente' });
+
   } catch (error) {
     console.error("Error en la creación de paciente:", error);
     return res.status(500).json({ mensaje: 'Ha ocurrido un error en la creación de paciente' });
@@ -323,7 +328,7 @@ async function CrearPaciente(req, res) {
 
 
 // Ruta para la creacion de pacientes
-app.post("/CrearPaciente", CrearPaciente);
+app.post("/CrearPaciente", subirfoto.single('file'), CrearPaciente);
 
 
 
@@ -332,7 +337,6 @@ app.post("/CrearPaciente", CrearPaciente);
 async function crearCarpeta(Ruta, Protocolo, id) {
   try {
     await fs.mkdir(Ruta, { recursive: true });
-    console.log("Carpeta creada exitosamente.");
     CarpetaPersonal(Protocolo, id);
   } catch (error) {
     console.error("Error al crear la carpeta:", error);
@@ -344,7 +348,7 @@ async function CarpetaPersonal(Protocolo, id) {
   //Verifica que existan los argumentos
   if (!Protocolo || !id) {
     console.log("Faltan argumentos para construir la ruta.");
-    throw new Error("Faltan argumentos para construir la ruta.");
+    throw new Error("Faltan argumentos para construir la ruta.",' Protocolo: ',Protocolo, ' id: ',id);
   }
   //Genera la ruta de la carpeta
   const Ruta = path.join(__dirname, "public/private/src/img", Protocolo, id.toString());

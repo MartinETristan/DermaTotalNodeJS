@@ -1,102 +1,216 @@
-h1{
+h1 {
   text-align: center;
 }
 
 .ZonaDeFoto {
-    float: left;
-    width: 16em;
-    padding: 15px;
-    border: 3px  rgba(0,0,0,0.06);
-    background: rgba(0,0,0,0.06);
-    border-radius: 10px;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  float: left;
+  width: 16em;
+  padding: 15px;
+  border: 3px rgba(0, 0, 0, 0.015);
+  background: rgba(0, 0, 0, 0.015);
+  border-radius: 10px;
+  width: 23%;
+}
+
+#ElecciondeFoto>* {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+#ElecciondeFoto {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  width: 210px;
+  height: 210px;
+  border: 2px solid #004368;
+  -webkit-border-radius: 5px;
+  border-radius: 15px;
+  text-align: center;
+  font: 21pt bold arial;
+  color: #fff;
+}
+
+
+
+#ElecciondeFoto img {
+  object-fit: cover;
+  border-radius: 15px;
+  width: 200px;
+  height: 200px;
+}
+
+.ZonaDeFoto label {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 14px;
+  border: 0;
+  outline: none;
+  background-color: #0280c4;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+
+
+
+
+.NuevoUsuario>* {
+  margin: 10px;
+}
+
+.NuevoUsuario {
+  width: 70%;
+  display: block;
+  margin: auto;
+  position: relative;
+  align-items: center;
+}
+
+input {
+  border-radius: 5px;
+  border: 1px solid #e3e3e3;
+  padding: 10px;
+  margin: 5px;
+}
+
+.TipoDeUsuario {
+  display: flex;
+  align-items: center;
+}
+
+.DatosGenerales {
+  margin-top: 15px;
+  display: block;
+}
+
+.DatosGeneralesInputs {
+  position: relative;
+  top: -10px;
+}
+
+.DatosDeSeleccion {
+  display: flex;
+  align-items: center;
+}
+
+select {
+  font-size: small;
+  border-radius: 5px;
+  border: 1px solid #e3e3e3;
+  margin: 10px;
+  padding: 3px;
+}
+
+#submit-button {
+  border-radius: 5px;
+  border: 1px solid #249DD9;
+  padding: 10px;
+  background-color: #249DD9;
+  color: white;
+  font-size: medium;
+  margin: 15px;
+  float: right;
+}
+
+#submit-button:hover {
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #004368;
+  background-color: #004368;
+}
+
+
+
+.BGExito{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.BGExito.active > * {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #4CD964;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-name: wow;
+  animation-delay: 1s;
+  transform-origin: center;
+}
+
+.BGExito.active{
+  visibility: visible;
+  opacity: 1;
+}
+
+
+@keyframes wow {
+
+  from,
+  20%,
+  40%,
+  60%,
+  80%,
+  to {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
-  #ElecciondeFoto {
-    border: 2px dashed #fff;
-    -webkit-border-radius: 5px;
-    border-radius: 15px;
-    padding: 50px;
-    text-align: center;
-    font: 21pt bold arial;
-    color: #fff;
+
+  0% {
+    opacity: 0;
+    transform: scale3d(0.3, 0.3, 0.3);
   }
 
-  #ElecciondeFoto a {
-    color: #004368;
+  20% {
+    transform: scale3d(1.1, 1.1, 1.1);
   }
 
-  .NuevoUsuario>*{
-    margin: 10px;
+  40% {
+    transform: scale3d(0.9, 0.9, 0.9);
   }
 
-  .NuevoUsuario{
-    width: 70%;
-    display: block;
-    margin: auto;
-    position: relative;
-    align-items: center;
+  60% {
+    opacity: 1;
+    transform: scale3d(1.03, 1.03, 1.03);
   }
 
-  input{
-    border-radius: 5px;
-    border: 1px solid #e3e3e3;
-    padding: 10px;
-    margin: 5px;
+  80% {
+    transform: scale3d(0.97, 0.97, 0.97);
   }
 
-.TipoDeUsuario{
-    display: flex;
-    align-items: center;
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
 }
 
-.DatosGenerales{
-    margin-top: 15px;
-    display: block;
-}
-
-.DatosGeneralesInputs{
-    position: relative;
-    top: -10px;
-}
-
-.DatosDeSeleccion{
-    display: flex;
-    align-items: center;
-}
-
-select{
-    font-size: small;
-    border-radius: 5px;
-    border: 1px solid #e3e3e3;
-    margin: 10px;
-    padding: 3px;
-}
-
-button{
-    border-radius: 5px;
-    border: 1px solid #249DD9;
-    padding: 10px;
-    background-color: #249DD9;
-    color: white;
-    font-size: medium;
-    margin: 15px;
-    float: right;
-}
-button:hover{
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
-    border: 1px solid #004368;
-    background-color: #004368;
-}
 
 
 /* Estilos del Footer Sticky */
 .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #29abe2;
-    color: white;
-    padding: 15px;
-    text-align: center;
-  }
-  
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #29abe2;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}

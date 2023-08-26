@@ -83,6 +83,7 @@ async function UsuarioyProfesion(idUsuario) {
         ApellidoP: rows[0].ApellidoP,
         ApellidoM: rows[0].ApellidoM,
         EsDoctor: EsDoctor,
+        idDoctor:rowsDoc[0].idDoctor,
       };
       return InfoUsuario;
     }
@@ -337,11 +338,11 @@ async function DashRecepcion(Sucursal, Fecha) {
 // Creaciones  / Assets
 //==================================================================================================
 
-async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto) {
+async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto,idDoctor,idRecepcionista) {
   try {
     const connection = await mysql.createConnection(db);
     await connection.beginTransaction();
-
+    // Almacenamos los Querys en variables para ejecutarlas despues
     const queryUsuario = `INSERT INTO Usuarios
       (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta, RutaFoto)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)`;
@@ -350,23 +351,28 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
       (idUsuario, Usuario, Contraseña)
       VALUES(LAST_INSERT_ID(), ?, ?)`;
 
+    const queryRegistro = `INSERT INTO Alta_Paciente 
+      (idDoctor,idRecepcionista,idPaciente)
+      VALUES(?, ?, LAST_INSERT_ID())`;
+
     //Obtenemos la fecha de hoy
     const fechaActual = new Date();
     // Y generamos el nombre de usuario con base a su nombre, el dia de registro y un numero aleatorio de 2 digitos
-    const usuario = Nombres.substring(0, 3)+fechaActual.getDate()+(Math.floor(Math.random() * 90) + 10);
-    console.log("El usuario/clave normal es: ",usuario);
+    const usuario = Nombres.substring(0, 3) + fechaActual.getDate() + (Math.floor(Math.random() * 90) + 10);
     // Encriptamos el usuario para generar la clave
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(usuario, salt);
 
+    // Ejecutamos el registro del paciente
     const [resultUsuario] = await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
 
     // Utilizamos el ID insertado en la primera consulta para la segunda consulta
     const [resultPaciente] = await connection.execute(queryPaciente, [usuario, password]);
 
+    // Y finalmente registramos quien hizo el registro del paciente
+    const [resultRegistro] = await connection.execute(queryRegistro, [idDoctor, idRecepcionista]);
     await connection.commit();
     connection.end();
-    console.log("Nuevo paciente agregado con éxito");
     return resultPaciente.insertId;
   } catch (error) {
     console.error("Ha ocurrido un error en la creacion de un nuevo paciente:", error);
@@ -375,6 +381,55 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
     return "Ha ocurrido un error.";
   }
 }
+
+
+// Funcion para obtener la informacion de los registros
+async function InfoRegistros() {
+  try {
+    const connection = await mysql.createConnection(db);
+    // Pedimos los Doctores Existentes
+    const Doctores = `SELECT d.idDoctor, u.Nombres, u.RutaFoto  FROM Doctor d
+    INNER JOIN Usuarios u ON d.idUsuario  = u.idUsuario `;
+    const [docs,a] = await connection.execute(Doctores);
+
+    //Pedimos el Sexo Disponible
+    const Asociados = `SELECT a.idAsociado,u.Nombres, u.RutaFoto  FROM Asociado a 
+    INNER JOIN Usuarios u ON a.idUsuario = u.idUsuario`;
+    const [Asoc,b] = await connection.execute(Asociados);
+
+    //Pedimos el Sexo Disponible
+    const Sexo = `SELECT * FROM Sexo s`;
+    const [Sex,c] = await connection.execute(Sexo);
+
+    //Pedimos las Sucursales Disponibles
+    const Sucursales = `SELECT idSucursal,Sucursal  FROM Sucursales s`;
+    const [suc,d] = await connection.execute(Sucursales);
+
+    //Pedimos los procedimientos Dispobibles
+    const Procedimiento = `SELECT idProcedimiento,Procedimiento FROM Procedimiento p`;
+    const [Proced,e] = await connection.execute(Procedimiento);
+
+    //Pedimos los procedimientos Dispobibles
+    const EstadoC = `SELECT * FROM Estado_Citas ec `;
+    const [EstC,f] = await connection.execute(EstadoC);
+
+    connection.end();
+    const InfoparaRegistros = {
+      Doctores: docs,
+      Asociados: Asoc,
+      Sucursales: suc,
+      Sexo:Sex,
+      Procedimiento:Proced,
+      EstadoCitas:EstC
+    };
+    return InfoparaRegistros;
+  } catch (error) {
+    console.error("Ha ocurrido un error en la consulta de registros:", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
 
 
 async function NuevaCita(
@@ -448,4 +503,5 @@ export {
   DashRecepcion,
   Hoy_Espera,
   NuevoPaciente,
+  InfoRegistros,
 };
