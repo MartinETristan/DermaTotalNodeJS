@@ -2,6 +2,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { config } from "dotenv";
 config();
+
 //==================================================================================================
 // Configuración de la conexión a la base de datos
 //==================================================================================================
@@ -37,6 +38,9 @@ async function VerificarUsuario(usuario, contrasena) {
         const hashedPassword = rows[0].Contraseña;
         // Compara la contraseña encrpitada
         if (bcrypt.compareSync(contrasena, hashedPassword)) {
+          // Registra el inicio de sesion
+          const registro = "INSERT INTO `Login/Out` (idUsuario,Login) VALUES (?, NOW())";
+          await connection.execute(registro, [rows[0].idUsuario]);
           connection.end();
           const InfoSession = {
             verificacion: "ReadyUser",
@@ -344,7 +348,7 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
     // Almacenamos los Querys en variables para ejecutarlas despues
     const queryUsuario = `INSERT INTO Usuarios
       (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta, RutaFoto)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)`;
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`;
 
     const queryPaciente = `INSERT INTO Paciente
       (idUsuario, Usuario, Contraseña)
@@ -363,13 +367,14 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
     const password = await bcrypt.hash(usuario, salt);
 
     // Ejecutamos el registro del paciente
-    const [resultUsuario] = await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
+    await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
 
     // Utilizamos el ID insertado en la primera consulta para la segunda consulta
     const [resultPaciente] = await connection.execute(queryPaciente, [usuario, password]);
 
     // Y finalmente registramos quien hizo el registro del paciente
-    const [resultRegistro] = await connection.execute(queryRegistro, [idDoctor, idRecepcionista]);
+    await connection.execute(queryRegistro, [idDoctor, idRecepcionista]);
+
     await connection.commit();
     connection.end();
     return resultPaciente.insertId;
@@ -428,7 +433,18 @@ async function InfoRegistros() {
   }
 }
 
+async function logout(idUsuario){
+  try{
+    const connection = await mysql.createConnection(db);
+    const registro = "UPDATE `Login/Out` SET Logout = NOW() WHERE Login  = (SELECT MAX(Login) FROM `Login/Out` WHERE Logout IS NULL);";
+    await connection.execute(registro, [idUsuario]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error realizando el registro de logout", error);
+    return "Ha ocurrido un error.";
+  }
 
+}
 
 
 async function NuevaCita(
@@ -503,4 +519,5 @@ export {
   Hoy_Espera,
   NuevoPaciente,
   InfoRegistros,
+  logout,
 };

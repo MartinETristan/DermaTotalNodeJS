@@ -20,6 +20,7 @@ import {
   Hoy_Espera,
   NuevoPaciente,
   InfoRegistros,
+  logout,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -181,6 +182,7 @@ app.post("/login", async (req, res) => {
 
 // Ruta para cerrar sesión
 app.get("/logout", function (peticion, respuesta) {
+  logout(peticion.session.idusuario);
   peticion.session.destroy(function (error) {
     if (error) {
       console.log(error);
