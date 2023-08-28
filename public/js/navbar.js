@@ -39,16 +39,13 @@ function getUserRole() {
   });
 }
 
-getUserRole()
-  .then(resultado => {
-    // Almacenar el resultado en una variable
-    const Clase = resultado.ClaseUsuario;
+getUserRole().then((resultado) => {
+  // Almacenar el resultado en una variable
+  const Clase = resultado.ClaseUsuario;
 
-    // Llamar a otra función con el resultado
-    CrearItemsNavBar(Clase)
-  })
-
-
+  // Llamar a otra función con el resultado
+  CrearItemsNavBar(Clase);
+});
 
 // Estos son los apartados del NavBar que se mostraran con base al tipo de usuario
 const ItemsNavBar = {
@@ -200,8 +197,6 @@ const ItemsNavBar = {
   ],
 };
 
-
-
 // Creacion del NavBar con base al tipo de usuario
 async function CrearItemsNavBar(ClaseUsuario) {
   const section = document.querySelector(".nav-bar");
@@ -231,48 +226,87 @@ async function CrearItemsNavBar(ClaseUsuario) {
   });
 }
 
-function datosSistema() {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-      url: "/DatosSistema",
-      method: "GET",
-      dataType: "json",
-      success: function (respuesta) {
-        resolve(respuesta.Copy + " " + respuesta.Empresa + " " + respuesta.Año + " " + respuesta.Ver);
-      },
-      error: function (error) {
-        reject(error);
-      },
-    });
-  });
-}
+// ==================================================================================================
+// Una vez que se cree con exito el documeto se ejecutara el codigo
+// ==================================================================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Generacion  del saludo para todos los usuarios
-  const saludo = document.querySelector(".saludo");
-  if (saludo) {
-    saludo.textContent = "Hola";
-  }
-  // Generacion del Footer para todos los usuarios
-  datosSistema()
-    .then((resultado) => {
+$(document).ready(function () {
+  // Crear el contenido HTML que se insertará en el div DropMenu
+  var contenidoHTML = `
+  <div class="Perfil" id="Perfil">
+    <img src="/img/UserIco.webp" alt="/img/UserIco.webp" />
+  </div>
+  <div class="Menu" id="Menu">
+    <div class="UserMenu">
+      <h2 id="Nombre">Cargando...</h2>
+      <b id="TipUser">Cargando...</b><br />
+      <span id="Empresa">Cargando...</span>
+    </div>
+    <ul>
+      <li><a href="#">Perfil</a></li>
+      <li><a href="#">Tema</a></li>
+      <li><a href="/logout">Cerrar Sesión</a></li>
+    </ul>
+  </div>
+`;
+
+  // Obtener el elemento div con clase DropMenu
+  var dropMenu = document.querySelector(".DropMenu");
+
+  // Insertar el contenido HTML en el div DropMenu
+  dropMenu.innerHTML = contenidoHTML;
+
+
+// ==================================================================================================
+// Realizamos peticiones para llenar en contenido del Sitio Web
+// ==================================================================================================
+  // Pedimos los datos del sistema
+  fetch("/DatosSistema")
+    .then((response) => response.json())
+    .then((dataSistema) => {
+      // Y pedimos los datos de la sesion
+      fetch("/InfoSesion")
+        .then((response) => response.json())
+        .then((dataSession) => {
+          // Generacion  del saludo para todos los usuarios
+          const saludo = document.querySelector(".saludo");
+          if (saludo) {
+            saludo.textContent = "¡"+dataSistema.Saludo+" "+dataSession.Nombre+"!";
+          }
+          // Actualizar el h2 con el Nombre del Usuario
+          var NombreH2 = document.getElementById("Nombre");
+          NombreH2.textContent = dataSession.Nombre;
+          // Actualizar el h2 con el Nombre del Usuario
+          var TipUserB = document.getElementById("TipUser");
+          TipUserB.textContent = dataSession.Nombre;
+        })
+        .catch((error) => {
+          console.error("Error en la petición Ajax en /InfoSesion:", error);
+        });
+
+      // Actualizar el contenido del span con el Nombre de la Empresa
+      var empresaSpan = document.getElementById("Empresa");
+      empresaSpan.textContent = dataSistema.Empresa;
+      //Y creamos el Footer
       const Footer = document.querySelector(".footer");
       if (Footer) {
         const b = document.createElement("b");
-        const text = document.createTextNode(resultado);
+        const text = document.createTextNode(
+          dataSistema.Copy + " " + dataSistema.Empresa + " " + dataSistema.Año + " " + dataSistema.Ver
+        );
         b.appendChild(text);
         Footer.appendChild(b);
       }
     })
     .catch((error) => {
-      console.error("Error:", error); // Manejar el error en caso de que ocurra
+      console.error("Error en la petición Ajax en /DatosSistema:", error);
     });
-});
 
 
 
-// Una vez que el documento se cree con exito se ejecutara el codigo
-$(document).ready(function () {
+  // ==================================================================================================
+  // Redirecciones y Funciones del NavBar
+  // ==================================================================================================
   // Al darle click a la foto de perfil del usuario se despliega el menu
   $("#Perfil").click(function () {
     const togglemenu = document.querySelector("#Menu");
@@ -305,8 +339,6 @@ $(document).ready(function () {
     window.location.href = "/Cortes";
   });
 
-
-  
   // ==================================================================================================
   // Sesiones del Socket.IO
   // ==================================================================================================
@@ -337,8 +369,6 @@ window.addEventListener("beforeunload", function (event) {
   socket.disconnect();
 });
 
-if (window.location.href.indexOf('/Dashboard') === -1) {
+if (window.location.href.indexOf("/Dashboard") === -1) {
   socket.disconnect();
 }
-
-

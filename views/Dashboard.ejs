@@ -34,25 +34,11 @@
       <a href="/Dashboard"><img src="/img/LogoB.svg" alt="" class="Logo" /></a>
     </div>
     <div class="DropMenu">
-      <div class="Perfil" id="Perfil">
-        <img src="/img/UserIco.webp" alt="/img/UserIco.webp" />
-      </div>
-      <div class="Menu" id="Menu">
-        <div class="UserMenu">
-          <h2 class="NombreUsuario"><%=Nombre%></h2>
-          <b class="TipoUsuario"><%=TipUser%></b><br />
-          <span class="Empresa"><%=Empresa%></span>
-        </div>
-        <ul>
-          <li><a href="#">Perfil</a></li>
-          <li><a href="#">Tema</a></li>
-          <li><a href="#" id="CerrarSesion">Cerrar Sesión</a></li>
-        </ul>
-      </div>
+      <% //Aqui se genera el DropMenu para todos los usuarios %>
     </div>
 
     <section class="nav-bar">
-      <!-- Aqui se generan los elementos del nav dependiendo del tipo de usuario -->
+      <% //Aqui se generan los elementos del nav dependiendo del tipo de usuario %>
     </section>
     <%
     //==================================================================================================
@@ -60,50 +46,48 @@
     //==================================================================================================
     switch (ClaseUsuario){ case 1: case 2: case 3:%>
     <script src="/js/dashDoc.js"></script>
-    <h1 class="saludo"></h1>
+    <h1 class="saludo">Cargando Saludo...</h1>
     <div class="contenido">
-      <!-- Contenido de la Izquierda  -->
+      <% //Contenido de la Izquierda%>
       <div class="Izquierda">
         <h2 class="Titulo">
           Registro de Entrada (<b class="NumeroPacientesEspera"></b>):
         </h2>
-       
-        <!-- Citas en Turno -->
+        <% //Citas en Turno%>
         <div class="Entrada">
           <div class="PacientesEnEspera">
-            <!-- Aqui van los usuarios en la sala de espera -->
+            <% //Aqui van los usuarios en la sala de espera%>
           </div>
         </div>
-
-        <!-- Otros Consultorios  -->
+        <% // Otros Consultorios%>
         <div class="OC">
           <h2>Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):</h2>
           <div class="Otros">
             <div class="ContenidoOtrosConsultorios">
-              <!-- Aqui se genera el contenido de la tabla de otros consultorios -->
+              <% // Aqui se genera el contenido de la tabla de otros consultorios%>
             </div>
           </div>
         </div>
       </div>
-      <!-- Contenido de la derecha -->
+      <% // Contenido de la derecha%>
       <div class="Derecha">
-        <!-- Citas Confirmadas para hoy -->
+        <% // Citas Confirmadas para hoy%>
         <h2 class="Titulo">
           Citas para hoy (<b class="NumeroPacientesCitasHoy"></b>):
         </h2>
         <div class="CCPH">
           <div class="Hoy">
             <div class="PacientesHoy">
-              <!-- Aqui se genera el contenido de la tabla de citas para hoy -->
+              <% // Aqui se genera el contenido de la tabla de citas para hoy %>
             </div>
           </div>
         </div>
-        <!-- Citas Finalizadas -->
+        <% // Citas Finalizadas%>
         <div class="CF">
           <h2>Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):</h2>
           <div class="Finalizadas">
             <div class="ContenidoCitasFinalizadas">
-              <!-- Aqui se genera el contenido de la tabla CitasFinalizadas -->
+              <% // Aqui se genera el contenido de la tabla CitasFinalizadas%>
             </div>
           </div>
         </div>
@@ -112,27 +96,27 @@
 
     <% break; case 4: %>
     <script src="/js/dashRecep.js"></script>
-    <h1 class="saludo"></h1>
+    <h1 class="saludo">Cargando Saludo...</h1>
     <a href="#" id="NuevoPaciente">NuevoPaciente</a>
     <h2>Pacientes Confirmados para hoy:</h2>
     <div class="ContenidoCitasHoyR"></div>
 
     <% break; case 5: %>
     <script src="/js/dashRecep.js"></script>
-    <h1 class="saludo"></h1>
+    <h1 class="saludo">Cargando Saludo...</h1>
     <a href="#" id="NuevoPaciente">NuevoPaciente</a>
     <h2>Pacientes Confirmados para hoy:</h2>
     <div class="ContenidoCitasHoyR"></div>
 
     <% break; case 6: %> 
-    <h1 class="saludo"></h1>
+    <h1 class="saludo">Cargando Saludo...</h1>
     <% break; default: %> 
     
-    <h1 class="saludo"></h1>
+    <h1 class="saludo">Cargando Saludo...</h1>
     <% break; }%>
-    <!-- Copyright -->
+    <% // Copyright%>
     <div class="footer">
-      <!-- Aqui va el contenido del Footer -->
+      <% // Aqui va el contenido del Footer%>
     </div>
   </body>
 </html>

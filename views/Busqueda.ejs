@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <% //Este es el tiempo antes de que se actualice la pagina automaticamente (10 min) %>
-    <meta http-equiv="refresh" content="600">
+    <meta http-equiv="refresh" content="600" />
     <title>Busqueda - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
     <link rel="stylesheet" href="/css/Busqueda.css" />
@@ -35,46 +35,51 @@
       <a href="/Dashboard"><img src="/img/LogoB.svg" alt="" class="Logo" /></a>
     </div>
     <div class="DropMenu">
-      <div class="Perfil" id="Perfil">
-        <img src="/img/UserIco.webp" alt="/img/UserIco.webp" />
-      </div>
-      <div class="Menu" id="Menu">
-        <div class="UserMenu">
-          <h2><%=Nombre%></h2>
-          <b><%=TipUser%></b><br />
-          <span><%=Empresa%></span>
-        </div>
-        <ul>
-          <li><a href="#">Perfil</a></li>
-          <li><a href="#">Tema</a></li>
-          <li><a href="/logout">Cerrar Sesión</a></li>
-        </ul>
-      </div>
+      <% //Aqui se genera el DropMenu para todos los usuarios %>
     </div>
 
     <section class="nav-bar">
       <!-- Aqui se generan los elementos del nav dependiendo del tipo de usuario -->
     </section>
 
-    <!-- ================================================================================================== -->
-    <!-- Contenido Busqueda de pacientes -->
-    <!-- ================================================================================================== -->
-
+    <% 
+    //==================================================================================================
+    // Contenido Busqueda de pacientes --> 
+    //==================================================================================================
+    %>
     <h1>Busqueda Pacientes:</h1>
     <div class="input-area">
-      <input name="BNombre" id="BNombre" type="text" placeholder="Nombre" class="f-inp" />
-      <input name="BApellido" id="BApellido" type="text" placeholder="Apellido" class="f-inp" />
-      <input name="BTelefono" id="BTelefono" type="text" placeholder="Correo / Teléfono" class="f-inp" />
+      <input
+        name="BNombre"
+        id="BNombre"
+        type="text"
+        placeholder="Nombre"
+        class="f-inp"
+      />
+      <input
+        name="BApellido"
+        id="BApellido"
+        type="text"
+        placeholder="Apellido"
+        class="f-inp"
+      />
+      <input
+        name="BTelefono"
+        id="BTelefono"
+        type="text"
+        placeholder="Correo / Teléfono"
+        class="f-inp"
+      />
       <button type="button" id="submit-button">Buscar</button>
     </div>
     <div id="ResultadosBusqueda">
-        <!-- Aqui van los resultados de la busqueda en la base de datos -->
-    </div><br><br>
-  
+      <% // Aqui van los resultados de la busqueda en la base de datos %>
+    </div>
+    <br /><br />
 
-    <!-- Copyright -->
+    <% // Copyright%>
     <div class="footer">
-      <!-- Aqui va el contenido del Footer -->
+      <% // Aqui va el contenido del Footer%>
     </div>
   </body>
 </html>

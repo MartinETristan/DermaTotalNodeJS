@@ -194,11 +194,18 @@ app.get("/logout", function (peticion, respuesta) {
 
 app.get("/InfoSesion", function (peticion, respuesta) {
   const DatosSistema = {
+    // ID del usuario en la TABLA USUARIOS
+    idUsuario: peticion.session.idusuario,
+    // Clase de usuario en Numero
     ClaseUsuario: peticion.session.idClaseUsuario,
-    Copy: Copyright().Copyright,
-    Empresa: Copyright().NombreEmpresa,
-    Año: FechaHora().Año,
-    Ver: Copyright().Version,
+    // ID de la TABLA de donde es el usuario
+    ID: peticion.session.idTipoDeUsuario,
+    // Estilo de la web
+    EstiloWeb: peticion.session.estiloweb,
+    // Nombre del usuario
+    Nombre: peticion.session.Nombres,
+    // Rol del usuario en TEXTO
+    TipUser: peticion.session.rol,
   };
   respuesta.end(JSON.stringify(DatosSistema));
 });
@@ -206,6 +213,7 @@ app.get("/InfoSesion", function (peticion, respuesta) {
 // Ruta para obtener los datos de la Compañia/CopyRight
 app.get("/DatosSistema", function (peticion, respuesta) {
   const DatosSistema = {
+    Saludo: Saludo(),
     Copy: Copyright().Copyright,
     Empresa: Copyright().NombreEmpresa,
     Año: FechaHora().Año,
@@ -411,25 +419,8 @@ app.get("/Dashboard", function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     // Pasamos los datos de la sesión
     respuesta.render("Dashboard.ejs", {
-      // ID del usuario en la TABLA USUARIOS
-      idUsuario: peticion.session.idusuario,
       // Clase de usuario en Numero
       ClaseUsuario: peticion.session.idClaseUsuario,
-      // ID de la TABLA de donde es el usuario
-      ID: peticion.session.idTipoDeUsuario,
-      // Estilo de la web
-      EstiloWeb: peticion.session.estiloweb,
-      // Nombre del usuario
-      Nombre: peticion.session.Nombres,
-      // Rol del usuario en TEXTO
-      TipUser: peticion.session.rol,
-      // InfoDelSistema
-      Empresa: Copyright().NombreEmpresa,
-      saludo: Saludo(),
-      Copy: Copyright().Copyright,
-      Año: FechaHora().Año,
-      Ver: Copyright().Version,
-      Fecha: FechaHora().FormatoDia,
     });
   } else {
     respuesta.redirect("/");
@@ -441,21 +432,6 @@ app.get("/Busqueda", function (peticion, respuesta) {
     respuesta.render("Busqueda.ejs", {
       // Clase de usuario en Numero
       ClaseUsuario: peticion.session.idClaseUsuario,
-      // ID de la TABLA de donde es el usuario
-      ID: peticion.session.idTipoDeUsuario,
-      // Estilo de la web
-      EstiloWeb: peticion.session.estiloweb,
-      // Nombre del usuario
-      Nombre: peticion.session.Nombres,
-      // Rol del usuario en TEXTO
-      TipUser: peticion.session.rol,
-      // InfoDelSistema
-      Empresa: Copyright().NombreEmpresa,
-      saludo: Saludo(),
-      Copy: Copyright().Copyright,
-      Año: FechaHora().Año,
-      Ver: Copyright().Version,
-      Fecha: FechaHora().FormatoDia,
     });
   } else {
     respuesta.redirect("/");
@@ -464,27 +440,7 @@ app.get("/Busqueda", function (peticion, respuesta) {
 
 app.get("/NuevoPaciente", function (peticion, respuesta) {
   if (peticion.session.idusuario && peticion.session.idClaseUsuario <= 5) {
-    respuesta.render("NuevoPaciente.ejs", {
-      // ID del usuario en la TABLA USUARIOS
-      idUsuario: peticion.session.idusuario,
-      // Clase de usuario en Numero
-      ClaseUsuario: peticion.session.idClaseUsuario,
-      // ID de la TABLA de donde es el usuario
-      ID: peticion.session.idTipoDeUsuario,
-      // Estilo de la web
-      EstiloWeb: peticion.session.estiloweb,
-      // Nombre del usuario
-      Nombre: peticion.session.Nombres,
-      // Rol del usuario en TEXTO
-      TipUser: peticion.session.rol,
-      // InfoDelSistema
-      Empresa: Copyright().NombreEmpresa,
-      saludo: Saludo(),
-      Copy: Copyright().Copyright,
-      Año: FechaHora().Año,
-      Ver: Copyright().Version,
-      Fecha: FechaHora().FormatoDia,
-    });
+    respuesta.render("NuevoPaciente.ejs");
   } else {
     respuesta.redirect("/");
   }
