@@ -210,11 +210,11 @@ function OtrosConsultorios(datos) {
   if (datos.length != 0) {
     for (var i = 0; i < datos.length; i++) {
       var item = document.createElement("li");
-      item.textContent =
+      item.textContent ="Paciente: "+
         datos[i].NombresPacientes +
-        " " +
-        datos[i].ApellidosPacientes +
-        " " +
+        " | Doctor: " +
+        datos[i].NombreDoctor+
+        " | HoraCita: " +
         datos[i].HoraCita;
       OtrosConsultorios.appendChild(item);
     }

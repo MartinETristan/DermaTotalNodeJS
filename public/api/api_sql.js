@@ -14,6 +14,8 @@ const db = {
   port: process.env.MYSQLDB_PORT_DOCKER,
 };
 
+
+
 //==================================================================================================
 // Función para verificar el usuario y contraseña en varias tablas
 //==================================================================================================
@@ -189,16 +191,19 @@ async function DashDoc(idDoctor, Fecha) {
     const consultaOtrosConsultorios = `SELECT p.idPaciente,
     CONCAT(up.Nombres, ' ', up.ApellidoP, ' ', up.ApellidoM) AS NombrePaciente,
     CONCAT(ud.Nombres) AS NombreDoctor,
+    CONCAT(ua.Nombres) AS NombreAsociado,
     DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,
     DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada,
     c.idStatusPaciente, s.idConsultorio, up.RutaFoto
     FROM Citas c
     INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
     INNER JOIN Usuarios up ON p.idUsuario = up.idUsuario 
-    INNER JOIN Doctor d ON c.idDoctor = d.idDoctor
-    INNER JOIN Usuarios ud ON d.idUsuario = ud.idUsuario
+    LEFT JOIN Doctor d ON c.idDoctor = d.idDoctor
+    LEFT JOIN Usuarios ud ON d.idUsuario = ud.idUsuario
+    LEFT JOIN Asociado a ON c.idAsociado = a.idAsociado
+    LEFT JOIN Usuarios ua ON a.idUsuario = ua.idUsuario
     LEFT JOIN Sesion s ON c.idCitas  = s.idCitas 
-    WHERE c.idDoctor != ?
+    WHERE (c.idDoctor != ? OR c.idAsociado != 0)
     AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 
     ORDER BY c.HoraLlegada ASC;`;
 
@@ -206,12 +211,15 @@ async function DashDoc(idDoctor, Fecha) {
       consultaOtrosConsultorios,
       [idDoctor]
     );
+
     if (rowsOtros.length > 0) {
       OtrosConsultorios = rowsOtros.map((elemento) => {
+        // Verificamos si el paciente esta con un doctor o con un asociado
+        const QuienAtiende = elemento.NombreDoctor || elemento.NombreAsociado;
         return {
           idPaciente: elemento.idPaciente,
-          NombresPacientes: elemento.Nombres,
-          ApellidosPacientes: elemento.Apellidos,
+          NombresPacientes: elemento.NombrePaciente,
+          NombreDoctor: QuienAtiende,
           HoraCita: elemento.HoraCita,
           HoraLlegada: elemento.HoraLlegada,
           StatusPaciente: elemento.idStatusPaciente,
@@ -445,6 +453,35 @@ async function logout(idUsuario){
   }
 
 }
+async function CitasDoctor(idDoctor) {
+  try{
+    const connection = await mysql.createConnection(db);
+    const CalendarioCitas =  `SELECT c.idCitas,c.idStatusPaciente, u.Nombres, p.Procedimiento ,c.HoraCita ,c.FinCita FROM Citas c 
+    INNER JOIN Procedimiento p ON c.idProcedimiento = p.idProcedimiento 
+    INNER JOIN Paciente pa ON c.idPaciente  = pa.idPaciente 
+    INNER JOIN  Usuarios u ON pa.idUsuario  = u.idUsuario 
+    WHERE  idDoctor = ?`;
+    const [rowsCitas, fieldsHoy] = await connection.execute(CalendarioCitas, [idDoctor]);
+    connection.end();
+    return rowsCitas;
+  }catch(error){
+    console.error("Ha ocurrido un error obteniendo las citas del doctor: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+async function ModificacionCita(idCita,HoraIncio,FinCita) {
+  try{
+    const connection = await mysql.createConnection(db);
+    const CambioCita =  `UPDATE Citas SET HoraCita = ?, FinCita = ? WHERE idCitas = ?;
+    `;
+    await connection.execute(CambioCita, [HoraIncio,FinCita,idCita]);
+    connection.end();
+  }catch(error){
+    console.error("Ha ocurrido un error actualizando la cita: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
 
 
 async function NuevaCita(
@@ -520,4 +557,6 @@ export {
   NuevoPaciente,
   InfoRegistros,
   logout,
+  CitasDoctor,
+  ModificacionCita,
 };

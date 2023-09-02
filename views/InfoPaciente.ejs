@@ -4,23 +4,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <% //Este es el tiempo antes de que se actualice la pagina automaticamente(10 min.) %>
+    <% //Este es el tiempo antes de que se actualice la pagina automaticamente (10 min) %>
     <meta http-equiv="refresh" content="600" />
-    <title>Agenda - DermaTotal</title>
+    <title>Paciente - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
-    <link rel="stylesheet" href="/css/Agenda.css" />
+    <link rel="stylesheet" href="/css/Busqueda.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
-    <% //FullCalendar %>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
-    <% //Bootstrap %>
-    <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
     <link rel="icon" href="/img/favicon.ico" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
+    <!-- <script src="/js/busqueda.js"></script> -->
   </head>
 
   <body>
@@ -45,27 +39,19 @@
     </div>
 
     <section class="nav-bar">
-      <% //Aqui se generan los elementos del nav dependiendo del tipo de usuario
-      %>
+      <!-- Aqui se generan los elementos del nav dependiendo del tipo de usuario -->
     </section>
+
     <% 
     //==================================================================================================
-    // Contenido Creacion de Paciente --> 
+    // Contenido Busqueda de pacientes --> 
     //==================================================================================================
     %>
+    <!-- Aqui comienza el Contenido de la informacion del paciente -->
 
-
-
-<h1>Agenda</h1>
-
-<div id="calendar-container">
-  <div id="calendar"></div>
-</div>
-
-<div class="footer">
-  <% // Aqui va el contenido del Footer%>
-</div>
-
-<script type="module" src="/js/agenda.js"></script>
+    <% // Copyright%>
+    <div class="footer">
+      <% // Aqui va el contenido del Footer%>
+    </div>
   </body>
-  </html>
+</html>

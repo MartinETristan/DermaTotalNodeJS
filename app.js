@@ -21,6 +21,8 @@ import {
   NuevoPaciente,
   InfoRegistros,
   logout,
+  CitasDoctor,
+  ModificacionCita,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -236,7 +238,7 @@ app.get("/DashboardDoc", async (peticion, respuesta) => {
       const PacientesEspera = await DashDoc(
         peticion.session.idTipoDeUsuario,
         FechaHora().FormatoDia
-      );
+        );
       respuesta.end(JSON.stringify(PacientesEspera));
     } else {
       const PacientesEspera = {
@@ -265,7 +267,25 @@ app.get("/DashboardRecepcion", async (peticion, respuesta) => {
   }
 });
 
+app.get("/AgendaDoctor", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+    if (peticion.session.EsDoctor) {
+      const Agenda = await CitasDoctor(peticion.session.idTipoDeUsuario);
+      respuesta.end(JSON.stringify(Agenda));
+    } else {
+      const Agenda = [];
+      respuesta.end(JSON.stringify(Agenda));
+    }
+  } else {
+    respuesta.redirect("/");
+  }
+});
 
+app.post("/ActualizarCita", async (req, res) => {
+  // Lanzamos la actualizacion de la cita a la base de datos
+  ModificacionCita(req.body.idCita, req.body.HoraCita, req.body.FinCita);
+  return res.status(200).json({ mensaje: 'Cita actualizada exitosamente' });
+});
 
 
 
@@ -441,6 +461,15 @@ app.get("/Busqueda", function (peticion, respuesta) {
 app.get("/NuevoPaciente", function (peticion, respuesta) {
   if (peticion.session.idusuario && peticion.session.idClaseUsuario <= 5) {
     respuesta.render("NuevoPaciente.ejs");
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+
+app.get("/Agenda", function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+    respuesta.render("Agenda.ejs");
   } else {
     respuesta.redirect("/");
   }

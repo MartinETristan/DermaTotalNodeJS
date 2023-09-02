@@ -278,7 +278,7 @@ $(document).ready(function () {
           NombreH2.textContent = dataSession.Nombre;
           // Actualizar el h2 con el Nombre del Usuario
           var TipUserB = document.getElementById("TipUser");
-          TipUserB.textContent = dataSession.Nombre;
+          TipUserB.textContent = dataSession.TipUser;
         })
         .catch((error) => {
           console.error("Error en la petición Ajax en /InfoSesion:", error);
