@@ -26,7 +26,6 @@ $(document).ready(function () {
   var calendarEl = document.getElementById("calendar");
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
-
     initialView: "timeGridWeek",
     headerToolbar: {
       left: "prev,today,next",
@@ -35,27 +34,26 @@ $(document).ready(function () {
     },
     locale: "es-MX",
     // Tiempos Maximos y minimos
-    
+
     slotMinTime: "08:30:00",
     slotMaxTime: "19:00:00",
     // Duracion de los eventos
     slotDuration: "00:10:00",
     // Ocultamos los eventos del domingo
-    hiddenDays: [0], 
+    hiddenDays: [0],
     //Ocultamos los eventos de todo el dia
     views: {
       timeGridWeek: {
         // Establecemos el tamano del calendario para que no aparezcan los scrollbars
-        contentHeight: '1538px',
+        contentHeight: "1538px",
         allDaySlot: false, // Ocultar la pestaña "all-day" en la vista semanal
       },
       timeGridDay: {
-        contentHeight: '1538px',
+        contentHeight: "1538px",
         allDaySlot: false, // Ocultar la pestaña "all-day" en la vista diaria
       },
       dayGridMonth: {
-        contentHeight: '1000px',
-   
+        contentHeight: "1000px",
       },
     },
 
@@ -80,7 +78,7 @@ $(document).ready(function () {
     selectable: true,
     // Formato de la hora
     slotLabelFormat: {
-      hour: "numeric",
+      hour: "2-digit",
       minute: "2-digit",
       omitZeroMinute: false,
       meridiem: "short",
@@ -94,7 +92,12 @@ $(document).ready(function () {
         dataType: "json",
         success: function (data) {
           // Array con los colores a mostrar con base a su status
-          const colores = {1: '#249DD9', 2: '#f9b11f', 3: 'green', 4: '#ACACAC'};
+          const colores = {
+            1: "#249DD9",
+            2: "#f9b11f",
+            3: "green",
+            4: "#ACACAC",
+          };
           var eventos = data.map(function (evento) {
             var startTime = moment.utc(evento.HoraCita).local().format("HH:mm"); // Convertir y ajustar la hora de inicio
             var endTime = moment.utc(evento.FinCita).local().format("HH:mm"); // Convertir y ajustar la hora de finalización
@@ -108,6 +111,7 @@ $(document).ready(function () {
               borderColor: colores[evento.idStatusPaciente],
               extendedProps: {
                 Procedimiento: evento.Procedimiento,
+                idPaciente: evento.idPaciente,
               },
               // Agrega otras propiedades según tus necesidades
               _content: `<h3>${evento.Nombres}</h3><div class="HoraConsulta">${startTime}/${endTime}</div>`,
@@ -128,12 +132,12 @@ $(document).ready(function () {
     },
 
     // Muestra el modal con la informacion del evento al hacer Hover
-    eventDidMount: function(info) {
+    eventDidMount: function (info) {
       var tooltip = new Tooltip(info.el, {
         title: info.event._def.extendedProps.Procedimiento,
-        placement: 'top',
-        trigger: 'hover',
-        container: 'body'
+        placement: "top",
+        trigger: "hover",
+        container: "body",
       });
     },
 
@@ -186,7 +190,6 @@ $(document).ready(function () {
       });
     },
 
-
     // Lo mismo de Arriba pero cuando se modifica la duracion del evento
     eventResize: function (info) {
       // Aquí accedemos a la información del evento movido en info.event
@@ -237,13 +240,12 @@ $(document).ready(function () {
     },
 
     // Cuando se hace click en un evento
-    eventClick: function(info) {
-
-
+    eventClick: function (info) {
+      // Obtenemos el id del paciente
+      var idPaciente = info.event._def.extendedProps.idPaciente;
+      // Pasamos a mostrar la vista del paciente con su info en la URL
+      window.location.href = "/InfoPaciente/" + idPaciente;
     },
-
-    
-
   });
 
   calendar.render();

@@ -23,6 +23,11 @@ import {
   logout,
   CitasDoctor,
   ModificacionCita,
+  InfoPaciente,
+  ActualizarAntecedentesPaciente,
+  PassRestart,
+  ActualizarDatosGenerales,
+  ActualizarStatus,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -32,6 +37,9 @@ import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 //Arreglo de __dirname y __filename
 import path from "path";
 import { fileURLToPath } from "url";
+import e from "express";
+import { info } from "console";
+import { render } from "ejs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -287,7 +295,42 @@ app.post("/ActualizarCita", async (req, res) => {
   return res.status(200).json({ mensaje: 'Cita actualizada exitosamente' });
 });
 
+// Actualziamos la informacion del Expediente del paciente
+app.post("/ActualizarAntecedentesPaciente", async(req,res)=>{
+  // Actualizamos la informacion del paciente
+  ActualizarAntecedentesPaciente(req.session.idInfoUsuario, req.body.Propiedad,req.body.Valor);
+  return res.status(200).json({ mensaje: 'Antecedente actualizado exitosamente' });
+});
 
+// Actualizamos la informacion personal
+app.post("/ActualizarInfoPersonal", async(req,res)=>{
+  ActualizarDatosGenerales(req.session.idInfoUsuario,req.body.Propiedad,req.body.Valor,req.body.TipoUser);
+  return res.status(200).json({ mensaje: 'Informacion Personal actualizada exitosamente' });
+});
+
+// Actualizamos la informacion personal
+app.post("/ActualizarStatus", async(req,res)=>{
+  ActualizarStatus(req.body.TipoUser,req.session.idInfoUsuario,req.body.Valor);
+  return res.status(200).json({ mensaje: 'Status actualizado exitosamente' });
+});
+
+// Reinicio de la contraseña al nombre de usuario 
+app.post("/PassRestart", async(req,res)=>{
+  PassRestart(req.body.usuario);
+  console.log("Contraseña Reiniciada con exito.")
+  return res.status(200).json({ mensaje: 'Contaseña reiniciada exitosamente' });
+});
+
+app.get("/InfoPaciente",  async function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+    // Ejecutamos el query para obtener los datos del paciente
+    const DataPaciente = await InfoPaciente(peticion.session.idInfoUsuario);
+    // Y damos el output e json
+    respuesta.end(JSON.stringify(DataPaciente));
+  } else {
+    respuesta.redirect("/");
+  }
+});
 
 
 //Variable para el almacenamiento de imagenes con multer
@@ -304,7 +347,7 @@ const almacenamiento = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const extension = path.extname(file.originalname);
-    const nombreArchivo = `${req.body.Nombres}_${Date.now("YYYY-MM-DD")}${extension}`;
+    const nombreArchivo = `${req.body.Nombres}${extension}`;
     cb(null, nombreArchivo);
   },
 });
@@ -474,6 +517,23 @@ app.get("/Agenda", function (peticion, respuesta) {
     respuesta.redirect("/");
   }
 });
+
+
+app.get('/InfoPaciente/:id', async (req, res) => {
+  if (req.session.idusuario) {
+   const pacienteId = req.params.id;
+   // Guardamos temporalmente el id del paciente en una Cookie para realizar la consulta
+   req.session.idInfoUsuario = pacienteId;
+  //  Y renderizamos la vista
+   res.render('InfoPaciente.ejs');
+  }else{
+    res.redirect('/');
+  }
+});
+
+
+
+
 
 // Y un Middleware para Cualquier otro sitio no encontrado (página 404)
 // app.use((req, res) => {

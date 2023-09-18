@@ -94,8 +94,8 @@ function PacientesEnEspera(datos) {
       const pacienteElement = event.target.closest(".Paciente");
       if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
         const idPaciente = pacienteElement.id;
-        alert(idPaciente);
-        console.log("El id del paciente seleccionado es:", idPaciente);
+        // Pasamos a mostrar la vista del paciente con su info en la URL
+        window.location.href = "/InfoPaciente/"+idPaciente;
       }
     });
 
@@ -183,8 +183,8 @@ function CitasHoy(datos) {
       var pacienteElement = event.target.closest(".Paciente");
       if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
         var idPaciente = pacienteElement.id;
-        alert(idPaciente);
-        console.log("El id del paciente seleccionado es:", idPaciente);
+        // Pasamos a mostrar la vista del paciente con su info en la URL
+        window.location.href = "/InfoPaciente/"+idPaciente;
       }
     });
   } else {
@@ -247,7 +247,7 @@ function CitasFinalizadas(datos) {
         datos[i].ApellidosPacientes +
         " " +
         datos[i].HoraCita;
-      OtrosConsultorios.appendChild(item);
+      CitasFinalizadas.appendChild(item);
     }
   } else {
     var NoPacientes = document.createElement("h2");

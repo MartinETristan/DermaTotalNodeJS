@@ -8,13 +8,13 @@
     <meta http-equiv="refresh" content="600" />
     <title>Paciente - DermaTotal</title>
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
-    <link rel="stylesheet" href="/css/Busqueda.css" />
+    <link rel="stylesheet" href="/css/InfoPaciente.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
     <link rel="icon" href="/img/favicon.ico" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
-    <!-- <script src="/js/busqueda.js"></script> -->
+    <script src="/js/infoPaciente.js"></script>
   </head>
 
   <body>
@@ -48,7 +48,50 @@
     //==================================================================================================
     %>
     <!-- Aqui comienza el Contenido de la informacion del paciente -->
-
+    <div class="app">
+      <main class="app__content">
+        <header class="page__header">
+          <div class="contfotousuario">
+            <img class="fotousuario"alt="Foto Paciente">
+          </div>
+          <div>
+            <div class="NombrePaciente">
+             <h1 class="Nombre">Cargando Nombre...<br><h1 class="Apellido">Cargando Apellidos...</h1></h1>
+             <h3>Edad: <span class="Edad">Cargando edad...</span> años</h3>
+            </div>
+            <br>
+            <div class="tablist">
+              <button class="tag--success">Clinica</button>
+              <button class="tag--success">Quirurgica</button>
+              <button class="tag--success">Cosmetica</button>
+              <button class="tag--success">Depilacion</button>
+            </div>
+          </div>
+          <ul class="page__controls">
+            <li><button class="page__controlbtn--split">Editar</button></li>
+            <li><button class="TerminarConsulta">Terminar Consulta</button></li>
+          </ul>
+        </header>
+    
+        
+        <div class="regions">
+          <section class="region">
+            <header class="region__header">
+              <ul class="tablist">
+                <li><a id="General" class="tablist__link">General</a></li>
+                <li><a id="Historial" class="tablist__link">Historial</a></li>
+                <li><a id="Recetas" class="tablist__link">Recetas</a></li>
+              </ul>
+            </header>
+            <!-- Contenido generado con AJAX -->
+            <div id="infocontenido">
+              
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
     <% // Copyright%>
     <div class="footer">
       <% // Aqui va el contenido del Footer%>

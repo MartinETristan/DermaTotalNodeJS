@@ -14,8 +14,6 @@ const db = {
   port: process.env.MYSQLDB_PORT_DOCKER,
 };
 
-
-
 //==================================================================================================
 // Función para verificar el usuario y contraseña en varias tablas
 //==================================================================================================
@@ -41,7 +39,8 @@ async function VerificarUsuario(usuario, contrasena) {
         // Compara la contraseña encrpitada
         if (bcrypt.compareSync(contrasena, hashedPassword)) {
           // Registra el inicio de sesion
-          const registro = "INSERT INTO `Login/Out` (idUsuario,Login) VALUES (?, NOW())";
+          const registro =
+            "INSERT INTO `Login/Out` (idUsuario,Login) VALUES (?, NOW())";
           await connection.execute(registro, [rows[0].idUsuario]);
           connection.end();
           const InfoSession = {
@@ -88,7 +87,7 @@ async function UsuarioyProfesion(idUsuario) {
         ApellidoP: rows[0].ApellidoP,
         ApellidoM: rows[0].ApellidoM,
         EsDoctor: EsDoctor,
-        idDoctor:idDoctor,
+        idDoctor: idDoctor,
       };
       return InfoUsuario;
     }
@@ -117,7 +116,7 @@ async function DashDoc(idDoctor, Fecha) {
         INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
         INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
         WHERE c.idDoctor = ? AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 AND DATE(c.HoraCita) = ? 
-        ORDER BY c.HoraLlegada ASC;`;
+        ORDER BY c.HoraLlegada ASC, c.HoraCita ASC;`;
 
     const [rowsEspera, fieldsEspera] = await connection.execute(
       consultaEspera,
@@ -237,6 +236,39 @@ async function DashDoc(idDoctor, Fecha) {
     return "Ha ocurrido un error.";
   }
 
+  //==================================================================================================
+  // Citas Finalizadas
+  try {
+    const connection = await mysql.createConnection(db);
+    const consultaFinalizadas = `SELECT p.idPaciente, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, u.RutaFoto
+    FROM Citas c
+    INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
+    INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    WHERE c.idDoctor = ? AND c.idStatusPaciente = 4 
+    ORDER BY c.HoraCita DESC;`;
+    const [rowsFin, fieldsEspera] = await connection.execute(
+      consultaFinalizadas,
+      [idDoctor]
+    );
+    if (rowsFin.length > 0) {
+      CitasFinalizadas = rowsFin.map((elemento) => {
+        return {
+          idPaciente: elemento.idPaciente,
+          NombresPacientes: elemento.Nombres,
+          ApellidosPacientes: elemento.Apellidos,
+          HoraCita: elemento.HoraCita,
+          RutaFoto: elemento.RutaFoto,
+        };
+      });
+      connection.end();
+    }
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error en la consulta de citas finalizadas:",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
   const InfoDashDoc = {
     PacientesEspera: PacientesEspera,
     CitasHoy: CitasHoy,
@@ -345,11 +377,188 @@ async function DashRecepcion(Sucursal, Fecha) {
   return InfoDashRecep;
 }
 
+async function InfoPaciente(idPaciente) {
+  // Llenamos los datos con valores por defecto
+  let BasicInfo = [];
+  let Antecedentes = [];
+  let DatosDT = [];
+  let Recetas = [];
+  let HistorialFotografico = [];
+  let Consultas = [];
+  // =================================================
+  // Informacion basica del paciente
+  try {
+    const connection = await mysql.createConnection(db);
+    const queryBasicInfo = `
+    SELECT U.Nombres, CONCAT(U.ApellidoP,' ',U.ApellidoM) AS Apellidos, TIMESTAMPDIFF(YEAR, u.FechadeNacimiento, CURDATE()) AS Edad,
+    DATE_FORMAT(U.FechadeNacimiento, '%d-%m-%Y') AS FechaDeNacimiento, S.Sexo, U.Telefono, U.TelefonoSecundario, U.Correo, U.RutaFoto 
+    FROM Paciente p INNER JOIN Usuarios U  ON p.idUsuario = U.idUsuario INNER JOIN Sexo s ON U.idSexo = S.idSexo 
+    WHERE p.idPaciente = ?
+    `;
+    const [rowInfoP, fieldsHistory] = await connection.execute(queryBasicInfo, [
+      idPaciente,
+    ]);
+    connection.end();
+    if (rowInfoP.length > 0) {
+      BasicInfo = rowInfoP.map((elemento) => {
+        return {
+          Nombres: elemento.Nombres,
+          Apellidos: elemento.Apellidos,
+          Edad: elemento.Edad,
+          FechadeNac: elemento.FechaDeNacimiento,
+          Sexo: elemento.Sexo,
+          Tel1: elemento.Telefono,
+          Tel2: elemento.TelefonoSecundario,
+          Correo: elemento.Correo,
+          RutaFoto: elemento.RutaFoto,
+        };
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo la informacion Basica del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+  // =================================================
+  // Antecedentes del paciente
+  try {
+    const connection = await mysql.createConnection(db);
+    const queryAntecedentes = `SELECT hc.P_Actual AS PadecimientoActual, hc.A_HF AS Antecedentes_HF, hc.A_NP AS Antecedentes_NP, hc.A_PP AS Antecedentes_PP, hc.Alergias AS Alergias 
+    FROM Paciente p 
+    INNER JOIN HistorialClinico hc ON p.idPaciente = hc.idPaciente 
+    WHERE p.idPaciente = ?`;
+    const [rowAntecedentes, fieldsAntecedentes] = await connection.execute(
+      queryAntecedentes,
+      [idPaciente]
+    );
+    connection.end();
+    if (rowAntecedentes.length > 0) {
+      Antecedentes = rowAntecedentes.map((elemento) => {
+        return {
+          P_Actual: elemento.PadecimientoActual,
+          A_HF: elemento.Antecedentes_HF,
+          A_NP: elemento.Antecedentes_NP,
+          A_PP: elemento.Antecedentes_PP,
+          Alergias: elemento.Alergias,
+        };
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo los antecedentes del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+
+  // =================================================
+  // Datos del Sistema del paciente
+  try {
+    const connection = await mysql.createConnection(db);
+    const queryDatoDT = `
+    SELECT S.Status, P.Usuario,COALESCE(u2.Nombres, u3.Nombres) AS AltaPor, COALESCE(u2.RutaFoto , u3.RutaFoto) AS FotoAlta, 
+    COALESCE(u2.RutaFoto , u3.RutaFoto) AS FotoAlta, 
+    COALESCE(tu.Tipo, tu2.Tipo) AS TipodeUsuario, 
+    DATE_FORMAT(u.FechaAlta, "%d/%m/%y a las %h:%i:%s %p") AS FechaAlta
+    FROM Paciente p 
+    LEFT JOIN Status s ON p.idStatus  = s.idStatus 
+    LEFT JOIN Usuarios U  ON p.idUsuario = U.idUsuario 
+    LEFT JOIN Alta_Paciente ap  ON p.idPaciente =ap.idPaciente
+    LEFT JOIN Doctor d ON ap.idDoctor  = d.idDoctor 
+    LEFT JOIN Usuarios u2 ON d.idUsuario = u2.idUsuario 
+    LEFT JOIN TipodeUsuario tu ON d.idTipoDeUsuario = tu.idTipoUsuario
+    LEFT JOIN Recepcionista r ON ap.idRecepcionista = r.idRecepcionista 
+    LEFT JOIN Usuarios u3 ON r.idUsuario = u3.idUsuario 
+    LEFT JOIN TipodeUsuario tu2 ON r.idTipoDeUsuario = tu2.idTipoUsuario
+    WHERE p.idPaciente = ?
+    `;
+    const [rowDatosDT, fieldsAntecedentes] = await connection.execute(
+      queryDatoDT,
+      [idPaciente]
+    );
+    connection.end();
+    if (rowDatosDT.length > 0) {
+      DatosDT = rowDatosDT.map((elemento) => {
+        return {
+          Status: elemento.Status,
+          Usuario: elemento.Usuario,
+          AltaPor: elemento.AltaPor,
+          TipoUsuarioAlta: elemento.TipodeUsuario,
+          FotoAlta: elemento.FotoAlta,
+          FechaAlta: elemento.FechaAlta,
+        };
+      });
+    }
+    // console.log(DatosDT);
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo los datos de DermaTotal del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+  // =================================================
+  // Recetas del paciente
+  try {
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo la receta del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+  // =================================================
+  // Historial fotografico del paciente
+  try {
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo el historial fotografico del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+  // =================================================
+  // Consultas del paciente
+  try {
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo las consultas del paciente: ",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+
+  const InfoPaciente = {
+    BasicInfo: BasicInfo,
+    Antecedentes: Antecedentes,
+    DatosDT: DatosDT,
+    Recetas: Recetas,
+    HistorialFotografico: HistorialFotografico,
+    Consultas: Consultas,
+  };
+
+  return InfoPaciente;
+}
+
 //==================================================================================================
 // Creaciones  / Assets
 //==================================================================================================
 
-async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto,idDoctor,idRecepcionista) {
+async function NuevoPaciente(
+  Nombres,
+  ApellidoP,
+  ApellidoM,
+  idSexo,
+  Correo,
+  Telefono,
+  TelefonoSecundario,
+  FechaNacimiento,
+  RutaFoto,
+  idDoctor,
+  idRecepcionista
+) {
   try {
     const connection = await mysql.createConnection(db);
     await connection.beginTransaction();
@@ -366,34 +575,58 @@ async function NuevoPaciente(Nombres, ApellidoP, ApellidoM, idSexo, Correo, Tele
       (idDoctor,idRecepcionista,idPaciente)
       VALUES(?, ?, LAST_INSERT_ID())`;
 
+    const queryAntecedentes = `INSERT INTO HistorialClinico (idPaciente) 
+      VALUES (?)`;
+
     //Obtenemos la fecha de hoy
     const fechaActual = new Date();
     // Y generamos el nombre de usuario con base a su nombre, el dia de registro y un numero aleatorio de 2 digitos
-    const usuario = Nombres.substring(0, 3) + fechaActual.getDate() + (Math.floor(Math.random() * 90) + 10);
+    const usuario =
+      Nombres.substring(0, 3) +
+      fechaActual.getDate() +
+      (Math.floor(Math.random() * 90) + 10);
     // Encriptamos el usuario para generar la clave
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(usuario, salt);
 
     // Ejecutamos el registro del paciente
-    await connection.execute(queryUsuario, [Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechaNacimiento, RutaFoto]);
+    await connection.execute(queryUsuario, [
+      Nombres,
+      ApellidoP,
+      ApellidoM,
+      idSexo,
+      Correo,
+      Telefono,
+      TelefonoSecundario,
+      FechaNacimiento,
+      RutaFoto,
+    ]);
 
     // Utilizamos el ID insertado en la primera consulta para la segunda consulta
-    const [resultPaciente] = await connection.execute(queryPaciente, [usuario, password]);
+    const [resultPaciente] = await connection.execute(queryPaciente, [
+      usuario,
+      password,
+    ]);
 
-    // Y finalmente registramos quien hizo el registro del paciente
+    // Y registramos quien hizo el registro del paciente
     await connection.execute(queryRegistro, [idDoctor, idRecepcionista]);
+
+    //Asi como le creamos un expediente vacio
+    await connection.execute(queryAntecedentes, [resultPaciente.insertId]);
 
     await connection.commit();
     connection.end();
     return resultPaciente.insertId;
   } catch (error) {
-    console.error("Ha ocurrido un error en la creacion de un nuevo paciente:", error);
+    console.error(
+      "Ha ocurrido un error en la creacion de un nuevo paciente:",
+      error
+    );
     connection.rollback();
     connection.end();
     return "Ha ocurrido un error.";
   }
 }
-
 
 // Funcion para obtener la informacion de los registros
 async function InfoRegistros() {
@@ -402,37 +635,42 @@ async function InfoRegistros() {
     // Pedimos los Doctores Existentes
     const Doctores = `SELECT d.idDoctor, u.Nombres, u.RutaFoto  FROM Doctor d
     INNER JOIN Usuarios u ON d.idUsuario  = u.idUsuario `;
-    const [docs,a] = await connection.execute(Doctores);
+    const [docs, a] = await connection.execute(Doctores);
 
     //Pedimos el Sexo Disponible
     const Asociados = `SELECT a.idAsociado,u.Nombres, u.RutaFoto  FROM Asociado a 
     INNER JOIN Usuarios u ON a.idUsuario = u.idUsuario`;
-    const [Asoc,b] = await connection.execute(Asociados);
+    const [Asoc, b] = await connection.execute(Asociados);
 
     //Pedimos el Sexo Disponible
     const Sexo = `SELECT * FROM Sexo s`;
-    const [Sex,c] = await connection.execute(Sexo);
+    const [Sex, c] = await connection.execute(Sexo);
 
     //Pedimos las Sucursales Disponibles
     const Sucursales = `SELECT idSucursal,Sucursal  FROM Sucursales s`;
-    const [suc,d] = await connection.execute(Sucursales);
+    const [suc, d] = await connection.execute(Sucursales);
 
     //Pedimos los procedimientos Dispobibles
     const Procedimiento = `SELECT idProcedimiento,Procedimiento FROM Procedimiento p`;
-    const [Proced,e] = await connection.execute(Procedimiento);
+    const [Proced, e] = await connection.execute(Procedimiento);
 
     //Pedimos los procedimientos Dispobibles
     const EstadoC = `SELECT * FROM Estado_Citas ec `;
-    const [EstC,f] = await connection.execute(EstadoC);
+    const [EstC, f] = await connection.execute(EstadoC);
+
+    //Pedimos los procedimientos Dispobibles
+    const StatusUsuario = ` SELECT * FROM Status s`;
+    const [Stat_U, g] = await connection.execute(StatusUsuario);
 
     connection.end();
     const InfoparaRegistros = {
       Doctores: docs,
       Asociados: Asoc,
       Sucursales: suc,
-      Sexo:Sex,
-      Procedimiento:Proced,
-      EstadoCitas:EstC
+      Sexo: Sex,
+      Procedimiento: Proced,
+      EstadoCitas: EstC,
+      StatusUsuario: Stat_U,
     };
     return InfoparaRegistros;
   } catch (error) {
@@ -441,49 +679,114 @@ async function InfoRegistros() {
   }
 }
 
-async function logout(idUsuario){
-  try{
+async function logout(idUsuario) {
+  try {
     const connection = await mysql.createConnection(db);
-    const registro = "UPDATE `Login/Out` SET Logout = NOW() WHERE Login  = (SELECT MAX(Login) FROM `Login/Out` WHERE Logout IS NULL);";
+    const registro =
+      "UPDATE `Login/Out` SET Logout = NOW() WHERE Login  = (SELECT MAX(Login) FROM `Login/Out` WHERE Logout IS NULL);";
     await connection.execute(registro, [idUsuario]);
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error realizando el registro de logout", error);
+    console.error(
+      "Ha ocurrido un error realizando el registro de logout",
+      error
+    );
     return "Ha ocurrido un error.";
   }
-
 }
 async function CitasDoctor(idDoctor) {
-  try{
+  try {
     const connection = await mysql.createConnection(db);
-    const CalendarioCitas =  `SELECT c.idCitas,c.idStatusPaciente, u.Nombres, p.Procedimiento ,c.HoraCita ,c.FinCita FROM Citas c 
+    const CalendarioCitas = `SELECT c.idCitas,c.idPaciente,c.idStatusPaciente, u.Nombres, p.Procedimiento ,c.HoraCita ,c.FinCita FROM Citas c 
     INNER JOIN Procedimiento p ON c.idProcedimiento = p.idProcedimiento 
     INNER JOIN Paciente pa ON c.idPaciente  = pa.idPaciente 
     INNER JOIN  Usuarios u ON pa.idUsuario  = u.idUsuario 
     WHERE  idDoctor = ?`;
-    const [rowsCitas, fieldsHoy] = await connection.execute(CalendarioCitas, [idDoctor]);
+    const [rowsCitas, fieldsHoy] = await connection.execute(CalendarioCitas, [
+      idDoctor,
+    ]);
     connection.end();
     return rowsCitas;
-  }catch(error){
-    console.error("Ha ocurrido un error obteniendo las citas del doctor: ", error);
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error obteniendo las citas del doctor: ",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 }
 
-async function ModificacionCita(idCita,HoraIncio,FinCita) {
-  try{
+async function ModificacionCita(idCita, HoraIncio, FinCita) {
+  try {
     const connection = await mysql.createConnection(db);
-    const CambioCita =  `UPDATE Citas SET HoraCita = ?, FinCita = ? WHERE idCitas = ?;
+    const CambioCita = `UPDATE Citas SET HoraCita = ?, FinCita = ? WHERE idCitas = ?;
     `;
-    await connection.execute(CambioCita, [HoraIncio,FinCita,idCita]);
+    await connection.execute(CambioCita, [HoraIncio, FinCita, idCita]);
     connection.end();
-  }catch(error){
+  } catch (error) {
     console.error("Ha ocurrido un error actualizando la cita: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
+// Cambia la contraseña de los pacientes
+async function CambiarContraseñaPaciente(idPaciente, NuevaContraseña) {
+  try {
+    // Encriptamos la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const ContraCript = await bcrypt.hash(NuevaContraseña, salt);
+    const connection = await mysql.createConnection(db);
 
+    const CambioContra = `UPDATE Paciente SET Contraseña = ?, WHERE idPaciente = ?;`;
+    // Y insartamos el cambio
+    await connection.execute(CambioContra, [ContraCript, idPaciente]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error actualizando la cita: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+// Cambia la contraseña del Personal
+async function CambiarContraseña(Usuario, NuevaContraseña) {}
+
+// Reinicia la contraseña por el nombre de usuario
+async function PassRestart(Usuario) {
+  try {
+    const connection = await mysql.createConnection(db);
+    // Tablas donde se realizara la busqueda para el usuario
+    const tablas = [
+      "SuperAdmin",
+      "Admin",
+      "Doctor",
+      "Recepcionista",
+      "Asociado",
+      "Paciente",
+    ];
+    // Buscael usuario en todas las tablas
+    for (const tabla of tablas) {
+      const consulta = `SELECT * FROM ${tabla} WHERE Usuario = ?`;
+      const [rows, fields] = await connection.execute(consulta, [Usuario]);
+      // Si encontro un usuario
+      if (rows.length > 0) {
+        // Encriptamos el nombre de usuario para generar la clave
+        const salt = await bcrypt.genSalt(10);
+        const ContraCript = await bcrypt.hash(Usuario, salt);
+        const CambioCita = `UPDATE ${tabla} SET Contraseña = ? WHERE Usuario = ?;`;
+        await connection.execute(CambioCita, [ContraCript, Usuario]);
+        connection.end();
+      }
+    }
+  } catch (error) {
+    console.error("Ha ocurrido un error actualizando la cita: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
+
+//==================================================================================================
+// Updates estados Pacientes / Citas
+//==================================================================================================
 async function NuevaCita(
   idPaciente,
   idSucursal,
@@ -494,11 +797,105 @@ async function NuevaCita(
   FinCita
 ) {}
 
-async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
+async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const Actualizacion = `UPDATE HistorialClinico SET ${Propiedad} = ? WHERE idPaciente = ?`;
+    await connection.execute(Actualizacion, [Valor, idPaciente]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error actualizando los antecedentes del paciente: ",
+      error
+    );
+  }
+}
 
-//==================================================================================================
-// Updates estados Pacientes / Citas
-//==================================================================================================
+async function ActualizarDatosGenerales(id, Propiedad, Valor, TipodeUsuario) {
+  // Acrtualiza la informacion del usuario basados en el tipo de usuario
+  switch (TipodeUsuario) {
+    case 1:
+      break;
+
+    case 2:
+      break;
+
+    case 3:
+      break;
+
+    case 4:
+      break;
+
+    case 5:
+      break;
+
+    case 6:
+      break;
+
+    case 7:
+      try {
+        const connection = await mysql.createConnection(db);
+        const Actualizacion = `UPDATE Usuarios as Usuario
+        SET ${Propiedad} = ?
+        WHERE Usuario.idUsuario IN(
+        SELECT Fuente.idUsuario 
+        FROM Paciente AS Fuente
+        WHERE Fuente.idPaciente = ?
+        )`;
+        await connection.execute(Actualizacion, [Valor, id]);
+        connection.end();
+      } catch (error) {
+        console.error(
+          "Ha ocurrido un error actualizando la informacion personal del paciente: ",
+          error
+        );
+      }
+      break;
+
+    default:
+      console.log("No se encontro el tipo de usuario");
+      break;
+  }
+}
+
+async function ActualizarStatus(TipodeUsuario, id, Status) {
+  switch (TipodeUsuario) {
+    case 1:
+      break;
+
+    case 2:
+      break;
+
+    case 3:
+      break;
+
+    case 4:
+      break;
+
+    case 5:
+      break;
+
+    case 6:
+      break;
+
+    case 7:
+      try {
+        const connection = await mysql.createConnection(db);
+        const Actualizacion = `UPDATE Paciente SET idStatus = ? WHERE idPaciente = ?`;
+        await connection.execute(Actualizacion, [Status, id]);
+        connection.end();
+      } catch (error) {
+        console.error(
+          "Ha ocurrido un error actualizando el status del usuario: ",
+          error
+        );
+      }
+      break;
+    default:
+      console.log("No se encontro el tipo de usuario");
+      break;
+  }
+}
 
 async function Hoy_Espera(idCita, idStatusPaciente, HoraLlegada) {
   try {
@@ -513,41 +910,6 @@ async function Hoy_Espera(idCita, idStatusPaciente, HoraLlegada) {
   }
 }
 
-// Test de Encriptación de Contraseña
-// app.post("/login", async (req, res) => {
-//   const user = req.body.user;
-//   const password = req.body.password;
-//   if (user === "admin" && password === "admin") {
-//     let encriptacion = await bcrypt.hash(password, 10);
-//     res.json({
-//       message: "success",
-//       password: encriptacion,
-//     });
-//   } else {
-//     res.json({
-//       message: "error",
-//     });
-//   }
-// });
-
-// app.get("/compare", async (req, res) => {
-//   let hashguardado =
-//     "$2a$10$imQ4bXRuqdmlCpRIV8yf.ezDoN7RBh6Sndb3/CNFtoDIsyHLPYLym";
-//   let comparacion = bcrypt.compareSync("adm in", hashguardado);
-
-//   if (comparacion) {
-//     res.json({
-//       message: "success",
-//       comparacion: comparacion,
-//     });
-//   } else {
-//     res.json({
-//       message: "error",
-//       comparacion: comparacion,
-//     });
-//   }
-// });
-
 export {
   VerificarUsuario,
   UsuarioyProfesion,
@@ -559,4 +921,9 @@ export {
   logout,
   CitasDoctor,
   ModificacionCita,
+  InfoPaciente,
+  ActualizarAntecedentesPaciente,
+  PassRestart,
+  ActualizarDatosGenerales,
+  ActualizarStatus,
 };
