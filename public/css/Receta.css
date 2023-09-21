@@ -9,7 +9,7 @@ body {
     justify-content: flex-end;
     align-items: center;
     padding: 0 20px;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 .ContenedorFooter {
@@ -18,7 +18,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 10px;
 }
 .Nombre,.Edad,.Fecha{
     display: flex;
@@ -78,7 +78,7 @@ dt{
 }
 
 .ContenedorFooter >*{
-    max-width: 33%;
+    max-width: 25%;
     /* page-break-after: always; */
 }
 
@@ -88,6 +88,21 @@ dt{
 
 .Correo{
     color: #00aaff;
+}
+
+.QRs{
+    display: flex;
+    width: 60px;
+    height: auto;
+    position: relative;
+    padding-right: 20px ;
+}
+
+.QRs > *{
+    display: flex;
+    width: 100%;
+    height: auto;
+    margin-right: 5px;
 }
 
 @page {

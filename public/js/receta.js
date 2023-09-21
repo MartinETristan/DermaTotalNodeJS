@@ -142,6 +142,13 @@ function FormatoReceta() {
   });
 
   // Insertar el fragmento de código HTML después del bucle
+  const divQR = document.createElement("div");
+  divQR.className = "QRs";
+  divQR.innerHTML = `
+  <img src="/img/RCTa/qr_FB.png" alt="QR_FB" />
+  <img src="/img/RCTa/qr_IG.png" alt="QR_IG" />
+  `;
+  divContenedorFooter.appendChild(divQR);
   const divLogo = document.createElement("div");
   divLogo.className = "LogoDT";
   divLogo.innerHTML = `
