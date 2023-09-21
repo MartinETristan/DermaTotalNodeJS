@@ -502,6 +502,34 @@ async function InfoPaciente(idPaciente) {
   // =================================================
   // Recetas del paciente
   try {
+    const connection = await mysql.createConnection(db);
+    const queryRecetas = `
+    SELECT mr.idReceta_Pacientes,u.Nombres as Doctor,m.Medicamento, m.Indicacion, Fecha, Nota
+    FROM Receta_Pacientes rp
+    LEFT JOIN Medicamento_Receta mr ON mr.idReceta_Pacientes = rp.idReceta_Pacientes
+    LEFT JOIN Medicamento m ON m.idMedicamento = mr.idMedicamento
+    LEFT JOIN Doctor d ON d.idDoctor = rp.idDoctor
+    LEFT JOIN Usuarios u ON u.idUsuario = d.idUsuario
+    WHERE rp.idPaciente = ?
+    ORDER BY Fecha DESC  
+    `;
+    const [rowRecetas, fieldsAntecedentes] = await connection.execute(
+      queryRecetas,
+      [idPaciente]
+    );
+    connection.end();
+    if (rowRecetas.length > 0) {
+      Recetas = rowRecetas.map((elemento) => {
+        return {
+          idReceta: elemento.idReceta_Pacientes,
+          Doctor: elemento.Doctor,
+          Medicamento: elemento.Medicamento,
+          Indicacion: elemento.Indicacion,
+          Fecha: elemento.Fecha,
+          Nota: elemento.Nota,
+        };
+      });
+    }
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo la receta del paciente: ",
@@ -512,6 +540,8 @@ async function InfoPaciente(idPaciente) {
   // =================================================
   // Historial fotografico del paciente
   try {
+
+
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo el historial fotografico del paciente: ",
@@ -522,6 +552,9 @@ async function InfoPaciente(idPaciente) {
   // =================================================
   // Consultas del paciente
   try {
+
+
+
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo las consultas del paciente: ",
@@ -647,7 +680,7 @@ async function InfoRegistros() {
     const [Sex, c] = await connection.execute(Sexo);
 
     //Pedimos las Sucursales Disponibles
-    const Sucursales = `SELECT idSucursal,Sucursal  FROM Sucursales s`;
+    const Sucursales = `SELECT * FROM Sucursales s`;
     const [suc, d] = await connection.execute(Sucursales);
 
     //Pedimos los procedimientos Dispobibles
@@ -781,6 +814,62 @@ async function PassRestart(Usuario) {
     return "Ha ocurrido un error.";
   }
 }
+
+
+
+async function NuevaReceta(idPaciente,idDoctor,idSesion) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const NewReceta = `INSERT INTO Receta_Pacientes
+    (idPaciente, idDoctor, idSesion, Fecha)
+    VALUES(?, ?, ${idSesion}, ?);`;
+    const receta = await connection.execute(NewReceta, [idPaciente, idDoctor, new Date()]);
+    connection.end();
+    console.log(receta);
+    return receta;
+  } catch (error) {
+    console.error("Ha ocurrido un error creando la receta: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
+
+async function MedicamentoReceta(idReceta,Medicamento,Indicacion) {
+  try {
+    
+  } catch (error) {
+    console.error("Ha ocurrido un error insertando el medicamento en la receta: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+async function Receta(idPaciente,idReceta){
+  try {
+    const connection = await mysql.createConnection(db);
+    const queryReceta = `
+    SELECT CONCAT(ud.Nombres ," ",ud.ApellidoP," ",ud.ApellidoM) as Doctor,d.Especialidad,d.Universidad ,d.CertificadoProf, ud.Correo as CorreoDoc,
+    CONCAT(up.Nombres ," ",up.ApellidoP," ",up.ApellidoM) as Paciente,TIMESTAMPDIFF(YEAR, up.FechadeNacimiento, CURDATE()) AS Edad,
+    m.Medicamento, m.Indicacion, Fecha, Nota
+    FROM Receta_Pacientes rp
+    LEFT JOIN Medicamento_Receta mr ON mr.idReceta_Pacientes = rp.idReceta_Pacientes
+    LEFT JOIN Medicamento m ON m.idMedicamento = mr.idMedicamento
+    LEFT JOIN Doctor d ON d.idDoctor = rp.idDoctor
+    LEFT JOIN Usuarios ud ON ud.idUsuario = d.idUsuario
+    LEFT JOIN Paciente p ON p.idPaciente = rp.idPaciente
+    LEFT JOIN Usuarios up ON up.idUsuario = p.idUsuario
+    WHERE rp.idPaciente = ? AND mr.idReceta_Pacientes = ?
+    `;
+    const [checkreceta,a] = await connection.execute(queryReceta, [idPaciente, idReceta]);
+    connection.end();
+    return checkreceta;
+  } catch (error) {
+    console.error("Ha ocurrido un error consultando la receta del paciente: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
 
 async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
 
@@ -926,4 +1015,6 @@ export {
   PassRestart,
   ActualizarDatosGenerales,
   ActualizarStatus,
+  NuevaReceta,
+  Receta,
 };

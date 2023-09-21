@@ -70,6 +70,7 @@ $(document).ready(function () {
         endTime: "14:00", // 2pm
       },
     ],
+    stickyHeaderDates: true,
     // Indicador de hora
     nowIndicator: true,
     // Si se puede arrastrar los eventos

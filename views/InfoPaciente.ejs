@@ -14,6 +14,9 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
+    <script src="/js/infoPaciente/General.js"></script>
+    <script src="/js/infoPaciente/Historial.js"></script>
+    <script src="/js/infoPaciente/Recetas.js"></script>
     <script src="/js/infoPaciente.js"></script>
   </head>
 
@@ -60,16 +63,16 @@
              <h3>Edad: <span class="Edad">Cargando edad...</span> años</h3>
             </div>
             <br>
-            <div class="tablist">
+            <!-- <div class="tablist">
               <button class="tag--success">Clinica</button>
               <button class="tag--success">Quirurgica</button>
               <button class="tag--success">Cosmetica</button>
               <button class="tag--success">Depilacion</button>
-            </div>
+            </div> -->
           </div>
           <ul class="page__controls">
             <li><button class="page__controlbtn--split">Editar</button></li>
-            <li><button class="TerminarConsulta">Terminar Consulta</button></li>
+            <!-- <li><button class="TerminarConsulta">Terminar Consulta</button></li> -->
           </ul>
         </header>
     
@@ -83,9 +86,8 @@
                 <li><a id="Recetas" class="tablist__link">Recetas</a></li>
               </ul>
             </header>
-            <!-- Contenido generado con AJAX -->
             <div id="infocontenido">
-              
+              <!-- Contenido generado con AJAX -->
             </div>
           </div>
         </section>

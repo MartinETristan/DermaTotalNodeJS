@@ -1,0 +1,100 @@
+body {
+    margin: 0px 20px 0px 20px;
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+}
+
+.Header {
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 10px;
+}
+
+.ContenedorFooter {
+    font-size: 12px;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+.Nombre,.Edad,.Fecha{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.LogoCMI>img,
+.LogoDT>img {
+
+    width: 100%;
+    height: auto;
+}
+
+.LogoCMI {
+    width: 50%;
+    height: auto;
+}
+
+.LogoDT {
+    overflow: hidden;
+    width: auto;
+    height: auto;
+}
+.InfoPaciente {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.InfoDoc{
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.InfoDoc >*{
+    margin: 0;
+}
+hr{
+    margin: 2px;
+}
+p{
+    margin: 0;
+}
+
+dt{
+    font-weight: bold;
+}
+.InfoReceta{
+    height: 270px;
+    /* min-height: 250px; */
+    /* max-height: 250px; */
+}
+
+.ContenedorFooter >*{
+    max-width: 33%;
+    /* page-break-after: always; */
+}
+
+.Footer{
+    margin-bottom: 15px;
+}
+
+.Correo{
+    color: #00aaff;
+}
+
+@page {
+    size: letter; /* Tamaño carta (8.5 x 11 pulgadas) */
+    margin: 1cm; /* Márgenes de 1 centímetro en cada lado */
+  }
+  div[class^="Receta_"]:nth-child(even) {
+    page-break-after: always;
+  }
+

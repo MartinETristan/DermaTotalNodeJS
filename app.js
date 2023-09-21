@@ -28,6 +28,8 @@ import {
   PassRestart,
   ActualizarDatosGenerales,
   ActualizarStatus,
+  NuevaReceta,
+  Receta,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -321,11 +323,34 @@ app.post("/PassRestart", async(req,res)=>{
   return res.status(200).json({ mensaje: 'Contaseña reiniciada exitosamente' });
 });
 
-app.get("/InfoPaciente",  async function (peticion, respuesta) {
+
+app.post("/NuevaReceta", async (req, res) => {
+  if(req.session.EsDoctor){
+    NuevaReceta(req.session.idInfoUsuario,req.session.idDoctor,req.body.idSesion);
+    return res.status(200).json({ mensaje: 'Nueva Receta creada exitosamente' });
+  }else{
+    res.redirect('/');
+  }
+});
+
+
+
+app.post("/InfoPaciente",  async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     // Ejecutamos el query para obtener los datos del paciente
     const DataPaciente = await InfoPaciente(peticion.session.idInfoUsuario);
-    // Y damos el output e json
+    // Y damos el output en json
+    respuesta.end(JSON.stringify(DataPaciente));
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+app.post("/Receta",  async function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+    // Ejecutamos el query para obtener los datos del paciente
+    const DataPaciente = await Receta(peticion.session.idInfoUsuario,peticion.session.idReceta);
+    // Y damos el output en json
     respuesta.end(JSON.stringify(DataPaciente));
   } else {
     respuesta.redirect("/");
@@ -531,7 +556,17 @@ app.get('/InfoPaciente/:id', async (req, res) => {
   }
 });
 
-
+app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
+  if (req.session.idusuario) {
+    const idPaciente = req.params.idPaciente;
+    const idReceta = req.params.idReceta;
+    // Guardamos temporalmente el id del paciente en una Cookie para realizar la consulta
+    req.session.idInfoUsuario = idPaciente;
+    req.session.idReceta = idReceta;
+    //  Y renderizamos la vista
+    res.render("Receta.ejs");
+  }
+});
 
 
 
