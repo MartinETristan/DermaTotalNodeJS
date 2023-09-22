@@ -277,7 +277,7 @@ async function cargarGeneral() {
   // ========================================================================================================
   $.ajax({
     url: "/InfoRegistros",
-    type: "GET",
+    type: "POST",
     dataType: "json",
     success: function (data) {
       // Llenado para el Sexo

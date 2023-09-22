@@ -27,7 +27,7 @@ function getUserRole() {
   return new Promise((resolve, reject) => {
     $.ajax({
       url: "/InfoSesion",
-      method: "GET",
+      method: "POST",
       dataType: "json",
       success: function (respuesta) {
         resolve(respuesta);
@@ -261,11 +261,15 @@ $(document).ready(function () {
 // Realizamos peticiones para llenar en contenido del Sitio Web
 // ==================================================================================================
   // Pedimos los datos del sistema
-  fetch("/DatosSistema")
+  fetch("/DatosSistema", {
+    method: "POST", // Especificamos que la petición sea de tipo POST
+  })
     .then((response) => response.json())
     .then((dataSistema) => {
       // Y pedimos los datos de la sesion
-      fetch("/InfoSesion")
+      fetch("/InfoSesion", {
+        method: "POST", // Especificamos que la petición sea de tipo POST
+      })
         .then((response) => response.json())
         .then((dataSession) => {
           // Generacion  del saludo para todos los usuarios
@@ -372,3 +376,30 @@ window.addEventListener("beforeunload", function (event) {
 if (window.location.href.indexOf("/Dashboard") === -1) {
   socket.disconnect();
 }
+
+
+// ==================================================================================================
+// Funciones de inactividad
+// ==================================================================================================
+let inactivityTimer;
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(function () {
+    // Se ejecutará esta función si no hay actividad en 10 minutos
+    location.reload();
+  }, 15 * 60 * 1000); // 10 minutos en milisegundos
+}
+
+// Cuando ocurra actividad (por ejemplo, un clic en algún lugar de la página)
+document.addEventListener("click", function () {
+  resetInactivityTimer(); // Reiniciar el contador de inactividad
+});
+
+// Cuando ocurre un evento de scroll en la página
+window.addEventListener("scroll", function () {
+  resetInactivityTimer(); // Reiniciar el contador de inactividad
+});
+
+// Iniciar el contador de inactividad al cargar la página
+resetInactivityTimer();

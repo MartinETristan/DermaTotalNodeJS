@@ -265,7 +265,7 @@ function CitasFinalizadas(datos) {
 //==================================================================================================
 $.ajax({
   url: "/DashboardDoc",
-  method: "GET",
+  method: "POST",
   dataType: "json",
   success: function (respuesta) {
     PacientesEnEspera(respuesta.PacientesEspera);

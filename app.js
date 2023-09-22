@@ -151,7 +151,16 @@ io.on("connection", (socket) => {
 //  TESTING
 //==================================================================================================
 
-
+app.use((req, res, next) => {
+  const agent = req.headers['user-agent'];
+  if (agent.indexOf('Safari') > -1 && agent.indexOf('Chrome') === -1 && agent.indexOf('OPR') === -1) {
+    res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.header('Pragma', 'no-cache');
+    res.header('Expires', '0');
+    console.log('Safari');
+  }
+  next();
+});
 
 
 //==================================================================================================
@@ -193,7 +202,7 @@ app.post("/login", async (req, res) => {
 });
 
 // Ruta para cerrar sesión
-app.get("/logout", function (peticion, respuesta) {
+app.post("/logout", function (peticion, respuesta) {
   logout(peticion.session.idusuario);
   peticion.session.destroy(function (error) {
     if (error) {
@@ -204,7 +213,7 @@ app.get("/logout", function (peticion, respuesta) {
   });
 });
 
-app.get("/InfoSesion", function (peticion, respuesta) {
+app.post("/InfoSesion", function (peticion, respuesta) {
   const DatosSistema = {
     // ID del usuario en la TABLA USUARIOS
     idUsuario: peticion.session.idusuario,
@@ -223,7 +232,7 @@ app.get("/InfoSesion", function (peticion, respuesta) {
 });
 
 // Ruta para obtener los datos de la Compañia/CopyRight
-app.get("/DatosSistema", function (peticion, respuesta) {
+app.post("/DatosSistema", function (peticion, respuesta) {
   const DatosSistema = {
     Saludo: Saludo(),
     Copy: Copyright().Copyright,
@@ -235,14 +244,14 @@ app.get("/DatosSistema", function (peticion, respuesta) {
 });
 
 // Ruta para obtener las opciones de cualqueir tipo de registro 
-app.get("/InfoRegistros", async (req, res) => {
+app.post("/InfoRegistros", async (req, res) => {
   const resultado = await InfoRegistros();
   res.end(JSON.stringify(resultado));
 });
 
 
 // Ruta para obtener los datos del Dashboard para los Doctores
-app.get("/DashboardDoc", async (peticion, respuesta) => {
+app.post("/DashboardDoc", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     if (peticion.session.EsDoctor) {
       const PacientesEspera = await DashDoc(
@@ -265,7 +274,7 @@ app.get("/DashboardDoc", async (peticion, respuesta) => {
 });
 
 // Ruta para obtener los datos del Dashboard para los recepcionistas
-app.get("/DashboardRecepcion", async (peticion, respuesta) => {
+app.post("/DashboardRecepcion", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     const PacientesEspera = await DashRecepcion(
       peticion.session.Sucursal,
@@ -277,7 +286,7 @@ app.get("/DashboardRecepcion", async (peticion, respuesta) => {
   }
 });
 
-app.get("/AgendaDoctor", async (peticion, respuesta) => {
+app.post("/AgendaDoctor", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     if (peticion.session.EsDoctor) {
       const Agenda = await CitasDoctor(peticion.session.idTipoDeUsuario);
@@ -290,6 +299,18 @@ app.get("/AgendaDoctor", async (peticion, respuesta) => {
     respuesta.redirect("/");
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.post("/ActualizarCita", async (req, res) => {
   // Lanzamos la actualizacion de la cita a la base de datos

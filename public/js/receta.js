@@ -21,7 +21,7 @@ function obtenerDatos() {
   // ====================================================
   $.ajax({
     url: "/InfoRegistros",
-    method: "GET",
+    method: "POST",
     dataType: "json",
     success: (data) => {
       IDT.push(data);
