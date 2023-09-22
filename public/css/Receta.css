@@ -72,7 +72,7 @@ dt{
     font-weight: bold;
 }
 .InfoReceta{
-    height: 270px;
+    height: 250px;
     /* min-height: 250px; */
     /* max-height: 250px; */
 }
@@ -83,7 +83,7 @@ dt{
 }
 
 .Footer{
-    margin-bottom: 15px;
+    margin-bottom: 75px;
 }
 
 .Correo{
