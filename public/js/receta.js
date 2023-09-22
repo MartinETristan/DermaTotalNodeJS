@@ -12,7 +12,6 @@ function obtenerDatos() {
     method: "POST",
     dataType: "json",
     success: (data) => {
-      console.log(data);
       IReceta.push(data);
     },
   });
@@ -25,35 +24,24 @@ function obtenerDatos() {
     method: "GET",
     dataType: "json",
     success: (data) => {
-      // console.log(data);
       IDT.push(data);
     },
   });
   // Se pone un Delay para que se cargue la info de la receta
-  setTimeout(
-    () => {
-      MedicamentosReceta();
-    },
-    100
-  );
+  setTimeout(() => {
+    MedicamentosReceta();
+  }, 100);
   // Y para que en cuanto termine de cargarse, se imprima automaticamente y se cierre la ventana
-  setTimeout(
-    () => {
-      window.print();
-      window.close();
-    },
-    150
-  );
+  setTimeout(() => {
+    window.print();
+    window.close();
+  }, 150);
 }
 // ====================================================
 // Función para formatear la receta
 // ====================================================
 function FormatoReceta() {
   Pagina++;
-  console.log("Info de la Receta con IReceta:");
-  console.log(IReceta);
-  console.log("Info de la Sucursal con IDT:");
-  console.log(IDT);
 
   const InsertReceta = document.getElementById("ContenidoReceta");
   // Obtener la fecha actual
@@ -174,8 +162,6 @@ function FormatoReceta() {
   document.body.appendChild(InsertReceta);
 }
 
-
-
 // ====================================================
 // Función para crear los elementos <div> de la receta
 // ====================================================
@@ -245,7 +231,7 @@ function MedicamentosReceta() {
       }
     }
     // Si se tiene una nota en la receta, se agrega al final de la receta
-    if(IReceta[0][0].Nota){
+    if (IReceta[0][0].Nota) {
       const divNota = document.createElement("div");
       divNota.className = "Nota";
       divNota.innerHTML = `
@@ -267,9 +253,6 @@ function MedicamentosReceta() {
   document.body.appendChild(mainDiv);
 }
 
-
-
 $(document).ready(async function () {
   obtenerDatos();
-
 });
