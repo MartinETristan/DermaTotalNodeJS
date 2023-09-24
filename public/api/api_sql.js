@@ -540,8 +540,6 @@ async function InfoPaciente(idPaciente) {
   // =================================================
   // Historial fotografico del paciente
   try {
-
-
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo el historial fotografico del paciente: ",
@@ -552,9 +550,6 @@ async function InfoPaciente(idPaciente) {
   // =================================================
   // Consultas del paciente
   try {
-
-
-
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo las consultas del paciente: ",
@@ -815,36 +810,76 @@ async function PassRestart(Usuario) {
   }
 }
 
+async function NuevaReceta(idPaciente, idDoctor, idSesion, Medicamentos, Indicaciones, Nota) {
+  let idReceta = 0;
+  let idMedicamento = [];
 
+  const connection = await mysql.createConnection(db);
 
-async function NuevaReceta(idPaciente,idDoctor,idSesion) {
   try {
-    const connection = await mysql.createConnection(db);
     const NewReceta = `INSERT INTO Receta_Pacientes
-    (idPaciente, idDoctor, idSesion, Fecha)
-    VALUES(?, ?, ${idSesion}, ?);`;
-    const receta = await connection.execute(NewReceta, [idPaciente, idDoctor, new Date()]);
-    connection.end();
-    console.log(receta);
-    return receta;
+      (idPaciente, idDoctor, idSesion, Fecha, Nota)
+      VALUES (?, ?, ?, ?, ?);`;
+
+    const [recetaResult] = await connection.execute(NewReceta, [
+      idPaciente,
+      idDoctor,
+      idSesion || null,
+      new Date(),
+      Nota || null,
+    ]);
+
+    idReceta = recetaResult.insertId;
   } catch (error) {
     console.error("Ha ocurrido un error creando la receta: ", error);
     return "Ha ocurrido un error.";
   }
-}
 
+  if (Medicamentos.length > 0) {
+    const medicamentosToInsert = Array.isArray(Medicamentos)
+      ? Medicamentos
+      : [Medicamentos];
 
+    const indicacionesToInsert = Array.isArray(Indicaciones)
+      ? Indicaciones
+      : [Indicaciones];
 
-async function MedicamentoReceta(idReceta,Medicamento,Indicacion) {
-  try {
-    
-  } catch (error) {
-    console.error("Ha ocurrido un error insertando el medicamento en la receta: ", error);
-    return "Ha ocurrido un error.";
+    for (let i = 0; i < medicamentosToInsert.length; i++) {
+      const Medicamento = medicamentosToInsert[i];
+      const Indicacion = indicacionesToInsert[i] || "";
+
+      const NewMedicamento = `INSERT INTO Medicamento
+        (Medicamento, Indicacion)
+        VALUES (?, ?);`;
+
+      try {
+        const [medicamentoResult] = await connection.execute(NewMedicamento, [
+          Medicamento,
+          Indicacion,
+        ]);
+
+        idMedicamento.push(medicamentoResult.insertId);
+      } catch (error) {
+        console.error("Error al insertar Medicamento:", error);
+      }
+    }
+  } else {
+    console.log("El array Medicamentos está vacío, no se realizaron inserciones.");
   }
+
+  if (Array.isArray(idMedicamento) && idMedicamento.length > 0) {
+    for (const medicamentoId of idMedicamento) {
+      const insertQuery =
+        "INSERT INTO Medicamento_Receta (idMedicamento, idReceta_Pacientes) VALUES (?, ?);";
+      await connection.execute(insertQuery, [medicamentoId, idReceta]);
+    }
+  }
+
+  await connection.end();
 }
 
-async function Receta(idPaciente,idReceta){
+
+async function Receta(idPaciente, idReceta) {
   try {
     const connection = await mysql.createConnection(db);
     const queryReceta = `
@@ -860,16 +895,20 @@ async function Receta(idPaciente,idReceta){
     LEFT JOIN Usuarios up ON up.idUsuario = p.idUsuario
     WHERE rp.idPaciente = ? AND mr.idReceta_Pacientes = ?
     `;
-    const [checkreceta,a] = await connection.execute(queryReceta, [idPaciente, idReceta]);
+    const [checkreceta, a] = await connection.execute(queryReceta, [
+      idPaciente,
+      idReceta,
+    ]);
     connection.end();
     return checkreceta;
   } catch (error) {
-    console.error("Ha ocurrido un error consultando la receta del paciente: ", error);
+    console.error(
+      "Ha ocurrido un error consultando la receta del paciente: ",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 }
-
-
 
 async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
 

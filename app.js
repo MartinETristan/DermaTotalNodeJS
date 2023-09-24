@@ -10,7 +10,6 @@ import { promises as fs, constants } from "fs";
 import multer from "multer";
 import sharp from "sharp";
 
-
 // Importacion de API's
 import {
   VerificarUsuario,
@@ -70,8 +69,8 @@ const sessionMiddleware = session({
   saveUninitialized: true,
   cookie: {
     // Caducidad de 12 horas de la cookie o "Sesión" en milisegundos
-    maxAge: 43200000
-  }
+    maxAge: 43200000,
+  },
 });
 
 app.use(sessionMiddleware);
@@ -146,22 +145,24 @@ io.on("connection", (socket) => {
   });
 });
 
-
 //==================================================================================================
 //  TESTING
 //==================================================================================================
 
 app.use((req, res, next) => {
-  const agent = req.headers['user-agent'];
-  if (agent.indexOf('Safari') > -1 && agent.indexOf('Chrome') === -1 && agent.indexOf('OPR') === -1) {
-    res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.header('Pragma', 'no-cache');
-    res.header('Expires', '0');
-    console.log('Safari');
+  const agent = req.headers["user-agent"];
+  if (
+    agent.indexOf("Safari") > -1 &&
+    agent.indexOf("Chrome") === -1 &&
+    agent.indexOf("OPR") === -1
+  ) {
+    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", "0");
+    console.log("Safari");
   }
   next();
 });
-
 
 //==================================================================================================
 //  Logica del Sitio Web (Backend)
@@ -202,7 +203,7 @@ app.post("/login", async (req, res) => {
 });
 
 // Ruta para cerrar sesión
-app.post("/logout", function (peticion, respuesta) {
+app.get("/logout", function (peticion, respuesta) {
   logout(peticion.session.idusuario);
   peticion.session.destroy(function (error) {
     if (error) {
@@ -243,12 +244,11 @@ app.post("/DatosSistema", function (peticion, respuesta) {
   respuesta.end(JSON.stringify(DatosSistema));
 });
 
-// Ruta para obtener las opciones de cualqueir tipo de registro 
+// Ruta para obtener las opciones de cualqueir tipo de registro
 app.post("/InfoRegistros", async (req, res) => {
   const resultado = await InfoRegistros();
   res.end(JSON.stringify(resultado));
 });
-
 
 // Ruta para obtener los datos del Dashboard para los Doctores
 app.post("/DashboardDoc", async (peticion, respuesta) => {
@@ -257,7 +257,7 @@ app.post("/DashboardDoc", async (peticion, respuesta) => {
       const PacientesEspera = await DashDoc(
         peticion.session.idTipoDeUsuario,
         FechaHora().FormatoDia
-        );
+      );
       respuesta.end(JSON.stringify(PacientesEspera));
     } else {
       const PacientesEspera = {
@@ -300,63 +300,75 @@ app.post("/AgendaDoctor", async (peticion, respuesta) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
 app.post("/ActualizarCita", async (req, res) => {
   // Lanzamos la actualizacion de la cita a la base de datos
   ModificacionCita(req.body.idCita, req.body.HoraCita, req.body.FinCita);
-  return res.status(200).json({ mensaje: 'Cita actualizada exitosamente' });
+  return res.status(200).json({ mensaje: "Cita actualizada exitosamente" });
 });
 
 // Actualziamos la informacion del Expediente del paciente
-app.post("/ActualizarAntecedentesPaciente", async(req,res)=>{
+app.post("/ActualizarAntecedentesPaciente", async (req, res) => {
   // Actualizamos la informacion del paciente
-  ActualizarAntecedentesPaciente(req.session.idInfoUsuario, req.body.Propiedad,req.body.Valor);
-  return res.status(200).json({ mensaje: 'Antecedente actualizado exitosamente' });
+  ActualizarAntecedentesPaciente(
+    req.session.idInfoUsuario,
+    req.body.Propiedad,
+    req.body.Valor
+  );
+  return res
+    .status(200)
+    .json({ mensaje: "Antecedente actualizado exitosamente" });
 });
 
 // Actualizamos la informacion personal
-app.post("/ActualizarInfoPersonal", async(req,res)=>{
-  ActualizarDatosGenerales(req.session.idInfoUsuario,req.body.Propiedad,req.body.Valor,req.body.TipoUser);
-  return res.status(200).json({ mensaje: 'Informacion Personal actualizada exitosamente' });
+app.post("/ActualizarInfoPersonal", async (req, res) => {
+  ActualizarDatosGenerales(
+    req.session.idInfoUsuario,
+    req.body.Propiedad,
+    req.body.Valor,
+    req.body.TipoUser
+  );
+  return res
+    .status(200)
+    .json({ mensaje: "Informacion Personal actualizada exitosamente" });
 });
 
 // Actualizamos la informacion personal
-app.post("/ActualizarStatus", async(req,res)=>{
-  ActualizarStatus(req.body.TipoUser,req.session.idInfoUsuario,req.body.Valor);
-  return res.status(200).json({ mensaje: 'Status actualizado exitosamente' });
+app.post("/ActualizarStatus", async (req, res) => {
+  ActualizarStatus(
+    req.body.TipoUser,
+    req.session.idInfoUsuario,
+    req.body.Valor
+  );
+  return res.status(200).json({ mensaje: "Status actualizado exitosamente" });
 });
 
-// Reinicio de la contraseña al nombre de usuario 
-app.post("/PassRestart", async(req,res)=>{
+// Reinicio de la contraseña al nombre de usuario
+app.post("/PassRestart", async (req, res) => {
   PassRestart(req.body.usuario);
-  console.log("Contraseña Reiniciada con exito.")
-  return res.status(200).json({ mensaje: 'Contaseña reiniciada exitosamente' });
+  console.log("Contraseña Reiniciada con exito.");
+  return res.status(200).json({ mensaje: "Contaseña reiniciada exitosamente" });
 });
-
 
 app.post("/NuevaReceta", async (req, res) => {
-  if(req.session.EsDoctor){
-    NuevaReceta(req.session.idInfoUsuario,req.session.idDoctor,req.body.idSesion);
-    return res.status(200).json({ mensaje: 'Nueva Receta creada exitosamente' });
-  }else{
-    res.redirect('/');
+  if (req.session.EsDoctor) {
+    await NuevaReceta(
+      req.session.idInfoUsuario,
+      req.session.idDoctor,
+      req.body.idSesion,
+      req.body.Medicamentos,
+      req.body.Indicaciones,
+      req.body.Nota
+    );
+    
+    // Redirige a la misma página actual (recargará la página)
+    return res.redirect(`InfoPaciente/${req.session.idInfoUsuario}`);
+  } else {
+    res.redirect("/");
   }
 });
 
 
-
-app.post("/InfoPaciente",  async function (peticion, respuesta) {
+app.post("/InfoPaciente", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     // Ejecutamos el query para obtener los datos del paciente
     const DataPaciente = await InfoPaciente(peticion.session.idInfoUsuario);
@@ -367,10 +379,13 @@ app.post("/InfoPaciente",  async function (peticion, respuesta) {
   }
 });
 
-app.post("/Receta",  async function (peticion, respuesta) {
+app.post("/Receta", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     // Ejecutamos el query para obtener los datos del paciente
-    const DataPaciente = await Receta(peticion.session.idInfoUsuario,peticion.session.idReceta);
+    const DataPaciente = await Receta(
+      peticion.session.idInfoUsuario,
+      peticion.session.idReceta
+    );
     // Y damos el output en json
     respuesta.end(JSON.stringify(DataPaciente));
   } else {
@@ -378,13 +393,15 @@ app.post("/Receta",  async function (peticion, respuesta) {
   }
 });
 
-
 //Variable para el almacenamiento de imagenes con multer
 const almacenamiento = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       //Creamos la carpeta del paciente
-      const rutaDestino = await CarpetaPersonal(req.body.Protocolo, req.body.Nombres);
+      const rutaDestino = await CarpetaPersonal(
+        req.body.Protocolo,
+        req.body.Nombres
+      );
       // Y utilizamos la ruta donde se creó la carpeta
       cb(null, rutaDestino);
     } catch (error) {
@@ -399,35 +416,40 @@ const almacenamiento = multer.diskStorage({
 });
 
 // Aqui está la configuracion del Resaizer (para los diferentes tamaños)
-const Resizer = (Archivo,Ruta, porcentaje) => {
+const Resizer = (Archivo, Ruta, porcentaje) => {
   return sharp(Archivo)
-  .resize(porcentaje)
-  .toFile(Ruta, (err, info) => {
-    if (err){
-      console.log(err);
-    }
-  });
+    .resize(porcentaje)
+    .toFile(Ruta, (err, info) => {
+      if (err) {
+        console.log(err);
+      }
+    });
 };
 
 const subirfoto = multer({ storage: almacenamiento });
 
 // Funcion de apoyo para la creacion de pacientes
 async function CrearPaciente(req, res) {
-  try {    
+  try {
     // Verificar si se proporcionó una imagen
     let rutaImagen = null;
     if (req.file) {
       rutaImagen = req.file.destination;
-      // Unicamente si el protocolo es perfil crea la miniatura para mostrar en todo el sitio 
-      if(req.body.Protocolo == "Perfil"){
-        Resizer(req.file.path,req.file.destination+`/Pequeño-${req.file.filename}`, 50);
+      // Unicamente si el protocolo es perfil crea la miniatura para mostrar en todo el sitio
+      if (req.body.Protocolo == "Perfil") {
+        Resizer(
+          req.file.path,
+          req.file.destination + `/Pequeño-${req.file.filename}`,
+          50
+        );
       }
-
     }
     // Si el usuario es doctor, le pasamos el id del doctor, si no, le pasamos el id del recepcionista
     const idDoctor = req.session.EsDoctor ? req.session.idDoctor : null;
-    const idTipoDeUsuario = req.session.EsDoctor ? null : req.session.idTipoDeUsuario;
-    
+    const idTipoDeUsuario = req.session.EsDoctor
+      ? null
+      : req.session.idTipoDeUsuario;
+
     // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
     await NuevoPaciente(
       req.body.Nombres,
@@ -442,22 +464,20 @@ async function CrearPaciente(req, res) {
       idDoctor,
       idTipoDeUsuario
     );
-    
 
-    return res.status(200).json({ mensaje: 'Nuevo paciente creado exitosamente' });
-
+    return res
+      .status(200)
+      .json({ mensaje: "Nuevo paciente creado exitosamente" });
   } catch (error) {
     console.error("Error en la creación de paciente:", error);
-    return res.status(500).json({ mensaje: 'Ha ocurrido un error en la creación de paciente' });
+    return res
+      .status(500)
+      .json({ mensaje: "Ha ocurrido un error en la creación de paciente" });
   }
 }
 
-
 // Ruta para la creacion de pacientes
-app.post("/CrearPaciente", subirfoto.single('file'), CrearPaciente);
-
-
-
+app.post("/CrearPaciente", subirfoto.single("file"), CrearPaciente);
 
 // Funcion para la creacion de carpetas de usuarios
 async function crearCarpeta(Ruta, Protocolo, id) {
@@ -474,17 +494,28 @@ async function CarpetaPersonal(Protocolo, id) {
   //Verifica que existan los argumentos
   if (!Protocolo || !id) {
     console.log("Faltan argumentos para construir la ruta.");
-    throw new Error("Faltan argumentos para construir la ruta.",' Protocolo: ',Protocolo, ' id: ',id);
+    throw new Error(
+      "Faltan argumentos para construir la ruta.",
+      " Protocolo: ",
+      Protocolo,
+      " id: ",
+      id
+    );
   }
   //Genera la ruta de la carpeta
-  const Ruta = path.join(__dirname, "public/private/src/img", Protocolo, id.toString());
+  const Ruta = path.join(
+    __dirname,
+    "public/private/src/img",
+    Protocolo,
+    id.toString()
+  );
 
   //Verifica que el protocolo sea valido
   if (Protocolo == "Perfil" || Protocolo == "Historial") {
     //Verifica que la carpeta exista
     try {
       await fs.access(Ruta, constants.F_OK);
-      console.log("La carpeta del usuario ",id," se creó o ya existe.");
+      console.log("La carpeta del usuario ", id, " se creó o ya existe.");
       return Ruta;
     } catch (error) {
       // Si no existe, la crea
@@ -496,8 +527,6 @@ async function CarpetaPersonal(Protocolo, id) {
     throw new Error("El protocolo no es valido.");
   }
 }
-
-
 
 //==================================================================================================
 //  Vistas del sitio Web (Frontend)
@@ -555,7 +584,6 @@ app.get("/NuevoPaciente", function (peticion, respuesta) {
   }
 });
 
-
 app.get("/Agenda", function (peticion, respuesta) {
   if (peticion.session.idusuario) {
     respuesta.render("Agenda.ejs");
@@ -564,16 +592,15 @@ app.get("/Agenda", function (peticion, respuesta) {
   }
 });
 
-
-app.get('/InfoPaciente/:id', async (req, res) => {
+app.get("/InfoPaciente/:id", async (req, res) => {
   if (req.session.idusuario) {
-   const pacienteId = req.params.id;
-   // Guardamos temporalmente el id del paciente en una Cookie para realizar la consulta
-   req.session.idInfoUsuario = pacienteId;
-  //  Y renderizamos la vista
-   res.render('InfoPaciente.ejs');
-  }else{
-    res.redirect('/');
+    const pacienteId = req.params.id;
+    // Guardamos temporalmente el id del paciente en una Cookie para realizar la consulta
+    req.session.idInfoUsuario = pacienteId;
+    //  Y renderizamos la vista
+    res.render("InfoPaciente.ejs");
+  } else {
+    res.redirect("/");
   }
 });
 
@@ -589,10 +616,7 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
   }
 });
 
-
-
 // Y un Middleware para Cualquier otro sitio no encontrado (página 404)
 // app.use((req, res) => {
 //   res.render("404.ejs");
 // });
-

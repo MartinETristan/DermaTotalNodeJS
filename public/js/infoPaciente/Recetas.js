@@ -15,110 +15,111 @@ $.ajax({
 
 function cargarRecetas() {
   const Recetas = document.querySelector("#infocontenido");
-  var htmlString = `
-    <h3>Historial de Recetas:</h3>
-  `;
-  Recetas.innerHTML = htmlString;
+  Recetas.innerHTML = `<h3>Historial de Recetas:</h3>`;
 
-  setTimeout(() => {
     const recetas = datosAlmacenadosReceta[0].Recetas;
-    const recetasPorId = {};
+
     if (recetas.length > 0) {
-    // Agrupar recetas por idReceta
-    recetas.forEach((receta) => {
-      if (!recetasPorId[receta.idReceta]) {
-        recetasPorId[receta.idReceta] = {
-          idreceta: [],
-          doctor: [],
-          nota: [],
-          fecha: [],
-          medicamentos: [],
-          indicaciones: [],
-        };
-      }
-      // Realizar conversiones en la fecha para que se muestre correctamente:
-      const fechaOriginal = receta.Fecha;
-      // Parsear la fecha
-      const fecha = new Date(fechaOriginal);
-      // Obtener los componentes de la fecha (día, mes y año)
-      const dia = fecha.getDate();
-      const mes = fecha.getMonth() + 1; // Sumar 1 porque los meses comienzan en 0
-      const año = fecha.getFullYear() % 100; // Obtener los últimos dos dígitos del año
+      const idRecetasUtilizadas = new Set();
 
-      recetasPorId[receta.idReceta].idreceta = receta.idReceta;
-      recetasPorId[receta.idReceta].nota = receta.Nota;
-      recetasPorId[receta.idReceta].doctor = receta.Doctor;
-      recetasPorId[receta.idReceta].fecha = `${dia}/${mes}/${año}`;
-      recetasPorId[receta.idReceta].medicamentos.push(receta.Medicamento);
-      recetasPorId[receta.idReceta].indicaciones.push(receta.Indicacion);
-    });
+      recetas.forEach((receta) => {
+        const ultimareceta = receta.idReceta;
 
-    // Ordenar las recetas por fecha ascendente
-    const recetasOrdenadas = Object.values(recetasPorId).sort((a, b) => {
-      const fechaA = new Date(a.fecha);
-      const fechaB = new Date(b.fecha);
-      return fechaB - fechaA;
-    });
+        // Verifica si el idReceta ya se ha utilizado
+        if (idRecetasUtilizadas.has(ultimareceta)) {
+          return; // Pasa al siguiente si ya se ha utilizado
+        }
 
-    // Crear divs para cada grupo de idReceta
-    recetasOrdenadas.forEach((receta) => {
-      const divReceta = document.createElement("div");
-      divReceta.className = "info__item";
-      divReceta.id = `receta_${receta.idreceta}`; // Cambiar el ID a uno basado en el índice
+        // Agrega el idReceta al conjunto
+        idRecetasUtilizadas.add(ultimareceta);
 
-      const contenidoReceta = document.createElement("div");
-      contenidoReceta.className = "info__item__content";
-      contenidoReceta.innerHTML = `
-        <header class="info__item__header">
-          <h2>Receta del día ${receta.fecha}:</h2>
-          <button class="iconbtn--print" id="Print_${
-            receta.idreceta
-          }">Imprimir Receta</button>
-        </header>
-        <p>Doctor: <b>${receta.doctor}</b></p>
-        <p>Medicamentos:</p>
-        <b>${receta.medicamentos.join(", ")}</b>
-        <p>${receta.nota ? `Nota: ${receta.nota}` : ''}</p>
-      `;
+        // Resto del código para crear elementos con este idReceta
+        const fechaOriginal = receta.Fecha;
+        const fecha = new Date(fechaOriginal);
+        const dia = fecha.getDate();
+        const mes = fecha.getMonth() + 1;
+        const año = fecha.getFullYear() % 100;
 
-      divReceta.appendChild(contenidoReceta);
-      Recetas.appendChild(divReceta);
+        const header = document.createElement("header");
+        header.className = "info__item__header";
+        const TituloReceta = document.createElement("h2");
+        TituloReceta.innerHTML = `Receta del día (<span>${dia}/${mes}/${año}</span>):`;
 
-      // Función para manejar la acción al hacer clic en el botón
-      function imprimirReceta() {
-        // Acciones a realizar cuando se haga clic en el botón de imprimir
-        // Acciones a realizar cuando se haga clic en el botón
-        // Obtenemos el id del paciente con base a la URL
-        const urlCompleta = window.location.href;
-        const urlPaciente = "InfoPaciente/";
-        const posision = urlCompleta.indexOf(urlPaciente);
-        const idPaciente = urlCompleta.substring(posision + urlPaciente.length);
+        const botonImprimir = document.createElement("button");
+        botonImprimir.className = "iconbtn--print";
+        botonImprimir.id = `Print_${ultimareceta}`;
+        botonImprimir.innerHTML = "Imprimir Receta";
 
-        // Obtenemos el id de la receta
-        const idReceta = datosAlmacenados.Recetas[0].idReceta;
-        // Abrimos la receta en una nueva pestaña
-        window.open(`/Receta/${idPaciente}/${receta.idreceta}`, "_blank");
-      }
+        header.appendChild(TituloReceta);
+        header.appendChild(botonImprimir);
 
-      // Agregar el escuchador de eventos al botón de imprimir
-      const botonImprimir = document.getElementById(`Print_${receta.idreceta}`);
-      if (botonImprimir) {
-        botonImprimir.addEventListener("click", imprimirReceta);
-      }
-    });
-  } else {
-    // Si no hay receta, muestra un mensaje
-    Recetas.innerHTML =  `
-    <div class="info">
-    <h3>Historial de Recetas:</h3>
-      <div class="info__item">
-        <div class="info__item__content">
-          <p>No hay recetas en el expediente</p>
+        const Doctor = document.createElement("p");
+        Doctor.innerHTML = `Recetado por: <b><span>${receta.Doctor}</span></b>`;
+
+        const dl = document.createElement("dl");
+        const datosFiltrados = recetas.filter(
+          (item) => item.idReceta === ultimareceta
+        );
+
+        datosFiltrados.forEach((item) => {
+          const dt = document.createElement("dt");
+          dt.innerHTML = `<b>${item.Medicamento}:</b>`;
+
+          const dd = document.createElement("dd");
+          dd.innerHTML = `
+            <p>${item.Indicacion}</p>
+            <br>
+          `;
+
+          dl.appendChild(dt);
+          dl.appendChild(dd);
+        });
+
+        const divReceta = document.createElement("div");
+        divReceta.className = "info__item";
+        divReceta.id = `receta_${ultimareceta}`;
+
+        const contenidoReceta = document.createElement("div");
+        contenidoReceta.className = "info__item__content";
+        contenidoReceta.appendChild(header);
+        contenidoReceta.appendChild(Doctor);
+        contenidoReceta.appendChild(dl);
+
+        if (receta.Nota) {
+          const Nota = document.createElement("div");
+          const NotaTitulo = document.createElement("h3");
+          NotaTitulo.innerHTML = "Nota:";
+          const NotaP = document.createElement("p");
+          NotaP.innerHTML = receta.Nota;
+          Nota.appendChild(NotaTitulo);
+          Nota.appendChild(NotaP);
+          contenidoReceta.appendChild(Nota);
+        }
+
+        botonImprimir.addEventListener("click", () => {
+          const urlCompleta = window.location.href;
+          const urlPaciente = "InfoPaciente/";
+          const posicion = urlCompleta.indexOf(urlPaciente);
+          const idPaciente = urlCompleta.substring(
+            posicion + urlPaciente.length
+          );
+          window.open(`/Receta/${idPaciente}/${ultimareceta}`, "_blank");
+        });
+
+        contenidoReceta.insertBefore(header, contenidoReceta.firstChild);
+        divReceta.appendChild(contenidoReceta);
+        Recetas.appendChild(divReceta);
+      });
+    } else {
+      Recetas.innerHTML = `
+        <div class="info">
+          <h3>Historial de Recetas:</h3>
+          <div class="info__item">
+            <div class="info__item__content">
+              <p>No hay recetas en el expediente</p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    `;
-  }
-  }, 100);
-
+      `;
+    }
 }

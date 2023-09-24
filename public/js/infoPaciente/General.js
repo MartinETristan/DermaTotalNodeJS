@@ -257,17 +257,36 @@ async function cargarGeneral() {
     </div>
   </section>
 
-  <section class="region" id="NR" style="display:none;">
-    <h2>Nueva Receta:</h2>
+  <section class="region" id="NR">
     <div class="infogroup">
       <div class="info__item">
         <div class="info__item__content">
-          <div class="Nueva_Receta" id="Nueva_Receta">
+          <header class="info__item__header">
+            <h2>Nueva Receta:</h2>
+            <button type="button" id="cancelarReceta" style="display:none;">Cancelar</button>
+            <button type="button" id="botonNuevaReceta">Nueva Receta</button>
+          </header>
+          <div class="NuevaReceta" id="NuevaReceta" style="display:none;">
+            <form id="recetaForm" action="/NuevaReceta" method="POST">
+              <div id="camposMedicamentos">
+                  <!-- Los campos Medicamentos e Indicaciones se agregarán aquí -->
+              </div>
+              <header class="info__item__header">
+                <div class="Nota">
+                  <input type="text" name="Nota" placeholder="Nota" class="inputNota">
+                </div>
+                <button type="button" id="quitarCampo" style="display:none;">Quitar Medicamento</button>
+                <button type="button" id="agregarCampo">Agregar Medicamento</button>
+              </header>
+              <button type="submit" id="GuardarReceta">Guardar Receta</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+
 
     `;
 
@@ -375,7 +394,7 @@ async function cargarGeneral() {
       }
     },
     // Resto de la configuración de la solicitud AJAX
-    
+
     error: function (error) {
       console.error(error);
     },
@@ -454,6 +473,26 @@ async function cargarGeneral() {
     reiniciarContraseña();
   });
 
+  agregarEventListener("botonNuevaReceta", function () {
+    // Acciones a realizar cuando se haga clic en el botón
+    const formreceta = document.getElementById("NuevaReceta");
+    const botoncancelar = document.getElementById("cancelarReceta");
+    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
+    formreceta.style.display = "block";
+    botoncancelar.style.display = "block";
+    botonNuevaReceta.style.display = "none";
+  });
+
+  agregarEventListener("cancelarReceta", function () {
+    // Acciones a realizar cuando se haga clic en el botón
+    const formreceta = document.getElementById("NuevaReceta");
+    const botoncancelar = document.getElementById("cancelarReceta");
+    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
+    formreceta.style.display = "none";
+    botoncancelar.style.display = "none";
+    botonNuevaReceta.style.display = "block";
+  });
+
   // ========================================================================================================
   // Para confirmar los cambios
   // ========================================================================================================
@@ -512,7 +551,6 @@ async function cargarGeneral() {
     confirmarEdicion("Status", "idStatus", 3);
   });
 
-  
   // ========================================================================================================
   // Y escucnhar el boton de imprimir
   // ========================================================================================================
@@ -522,16 +560,110 @@ async function cargarGeneral() {
     const urlCompleta = window.location.href;
     const urlPaciente = "InfoPaciente/";
     const posision = urlCompleta.indexOf(urlPaciente);
-    const idPaciente = urlCompleta.substring(posision+urlPaciente.length);
+    const idPaciente = urlCompleta.substring(posision + urlPaciente.length);
 
     // Obtenemos el id de la receta
     const idReceta = datosAlmacenados.Recetas[0].idReceta;
     // Abrimos la receta en una nueva pestaña
-    window.open(`/Receta/${idPaciente}/${idReceta}`, '_blank');
+    window.open(`/Receta/${idPaciente}/${idReceta}`, "_blank");
+  });
 
+  // Array para almacenar los valores de Medicamentos e Indicaciones
+  const medicamentosIndicaciones = [];
+  agregarCampos();
+  // Función para agregar campos de Medicamentos e Indicaciones
+  function agregarCampos() {
+    const camposMedicamentos = document.getElementById("camposMedicamentos");
+
+    const medicamentoInput = document.createElement("input");
+    medicamentoInput.type = "text";
+    medicamentoInput.name = "Medicamentos";
+    medicamentoInput.placeholder = "Medicamento";
+    medicamentoInput.required = true;
+    medicamentoInput.classList.add("medicamentoreceta");
+    camposMedicamentos.appendChild(medicamentoInput);
+
+    const indicacionInput = document.createElement("input");
+    indicacionInput.type = "text";
+    indicacionInput.name = "Indicaciones";
+    indicacionInput.placeholder = "Indicación";
+    indicacionInput.classList.add("indicacionreceta");
+    indicacionInput.required = true;
+    camposMedicamentos.appendChild(indicacionInput);
+
+    // Agregar el par de Medicamento e Indicación al array correspondiente
+    medicamentoInput.addEventListener("blur", () => {
+      agregarMedicamentoIndicacion(
+        medicamentoInput.value,
+        indicacionInput.value
+      );
+    });
+  }
+
+  function eliminarUltimosCampos() {
+    const camposMedicamentos = document.getElementById("camposMedicamentos");
+
+    // Obtén todos los elementos hijos (los pares de Medicamento e Indicación)
+    const elementosHijos =
+      camposMedicamentos.querySelectorAll("input[type='text']");
+
+    // Verifica si hay al menos un conjunto de campos para eliminar
+    if (elementosHijos.length >= 4) {
+      // Elimina el último conjunto de campos (Medicamento e Indicación)
+      camposMedicamentos.removeChild(elementosHijos[elementosHijos.length - 1]);
+      camposMedicamentos.removeChild(elementosHijos[elementosHijos.length - 2]);
+    }
+  }
+
+  function agregarMedicamentoIndicacion(medicamento, indicacion) {
+    // Buscar si ya existe el medicamento en el array
+    const medicamentoExistente = medicamentosIndicaciones.find(
+      (item) => item.medicamento === medicamento
+    );
+
+    if (indicacion && medicamento) {
+      if (medicamentoExistente) {
+        medicamentoExistente.indicaciones.push(indicacion);
+      } else {
+        medicamentosIndicaciones.push({
+          medicamento,
+          indicaciones: [indicacion],
+        });
+      }
+    }
+  }
+
+  // Escuchar clic en el botón "Agregar"
+  const agregarBoton = document.getElementById("agregarCampo");
+  agregarBoton.addEventListener("click", (event) => {
+    quitarBoton.style.display = "block";
+    agregarCampos();
+  });
+
+  // Escuchar clic en el botón "quitar"
+  const quitarBoton = document.getElementById("quitarCampo");
+  quitarBoton.addEventListener("click", (event) => {
+    const camposMedicamentos = document.getElementById("camposMedicamentos");
+    // Obtén todos los elementos hijos (los pares de Medicamento e Indicación)
+    const elementosHijos =
+      camposMedicamentos.querySelectorAll("input[type='text']");
+    if (elementosHijos.length > 4) {
+      eliminarUltimosCampos();
+    } else {
+      eliminarUltimosCampos();
+      quitarBoton.style.display = "none";
+    }
+  });
+
+  // Enviar el formulario con los datos recolectados
+  const recetaForm = document.getElementById("recetaForm");
+  recetaForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    // Enviar el formulario
+    recetaForm.submit();
   });
 }
-
 
 // ========================================================================================================
 // Funciones para realizar cambios en los datos

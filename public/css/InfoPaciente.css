@@ -464,6 +464,77 @@ h1 {
 }
 
 
+
+#botonNuevaReceta,#agregarCampo{
+    font-size: 15px;
+    background-color: #73c235;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: #73c235;
+}
+#cancelarReceta{
+    color: red;
+    border: 0;
+    background-color: #fff;
+}
+
+#quitarCampo{
+    font-size: 15px;
+    background-color: #ff0000;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: #ff0000;
+}
+
+#GuardarReceta{
+    font-size: 20px;
+    margin: 20px 0px 20px 0px;
+    background-color: #249DD9;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: #249DD9;
+}
+
+#camposMedicamentos{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+}
+.medicamentoreceta{
+    font-weight: bold;
+    font-size: 25px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 50%;
+    height: auto;
+}
+
+.indicacionreceta{
+    font-size: 15px;
+    padding: 5px;
+    margin-bottom: 50px;
+    width: 95%;
+    height: auto;
+}
+
+.Nota{
+    width: 65%;
+    display: flex;
+}
+
+
+
+.inputNota {
+    font-size: 15px;
+    width: 100%;
+    padding: 10px;
+}
+
+
 .footer {
     display: flex;
     position: relative;
