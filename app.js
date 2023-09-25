@@ -29,6 +29,7 @@ import {
   ActualizarStatus,
   NuevaReceta,
   Receta,
+  Busqueda,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -392,6 +393,17 @@ app.post("/Receta", async function (peticion, respuesta) {
     respuesta.redirect("/");
   }
 });
+
+app.post("/BusquedaPacientes", async function (req, res) {
+  if (req.session.idusuario) {
+    const resBusqueda = await Busqueda(req.body.nombre, req.body.apellido, req.body.telefono_correo);
+    res.end(JSON.stringify(resBusqueda));
+  } else {
+    res.redirect("/");
+  }
+});
+
+
 
 //Variable para el almacenamiento de imagenes con multer
 const almacenamiento = multer.diskStorage({

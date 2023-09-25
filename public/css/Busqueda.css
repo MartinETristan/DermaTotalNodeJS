@@ -1,86 +1,149 @@
-h1{
+h1 {
   text-align: center;
 }
 
 /* Estilos para las cajas donde se ingresa la busqueda */
 .input-area {
-    padding: 11px 25px;
-    border: 1px solid #e3e3e3;
-    line-height: 1;
-    border-radius: 20px;
-    background-color:#e3ecf2;
-    width: 50%;
-    margin: auto;
-    align-items: center;
-    display: flex;
-  }
+  padding: 20px 20px;
+  border: 1px solid #e3e3e3;
+  line-height: 1;
+  border-radius: 20px;
+  background-color: #e3ecf2;
+  width: 50%;
+  margin: auto;
+  align-items: center;
+  display: flex;
+}
 
 .input-area>input {
-   display: block;
-   position: relative;
-   margin-left: auto;
-   width: 23%;
-  }
+  display: block;
+  position: relative;
+  margin-left: auto;
+  width: 23%;
+  margin-left: 10px;
+}
 
-  .f-inp:hover {
-    border: 1px solid #249dd9;
-  }
+.f-inp:hover {
+  border: 1px solid #249dd9;
+}
 
-  .f-inp {
-    padding: 11px 25px;
-    border: 1px solid #e3e3e3;
-    line-height: 1;
-    border-radius: 15px;
-  
-  }
+.f-inp {
+  padding: 11px 25px;
+  border: 1px solid #e3e3e3;
+  line-height: 1;
+  border-radius: 15px;  
+}
 
-  .f-inp input {
-    width: 100%;
-    font-size: 13.4px;
-    padding: 0;
-    margin: 0;
-    border: 0;
-  }
+.f-inp input {
+  width: 100%;
+  font-size: 13.4px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
 
-  .f-inp input::placeholder {
-    color: #b9b9b9;
-  }
+.f-inp input::placeholder {
+  color: #b9b9b9;
+}
 
-  /* Estilo para el botón de busqueda */
-  #submit-button {
-    font-weight: 500;
-    font-size: 12px;
-    color: #fff;
-    margin: 10px;
-    padding: 11px 15px 11px 15px;
-    border: 0;
-    background-color: #249dd9;
-    border-radius: 25px;
-    line-height: 1;
-    cursor: pointer;
-  }
-  #submit-button:hover {
-    background-color: #004368;
-  }
+/* Estilo para el botón de busqueda */
+#submit-button {
+  font-weight: 500;
+  font-size: 12px;
+  color: #fff;
+  margin: 10px;
+  padding: 11px 15px 11px 15px;
+  border: 0;
+  background-color: #249dd9;
+  border-radius: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#submit-button:hover {
+  background-color: #004368;
+}
 
 
 /* Estilo para los resultados obtenidos */
-  .resultado {
-    margin-top: 25px;
-    padding: 11px 300px;
-    border: 1px solid #e3e3e3;
-    line-height: 1;
-    border-radius: 20px;
-    background-color:#fff;
-  }
+.resultado {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  margin-top: 25px;
+  padding: 15px 15px;
+  border-radius: 10px;
+  background-color: #fff;
+}
 
-  .resultado:hover{
-    cursor: pointer;
-    background-color:#e2e2e2;
-  }
-  hr{
-    margin-top: 25px;
-  }
+
+.resultado:hover {
+  cursor: pointer;
+  background-color: #e2e2e2;
+}
+
+hr {
+  margin-top: 25px;
+  width: 100%;
+}
+
+.contresultados {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  width: 50%;
+}
+
+#ResultadosBusqueda {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.NuevoPaciente {
+  text-wrap: nowrap;
+  text-decoration: none;
+  font-size: 15px;
+  color: #fff;
+  padding: 11px 15px 11px 15px;
+  border: 0;
+  margin-left: 10px;
+  background-color: #18ad01;
+  border-radius: 25px;
+}
+.NuevoPaciente:hover {
+  background-color: #106d02;
+}
+
+.PacienteFoto {
+  margin-right: 20px;
+  border-radius: 5px;
+  width: 100px; /* El tamaño deseado del contenedor cuadrado */
+  height: 100px; /* El tamaño deseado del contenedor cuadrado */
+  overflow: hidden;
+  position: relative;
+}
+
+.fotousuario {
+  width: 100%; /* Establece el ancho de la imagen al 100% del contenedor */
+  height: 100%; /* Establece la altura de la imagen al 100% del contenedor */
+  object-fit: cover;
+  object-position: center; /* Opcional, centra la imagen dentro del contenedor */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+
+
+.datospaciente >h2{
+  padding: 0;
+}
+
 
 /* Estilos del Footer Sticky */
 .footer {

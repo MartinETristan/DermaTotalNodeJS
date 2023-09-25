@@ -377,6 +377,9 @@ async function DashRecepcion(Sucursal, Fecha) {
   return InfoDashRecep;
 }
 
+//==================================================================================================
+// Funcion para obtener la informacion de los pacientes
+//==================================================================================================
 async function InfoPaciente(idPaciente) {
   // Llenamos los datos con valores por defecto
   let BasicInfo = [];
@@ -722,6 +725,7 @@ async function logout(idUsuario) {
     return "Ha ocurrido un error.";
   }
 }
+
 async function CitasDoctor(idDoctor) {
   try {
     const connection = await mysql.createConnection(db);
@@ -810,7 +814,14 @@ async function PassRestart(Usuario) {
   }
 }
 
-async function NuevaReceta(idPaciente, idDoctor, idSesion, Medicamentos, Indicaciones, Nota) {
+async function NuevaReceta(
+  idPaciente,
+  idDoctor,
+  idSesion,
+  Medicamentos,
+  Indicaciones,
+  Nota
+) {
   let idReceta = 0;
   let idMedicamento = [];
 
@@ -864,7 +875,9 @@ async function NuevaReceta(idPaciente, idDoctor, idSesion, Medicamentos, Indicac
       }
     }
   } else {
-    console.log("El array Medicamentos está vacío, no se realizaron inserciones.");
+    console.log(
+      "El array Medicamentos está vacío, no se realizaron inserciones."
+    );
   }
 
   if (Array.isArray(idMedicamento) && idMedicamento.length > 0) {
@@ -877,7 +890,6 @@ async function NuevaReceta(idPaciente, idDoctor, idSesion, Medicamentos, Indicac
 
   await connection.end();
 }
-
 
 async function Receta(idPaciente, idReceta) {
   try {
@@ -910,7 +922,80 @@ async function Receta(idPaciente, idReceta) {
   }
 }
 
-async function Busqueda(Nombre, Apellidos, Telefono_Correo) {}
+
+async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
+  let connection;
+  try {
+    connection = await mysql.createConnection(db);
+    let busqueda = `
+    SELECT p.idPaciente, u.Nombres, u.ApellidoP, u.ApellidoM,
+    CASE 
+      WHEN u.Telefono IS NOT NULL THEN u.Telefono
+      ELSE u.TelefonoSecundario
+    END AS Telefono,
+    u.Correo,
+    u.RutaFoto,
+    s.Status  
+    FROM Paciente p 
+    LEFT JOIN Usuarios u ON u.idUsuario = p.idUsuario 
+    LEFT JOIN Status s ON s.idStatus = p.idStatus 
+    WHERE s.idStatus IN (1, 2) AND`;
+
+    const params = [];
+
+    switch (true) {
+      case Boolean(Nombre):
+        busqueda += ` u.Nombres LIKE ? AND`;
+        params.push(`%${Nombre}%`);
+        break;
+      case Boolean(Apellidos):
+        busqueda += ` (ApellidoP LIKE ? OR ApellidoM LIKE ?) AND`;
+        params.push(`%${Apellidos}%`, `%${Apellidos}%`);
+        break;
+      case Boolean(Telefono_Correo):
+        busqueda += ` (Telefono LIKE ? OR TelefonoSecundario LIKE ? OR Correo LIKE ?) AND`;
+        params.push(
+          `%${Telefono_Correo}%`,
+          `%${Telefono_Correo}%`,
+          `%${Telefono_Correo}%`
+        );
+        break;
+      default:
+        throw new Error("Ningún criterio de búsqueda válido proporcionado.");
+    }
+
+    // Elimina el último "AND" si existe
+    if (busqueda.endsWith("AND")) {
+      busqueda = busqueda.slice(0, -3);
+    }
+
+    // Ejecuta la consulta SQL con los parámetros
+    const [resBusqueda] = await connection.execute(busqueda, params);
+
+    let arrayBusqueda = resBusqueda.map((elemento) => {
+      return {
+        idPaciente: elemento.idPaciente,
+        Nombre: elemento.Nombres,
+        ApellidoP: elemento.ApellidoP,
+        ApellidoM: elemento.ApellidoM,
+        Telefono: elemento.Telefono,
+        Correo:elemento.Correo,
+        Status: elemento.Status,
+        RutaFoto:elemento.RutaFoto,
+      };
+    });
+
+    // Devuelve el resultado de la búsqueda
+    return arrayBusqueda;
+  } catch (error) {
+    throw error; // Lanza la excepción para que el cliente pueda manejarla
+  } finally {
+    if (connection) {
+      connection.end();
+    }
+  }
+}
+
 
 //==================================================================================================
 // Updates estados Pacientes / Citas
@@ -1056,4 +1141,5 @@ export {
   ActualizarStatus,
   NuevaReceta,
   Receta,
+  Busqueda,
 };

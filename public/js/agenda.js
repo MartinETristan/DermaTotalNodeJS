@@ -89,7 +89,7 @@ $(document).ready(function () {
     events: function (fetchInfo, successCallback, failureCallback) {
       $.ajax({
         url: "/AgendaDoctor",
-        method: "GET",
+        method: "POST",
         dataType: "json",
         success: function (data) {
           // Array con los colores a mostrar con base a su status
