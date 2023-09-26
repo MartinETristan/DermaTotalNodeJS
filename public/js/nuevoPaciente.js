@@ -35,7 +35,7 @@ InputFile.addEventListener("change", (e) => {
 
 $.ajax({
   url: "/InfoRegistros",
-  type: "GET",
+  type: "POST",
   dataType: "json",
   success: function (data) {
     const Sexo = document.getElementById("Sexo");

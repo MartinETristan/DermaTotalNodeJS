@@ -30,6 +30,7 @@ import {
   NuevaReceta,
   Receta,
   Busqueda,
+  InsertRutaFoto,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -223,6 +224,10 @@ app.post("/InfoSesion", function (peticion, respuesta) {
     ClaseUsuario: peticion.session.idClaseUsuario,
     // ID de la TABLA de donde es el usuario
     ID: peticion.session.idTipoDeUsuario,
+    //En caso de tener sucursal, la guardamos en la sesión
+    Sucursal: peticion.session.Sucursal,
+    // Mandamos si es doctor o no
+    EsDoctor: peticion.session.EsDoctor,
     // Estilo de la web
     EstiloWeb: peticion.session.estiloweb,
     // Nombre del usuario
@@ -296,6 +301,25 @@ app.post("/AgendaDoctor", async (peticion, respuesta) => {
       const Agenda = [];
       respuesta.end(JSON.stringify(Agenda));
     }
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+app.post("/CrearCita", async (req, res) => {
+  if (peticion.session.idusuario) {
+    // Lanzamos la creacion de la cita a la base de datos
+    await NuevaCita(
+      req.body.idSucursal, 
+      req.body.idProcedimiento, 
+      req.body.idDoctor, 
+      req.body.idAsociado, 
+      req.body.idPaciente, 
+      req.body.idStatus,
+      req.body.FechaCita,
+      req.body.DuracionCita,
+      req.body.NotasCita,
+      );
   } else {
     respuesta.redirect("/");
   }
@@ -405,15 +429,18 @@ app.post("/BusquedaPacientes", async function (req, res) {
 
 
 
+
+
+
+
+
+
 //Variable para el almacenamiento de imagenes con multer
 const almacenamiento = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       //Creamos la carpeta del paciente
-      const rutaDestino = await CarpetaPersonal(
-        req.body.Protocolo,
-        req.body.Nombres
-      );
+      const rutaDestino = path.join(__dirname,"public/private/src/temp");
       // Y utilizamos la ruta donde se creó la carpeta
       cb(null, rutaDestino);
     } catch (error) {
@@ -443,19 +470,6 @@ const subirfoto = multer({ storage: almacenamiento });
 // Funcion de apoyo para la creacion de pacientes
 async function CrearPaciente(req, res) {
   try {
-    // Verificar si se proporcionó una imagen
-    let rutaImagen = null;
-    if (req.file) {
-      rutaImagen = req.file.destination;
-      // Unicamente si el protocolo es perfil crea la miniatura para mostrar en todo el sitio
-      if (req.body.Protocolo == "Perfil") {
-        Resizer(
-          req.file.path,
-          req.file.destination + `/Pequeño-${req.file.filename}`,
-          50
-        );
-      }
-    }
     // Si el usuario es doctor, le pasamos el id del doctor, si no, le pasamos el id del recepcionista
     const idDoctor = req.session.EsDoctor ? req.session.idDoctor : null;
     const idTipoDeUsuario = req.session.EsDoctor
@@ -463,7 +477,7 @@ async function CrearPaciente(req, res) {
       : req.session.idTipoDeUsuario;
 
     // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
-    await NuevoPaciente(
+   const idUsuario = await NuevoPaciente(
       req.body.Nombres,
       req.body.ApellidoP,
       req.body.ApellidoM,
@@ -472,10 +486,40 @@ async function CrearPaciente(req, res) {
       req.body.Telefono,
       req.body.TelefonoSecundario,
       req.body.FechaNacimiento,
-      rutaImagen,
       idDoctor,
       idTipoDeUsuario
     );
+    console.log("idUsuario insertado: ", idUsuario);
+
+    // Crear la carpeta del paciente
+    const Ruta = await CarpetaPersonal(req.body.Protocolo, idUsuario);
+
+    // Mover la imagen a la carpeta del paciente
+    await fs.rename(
+      path.join(__dirname, "public/private/src/temp", req.file.filename),
+      path.join(Ruta, req.file.filename)
+    );
+    
+    // Si el protocolo es "Perfil", crear la miniatura de la imagen y moverla a la carpeta del paciente
+    if (req.body.Protocolo === "Perfil") {
+      const rutaImagenOriginal = path.join(Ruta, req.file.filename);
+      const rutaMiniatura = path.join(Ruta, `Pequeño-${req.file.filename}`);
+    
+      // Llamar a la función Resizer para redimensionar la imagen
+      Resizer(rutaImagenOriginal, rutaMiniatura, 50)
+      // Y guardar la ruta de la imagen en la base de datos
+      InsertRutaFoto(idUsuario,rutaImagenOriginal);
+    }else{
+      const rutaImagenOriginal = path.join(Ruta, req.file.filename);
+      const rutaMiniatura = path.join(Ruta, `Preview-${req.file.filename}`);
+    
+      // Llamar a la función Resizer para redimensionar la imagen
+      Resizer(rutaImagenOriginal, rutaMiniatura, 100)
+      // Y guardar la ruta de la imagen en la base de datos
+      InsertRutaFoto(idUsuario,rutaImagenOriginal);
+    }
+
+
 
     return res
       .status(200)
@@ -539,6 +583,14 @@ async function CarpetaPersonal(Protocolo, id) {
     throw new Error("El protocolo no es valido.");
   }
 }
+
+
+
+
+
+
+
+
 
 //==================================================================================================
 //  Vistas del sitio Web (Frontend)

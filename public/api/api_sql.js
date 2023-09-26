@@ -586,28 +586,29 @@ async function NuevoPaciente(
   Telefono,
   TelefonoSecundario,
   FechaNacimiento,
-  RutaFoto,
   idDoctor,
   idRecepcionista
 ) {
+  let connection;
   try {
-    const connection = await mysql.createConnection(db);
+    connection = await mysql.createConnection(db);
     await connection.beginTransaction();
+
     // Almacenamos los Querys en variables para ejecutarlas despues
     const queryUsuario = `INSERT INTO Usuarios
-      (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta, RutaFoto)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`;
+    (Nombres, ApellidoP, ApellidoM, idSexo, Correo, Telefono, TelefonoSecundario, FechadeNacimiento, FechaAlta)
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
 
     const queryPaciente = `INSERT INTO Paciente
-      (idUsuario, Usuario, Contraseña)
-      VALUES(LAST_INSERT_ID(), ?, ?)`;
+    (idUsuario, Usuario, Contraseña)
+    VALUES(LAST_INSERT_ID(), ?, ?)`;
 
     const queryRegistro = `INSERT INTO Alta_Paciente 
-      (idDoctor,idRecepcionista,idPaciente)
-      VALUES(?, ?, LAST_INSERT_ID())`;
+    (idDoctor,idRecepcionista,idPaciente)
+    VALUES(?, ?, LAST_INSERT_ID())`;
 
     const queryAntecedentes = `INSERT INTO HistorialClinico (idPaciente) 
-      VALUES (?)`;
+    VALUES (?)`;
 
     //Obtenemos la fecha de hoy
     const fechaActual = new Date();
@@ -621,7 +622,7 @@ async function NuevoPaciente(
     const password = await bcrypt.hash(usuario, salt);
 
     // Ejecutamos el registro del paciente
-    await connection.execute(queryUsuario, [
+    const [resultUsuario] = await connection.execute(queryUsuario, [
       Nombres,
       ApellidoP,
       ApellidoM,
@@ -630,7 +631,6 @@ async function NuevoPaciente(
       Telefono,
       TelefonoSecundario,
       FechaNacimiento,
-      RutaFoto,
     ]);
 
     // Utilizamos el ID insertado en la primera consulta para la segunda consulta
@@ -642,22 +642,41 @@ async function NuevoPaciente(
     // Y registramos quien hizo el registro del paciente
     await connection.execute(queryRegistro, [idDoctor, idRecepcionista]);
 
-    //Asi como le creamos un expediente vacio
+    // Así como le creamos un expediente vacío
     await connection.execute(queryAntecedentes, [resultPaciente.insertId]);
 
     await connection.commit();
     connection.end();
-    return resultPaciente.insertId;
+
+    // Retorna el ID del usuario insertado en la tabla Usuarios
+    return resultUsuario.insertId;
   } catch (error) {
     console.error(
-      "Ha ocurrido un error en la creacion de un nuevo paciente:",
+      "Ha ocurrido un error en la creación de un nuevo paciente:",
       error
     );
-    connection.rollback();
-    connection.end();
+    if (connection) {
+      connection.rollback();
+      connection.end();
+    }
     return "Ha ocurrido un error.";
   }
 }
+
+async function InsertRutaFoto(idUsuario, RutaFoto){
+  try {
+    const connection = await mysql.createConnection(db);
+    const query = `UPDATE Usuarios SET RutaFoto = ? WHERE idUsuario = ?`;
+    const [result] = await connection.execute(query, [RutaFoto,idUsuario]);
+    connection.end();
+    return result.insertId;
+  } catch (error) {
+    console.error("Ha ocurrido un error actualizando la ruta del usuario:", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
 
 // Funcion para obtener la informacion de los registros
 async function InfoRegistros() {
@@ -922,7 +941,6 @@ async function Receta(idPaciente, idReceta) {
   }
 }
 
-
 async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
   let connection;
   try {
@@ -979,9 +997,9 @@ async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
         ApellidoP: elemento.ApellidoP,
         ApellidoM: elemento.ApellidoM,
         Telefono: elemento.Telefono,
-        Correo:elemento.Correo,
+        Correo: elemento.Correo,
         Status: elemento.Status,
-        RutaFoto:elemento.RutaFoto,
+        RutaFoto: elemento.RutaFoto,
       };
     });
 
@@ -996,18 +1014,19 @@ async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
   }
 }
 
-
 //==================================================================================================
 // Updates estados Pacientes / Citas
 //==================================================================================================
 async function NuevaCita(
-  idPaciente,
   idSucursal,
-  idProcedimineto,
+  idProcedimiento,
   idDoctor,
   idAsociado,
-  HoraCita,
-  FinCita
+  idPaciente,
+  idStatus,
+  FechaCita,
+  DuracionCita,
+  NotasCita
 ) {}
 
 async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
@@ -1142,4 +1161,5 @@ export {
   NuevaReceta,
   Receta,
   Busqueda,
+  InsertRutaFoto,
 };
