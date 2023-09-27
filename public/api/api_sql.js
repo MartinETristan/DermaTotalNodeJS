@@ -115,7 +115,7 @@ async function DashDoc(idDoctor, Fecha) {
         FROM Citas c
         INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
         INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
-        WHERE c.idDoctor = ? AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 AND DATE(c.HoraCita) = ? 
+        WHERE c.idDoctor = ? AND (c.idStatusPaciente = 2 OR c.idStatusPaciente = 3) AND DATE(c.HoraCita) = ? 
         ORDER BY c.HoraLlegada ASC, c.HoraCita ASC;`;
 
     const [rowsEspera, fieldsEspera] = await connection.execute(
@@ -187,13 +187,13 @@ async function DashDoc(idDoctor, Fecha) {
   // Otros consultorios
   try {
     const connection = await mysql.createConnection(db);
-    const consultaOtrosConsultorios = `SELECT p.idPaciente,
-    CONCAT(up.Nombres, ' ', up.ApellidoP, ' ', up.ApellidoM) AS NombrePaciente,
+    const consultaOtrosConsultorios = `SELECT p.idPaciente, c.idCitas, c.idStatusPaciente,
+    up.Nombres, CONCAT(up.ApellidoP, ' ', up.ApellidoM) AS Apellidos,
     CONCAT(ud.Nombres) AS NombreDoctor,
     CONCAT(ua.Nombres) AS NombreAsociado,
     DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,
     DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada,
-    c.idStatusPaciente, s.idConsultorio, up.RutaFoto
+    c2.NombreConsultorio AS Consultorio, up.RutaFoto
     FROM Citas c
     INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
     INNER JOIN Usuarios up ON p.idUsuario = up.idUsuario 
@@ -201,9 +201,10 @@ async function DashDoc(idDoctor, Fecha) {
     LEFT JOIN Usuarios ud ON d.idUsuario = ud.idUsuario
     LEFT JOIN Asociado a ON c.idAsociado = a.idAsociado
     LEFT JOIN Usuarios ua ON a.idUsuario = ua.idUsuario
-    LEFT JOIN Sesion s ON c.idCitas  = s.idCitas 
+    LEFT JOIN Sesion s ON s.idCitas  = c.idCitas 
+    LEFT JOIN Consultorio c2 ON c2.idConsultorio = s.idConsultorio
     WHERE (c.idDoctor != ? OR c.idAsociado != 0)
-    AND c.idStatusPaciente = 2 OR c.idStatusPaciente = 3 
+    AND (c.idStatusPaciente = 2 OR c.idStatusPaciente = 3)
     ORDER BY c.HoraLlegada ASC;`;
 
     const [rowsOtros, fieldsEspera] = await connection.execute(
@@ -216,13 +217,15 @@ async function DashDoc(idDoctor, Fecha) {
         // Verificamos si el paciente esta con un doctor o con un asociado
         const QuienAtiende = elemento.NombreDoctor || elemento.NombreAsociado;
         return {
+          idCita: elemento.idCitas,
           idPaciente: elemento.idPaciente,
-          NombresPacientes: elemento.NombrePaciente,
+          idStatusPaciente: elemento.idStatusPaciente,
+          Nombres: elemento.Nombres,
+          Apellidos: elemento.Apellidos,
           NombreDoctor: QuienAtiende,
           HoraCita: elemento.HoraCita,
           HoraLlegada: elemento.HoraLlegada,
-          StatusPaciente: elemento.idStatusPaciente,
-          Consultorio: elemento.idConsultorio,
+          Consultorio: elemento.Consultorio,
           RutaFoto: elemento.RutaFoto,
         };
       });
@@ -240,10 +243,15 @@ async function DashDoc(idDoctor, Fecha) {
   // Citas Finalizadas
   try {
     const connection = await mysql.createConnection(db);
-    const consultaFinalizadas = `SELECT p.idPaciente, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, u.RutaFoto
+    const consultaFinalizadas = `SELECT p.idPaciente, u.Nombres, 
+    CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, 
+    DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, u.RutaFoto,
+    s.idSesion, pr.Procedimiento
     FROM Citas c
     INNER JOIN Paciente p ON c.idPaciente = p.idPaciente
     INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario
+    LEFT JOIN Sesion s ON s.idCitas  = c.idCitas 
+    LEFT JOIN Procedimiento pr ON pr.idProcedimiento = s.idProcedimiento
     WHERE c.idDoctor = ? AND c.idStatusPaciente = 4 
     ORDER BY c.HoraCita DESC;`;
     const [rowsFin, fieldsEspera] = await connection.execute(
@@ -254,9 +262,11 @@ async function DashDoc(idDoctor, Fecha) {
       CitasFinalizadas = rowsFin.map((elemento) => {
         return {
           idPaciente: elemento.idPaciente,
+          idSesion: elemento.idSesion,
           NombresPacientes: elemento.Nombres,
           ApellidosPacientes: elemento.Apellidos,
           HoraCita: elemento.HoraCita,
+          Procedimiento: elemento.Procedimiento,
           RutaFoto: elemento.RutaFoto,
         };
       });

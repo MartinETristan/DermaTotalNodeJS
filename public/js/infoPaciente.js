@@ -49,7 +49,7 @@ function obtenerDatos() {
             }
           }
           const nuevaURL =
-            rutarelativa + "/" + data.BasicInfo[0].Nombres + ".jpg";
+            rutarelativa || "/img/UserIco.webp";
 
           // En caso de error (imagen no encontrada), utiliza la imagen por defecto
           Avatar.onerror = function () {

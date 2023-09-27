@@ -20,15 +20,32 @@ $(document).ready(function () {
       data: { nombre: nombre, apellido: apellido, telefono_correo: telefono },
       dataType: "json",
       success: function (data) {
-        function generarImagenPerfil(ruta, nombre) {
-          const relativa = "/public";
-          const posicion = ruta.indexOf(relativa);
-          const rutarelativa =
-            posicion !== -1 ? ruta.substring(posicion + relativa.length) : "";
-          const nuevaURL =
-            rutarelativa + "/" + encodeURIComponent(nombre) + ".jpg";
-
-          return nuevaURL;
+        function generarImagenPerfil(ruta) {
+            let rutarelativa = "/img/UserIco.webp";  // Declarar la imagen por defecto fuera del bloque if
+            if (ruta !== "/img/UserIco.webp") {
+              // Formato para la ruta de la imagen del paciente
+              const relativa = "/public";
+              // Encuentra la posición del texto deseado
+              const posicion = ruta.indexOf(relativa);
+    
+              if (posicion !== -1) {
+                // Usa substring() para obtener los caracteres después de "Ejemplo:"
+                rutarelativa = ruta.substring(posicion + relativa.length);
+      
+                // Encuentra la última posición de "/" en la cadena rutarelativa
+                const ultimaBarra = rutarelativa.lastIndexOf("/");
+      
+                // Agrega el texto después de la última barra
+                if (ultimaBarra !== -1) {
+                  const parte1 = rutarelativa.substring(0, ultimaBarra + 1); // Incluye la última barra
+                  const parte2 = rutarelativa.substring(ultimaBarra + 1); // Lo que sigue después de la última barra
+                  rutarelativa = parte1 + "Pequeño-" + parte2;
+                }
+              } else {
+                console.log("Texto deseado no encontrado");
+              }
+            }
+          return rutarelativa;
         }
 
         // Muestra los resultados en la sección "ResultadosBusqueda"
@@ -37,10 +54,7 @@ $(document).ready(function () {
           data && Array.isArray(data) && data.length > 0
             ? data
                 .map((elemento) => {
-                  const imagenPerfil = generarImagenPerfil(
-                    elemento.RutaFoto || "/img/UserIco.webp",
-                    elemento.Nombre
-                  );
+                  const imagenPerfil = generarImagenPerfil(elemento.RutaFoto || "/img/UserIco.webp");
                   return `
                   <div class="contresultados">
                     <div class="resultado" data-id="${elemento.idPaciente}">

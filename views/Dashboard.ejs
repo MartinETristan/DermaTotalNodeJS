@@ -43,6 +43,7 @@
     // InfoDasboard (SuperAdmin, Admin y Doctor)-->
     //==================================================================================================
     switch (ClaseUsuario){ case 1: case 2: case 3:%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
     <script src="/js/dashDoc.js"></script>
     <h1 class="saludo">Cargando Saludo...</h1>
     <div class="contenido">
@@ -56,14 +57,16 @@
           <div class="PacientesEnEspera">
             <% //Aqui van los usuarios en la sala de espera%>
           </div>
+          <div class="PaginacionEspera"></div>
         </div>
         <% // Otros Consultorios%>
         <div class="OC">
-          <h2>Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):</h2>
+          <h2 class="Titulo">Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):</h2>
           <div class="Otros">
             <div class="ContenidoOtrosConsultorios">
               <% // Aqui se genera el contenido de la tabla de otros consultorios%>
             </div>
+            <div class="PaginacionOtros"></div>
           </div>
         </div>
       </div>
@@ -78,15 +81,17 @@
             <div class="PacientesHoy">
               <% // Aqui se genera el contenido de la tabla de citas para hoy %>
             </div>
+            <div class="PaginacionHoy"></div>
           </div>
         </div>
         <% // Citas Finalizadas%>
         <div class="CF">
-          <h2>Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):</h2>
+          <h2 class="Titulo">Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):</h2>
           <div class="Finalizadas">
             <div class="ContenidoCitasFinalizadas">
               <% // Aqui se genera el contenido de la tabla CitasFinalizadas%>
             </div>
+            <div class="PaginacionCF"></div>
           </div>
         </div>
       </div>
