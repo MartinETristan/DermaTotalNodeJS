@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
       break;
     case 4:
     case 5:
-      var RoomRecepcion = "Recepcion" + socket.request.session.idTipoDeUsuario;
+      var RoomRecepcion = "Recepcion";
       socket.join(RoomRecepcion);
       break;
     case 6:
@@ -141,6 +141,10 @@ io.on("connection", (socket) => {
         break;
     }
   });
+
+  // const rooms = io.sockets.adapter.rooms;
+  // // Con esto vemos las salasdisponibles a donde se mandarán los mensajes
+  // console.log('Lista de salas:', rooms);
 
   socket.on("disconnect", () => {
     console.log("Socket desconectado");
@@ -261,7 +265,7 @@ app.post("/DashboardDoc", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     if (peticion.session.EsDoctor) {
       const PacientesEspera = await DashDoc(
-        peticion.session.idTipoDeUsuario,
+        peticion.session.idDoctor,
         FechaHora().FormatoDia
       );
       respuesta.end(JSON.stringify(PacientesEspera));
@@ -295,7 +299,7 @@ app.post("/DashboardRecepcion", async (peticion, respuesta) => {
 app.post("/AgendaDoctor", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     if (peticion.session.EsDoctor) {
-      const Agenda = await CitasDoctor(peticion.session.idTipoDeUsuario);
+      const Agenda = await CitasDoctor(peticion.session.idDoctor);
       respuesta.end(JSON.stringify(Agenda));
     } else {
       const Agenda = [];

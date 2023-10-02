@@ -11,8 +11,8 @@
 #LoadingLogo{
     width: 100%;
     height: 100%;
-    position: absolute;
-    z-index: 2;
+    position: fixed;
+    z-index: 3;
     top: 0;
     left: 0;
     background-color: white;
@@ -246,8 +246,8 @@ h1, h2 {
   filter: invert();
 }
 
-/*  Esta propiedad hace que el nav se mueva de izquiera a derecha al bajar
-.toleft {
+ /* Esta propiedad hace que el nav se mueva de izquiera a derecha al bajar */
+/* .toleft {
   margin-right: 50%;
 } */
 

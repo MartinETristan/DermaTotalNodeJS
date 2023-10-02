@@ -9,8 +9,59 @@ h1 {
   }
 }
 
+/* Contenedor que se mostrará de manera diferente al accionar los botones */
+#Cont_Opciones{
+  width: 100%;
+  height: 100%;
+  background: #00000049;
+  position: fixed; /* Cambiado de absolute a fixed para que siga el scroll de la página */
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  z-index: 2; /* Ajusta el índice Z según sea necesario para asegurarte de que esté por encima de todo */
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: .2s;
+}
 
 
+/* Otros estilos si es necesario */
+#Opciones{
+  width: 50%;
+  padding: 20px;
+  background: #fff;
+  border: 2px solid #249dd98b;
+  border-radius: 10px;
+}
+
+#TituloOpciones{
+  padding: 0;
+}
+
+.TituloCheckout{
+  padding-bottom: 0px;
+}
+.PrecioProcedimiento{
+  margin-top: 0px;
+}
+
+.BotonesOpciones{
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+#valorCheckout{
+  padding: 10px;
+  border: 2px solid #00792e8b;
+  border-radius: 5px;
+  color: green;
+  font-size: 50px;
+  width: 97%;
+}
 
 
 
@@ -98,16 +149,6 @@ h1 {
 
 
 
-/* Estilos del contenedor de las tablas */
-.contenedor {
-  display: flex;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
-  align-content: space-around;
-  gap: 1em;
-  margin-left: 20px;
-  margin-right: 20px;
-}
 
 
 /* Estilos para los titulos */
@@ -187,6 +228,14 @@ img {
 
 .Paciente.CitasFin {
   background: rgb(255, 246, 246);
+}
+
+.Paciente.Opciones >* {
+  cursor: default;
+
+}
+.Paciente.Opciones {
+  background: rgb(255, 255, 255);
 }
 
 .Paciente.Pedir {
@@ -282,6 +331,11 @@ img {
   letter-spacing: 1px;
 }
 
+.SelectConsultorios{
+  border: 0;
+  padding: 5px 10px 5px 10px;
+}
+
 
 .DatoInfoCita {
   flex: 1;
@@ -336,6 +390,21 @@ img {
   transition: 0.5s;
 }
 
+.AceptarOpciones {
+  font-size: 14px;
+  padding: 15px;
+  border-radius: 10px;
+  border: 0;
+  color: #fff;
+  background: rgba(5, 173, 5, 0.500);
+  box-shadow: 0 0px 10px rgba(5, 173, 5, 0.0);
+  transition: .2s;
+}
+.AceptarOpciones:hover {
+  background: rgb(5, 173, 5);
+  box-shadow: 0 0px 10px rgba(5, 173, 5, 0.5);
+}
+
 .BotonFinalizar {
   font-size: 14px;
   margin: 8px;
@@ -352,6 +421,22 @@ img {
   background: red;
   box-shadow: 0 0px 10px rgba(186, 0, 0, 0.5);
   transition: 0.5s;
+}
+
+.CancelarOpciones {
+  font-size: 14px;
+  padding: 15px;
+  border-radius: 10px;
+  border: 0;
+  color: #fff;
+  background: rgba(255, 0, 0, 0.500);
+  box-shadow: 0 0px 10px rgba(186, 0, 0, 0.0);
+  transition: .2s;
+}
+
+.CancelarOpciones:hover {
+  background: red;
+  box-shadow: 0 0px 10px rgba(186, 0, 0, 0.5);
 }
 
 

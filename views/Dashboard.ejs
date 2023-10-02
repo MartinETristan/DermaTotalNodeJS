@@ -45,6 +45,17 @@
     switch (ClaseUsuario){ case 1: case 2: case 3:%>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
     <script src="/js/dashDoc.js"></script>
+    <%//Crea la vista de opciones la cual, en un inicio estará oculta%>
+    <div id="Cont_Opciones">
+      <div id="Opciones">
+        <h1 id="TituloOpciones">Cargando Titulo de Opciones...</h1>
+        <p id="MensajeOpciones">Cargando Mensaje de las opciones...</p>
+        <div class="InfoOpciones">
+          
+        </div>
+      </div>
+    </div>
+    <%//Y este ya es el contenido de la vista%>
     <h1 class="saludo">Cargando Saludo...</h1>
     <div class="contenido">
       <% //Contenido de la Izquierda%>

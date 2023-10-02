@@ -111,5 +111,6 @@ dt{
   }
   div[class^="Receta_"]:nth-child(even) {
     page-break-after: always;
+    /* break-before: page; */
   }
 
