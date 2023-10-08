@@ -31,6 +31,7 @@ import {
   Receta,
   Busqueda,
   InsertRutaFoto,
+  PedirPaciente,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -124,23 +125,34 @@ io.on("connection", (socket) => {
       case 1:
         //Registrar hora de llegada con base a la hora del recepcionista
         if (socket.request.session.Sucursal == 1) {
-          Hoy_Espera(data.Cita, data.idStatus, FechaHora().HoraS1);
+          Hoy_Espera(data.Cita,FechaHora().HoraS1);
         } else {
-          Hoy_Espera(data.Cita, data.idStatus, FechaHora().HoraS2);
+          Hoy_Espera(data.Cita,FechaHora().HoraS2);
         }
         io.to("Doctor" + data.Doctor).emit("Hoy/Espera");
         socket.except("Doctor" + data.Doctor).emit("OtrosConsultorios");
+        io.to("Recepcion").emit("CheckIn");
         break;
       case 2:
-        io.emit("Espera/Activos");
+        io.emit("Espera/Consulta");
         break;
       case 3:
-        io.emit("Activos/Finalizada");
+        io.emit("Consulta/CheckOut");
         break;
       default:
         break;
     }
   });
+// Socket para pedir paciente en recepcion
+socket.on("PedirPaciente", async (data) => {
+  const pedir = await PedirPaciente(data.Cita, socket.request.session.idDoctor, data.idConsultorio);
+  if (pedir === "Sonido") {
+    io.to("Recepcion").emit("Sonido");
+  }
+  else{
+    io.to("Recepcion").emit("P_Pedidos");
+  }
+});
 
   // const rooms = io.sockets.adapter.rooms;
   // // Con esto vemos las salasdisponibles a donde se mandarán los mensajes

@@ -1,0 +1,149 @@
+.ContenidoRecepcion{
+    /* background-color: black; */
+    display: flex;
+    flex-wrap: nowrap;
+    width: 95%;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+    gap: 10px;
+    margin-bottom: 75px;
+}
+.ContenidoRecepcion> div{
+    min-width: 33%;
+    min-height: 750px;
+}
+
+  
+.CitasHoy{
+    background-color: rgb(247, 253, 255);
+    border: 2px solid rgb(212, 231, 253);
+    border-radius: 15px;
+    padding: 0px 10px 10px 10px;
+    gap: 10px;
+
+}
+.PacientesFinalizados{
+    background-color: rgb(255, 247, 247);
+    border: 2px solid rgb(253, 212, 212);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.Paciente.Checkout{
+    display: flex;
+    flex-direction: column;
+    background: rgb(255, 255, 255);
+}
+
+.Paciente.Asignar{
+    display: block;
+    --bg-size: 400%;
+    --color-one: hsla(34, 100%, 75%, 0.0);
+    --color-two: #fce4bdb9;
+    background: linear-gradient(90deg, var(--color-one),
+        var(--color-two),
+        var(--color-one)) 0 0 / var(--bg-size) 100%;
+    color: orange;
+    animation: move-bg 8s infinite linear;
+}
+
+
+.InfoCheckout{
+    padding: 0px 20px 20px 20px;
+    bottom: 0;
+    color: green;
+    font-size: 40px;
+    font-weight: bold;
+}
+.textCheckout{
+    word-wrap: break-word;
+  }
+
+.ContPacientePedido>*{
+    margin: 0 auto;
+    display: flex;
+    position: relative;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    flex-direction: column;
+}
+
+.ContPacientePedido>.HeaderPaciente{
+    padding-bottom: 0;
+}
+
+
+
+.Paciente.Asignar>.BotonesDeAccion{
+    margin-top: 0px;
+}
+
+.Pedidos{
+    position: relative;
+    max-height: 650px;
+    overflow-y: scroll;
+}
+
+/* Estilos generales */
+.Paciente.Asignar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.InfoPedido {
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Estilo para las secciones de paciente y doctor (ambas son similares) */
+.PacientePedido,
+.DrPedido {
+    display: flex;
+    flex-direction: column;
+    width: 48%; /* le da un poco de espacio entre las dos secciones */
+}
+
+.HeaderPaciente {
+    display: flex;
+    align-items: center; /* alinea verticalmente la imagen y la información */
+}
+
+.DrPedido>.CitaInfo,.PacientePedido>.CitaInfo{
+    padding-top: 0;
+}
+.DrPedido>.HeaderPaciente{
+    padding-left: 0;
+}
+
+.CitaInfo{
+    margin: 0 auto;
+}
+
+
+.TituloInfoCita,
+.DatoInfoCita {
+    display: block;
+}
+
+.BotonesDeAccion {
+    display: flex;
+    justify-content: center; /* centra el botón horizontalmente */
+}
+
+
+
+
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #29abe2;
+    color: white;
+    /* padding: 15px;/ */
+    z-index: 3;
+    text-align: center;
+  }

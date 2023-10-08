@@ -98,7 +98,8 @@ async function UsuarioyProfesion(idUsuario) {
 }
 
 //==================================================================================================
-// Funciones para obtener la informacion del Dashboard de los doctores (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
+// Funciones para obtener la informacion del Dashboard de los doctores (Pacientes en espera, 
+//Citas del dia, Otros consultorios y Citas Finalizadas)
 //==================================================================================================
 async function DashDoc(idDoctor, Fecha) {
   let PacientesEspera = [];
@@ -318,18 +319,22 @@ async function DashDoc(idDoctor, Fecha) {
 // Función para obtener la informacion del Dashboard de recpecion (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
 //==================================================================================================
 async function DashRecepcion(Sucursal, Fecha) {
-  let PacientesEsperaR = [];
-  let CitasDoctoresHoy = [];
-  let OtrosConsultoriosR = [];
-  let CitasFinalizadasR = [];
+  let CitasHoy = [];
+  let PacientesPedidos = [];
+  let PacientesCheckout = [];
   try {
     //==================================================================================================
     // Citas del dia
     const connection = await mysql.createConnection(db);
-    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,u.RutaFoto
+    const consultaHoy = `SELECT c.idCitas, p.idPaciente, c.idDoctor, CONCAT(uDoc.Nombres," ",uDoc.ApellidoP) AS Doctor,
+    u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, 
+    DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,p2.Procedimiento, u.RutaFoto
     FROM Citas c
     INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
     INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
+    LEFT JOIN Doctor d ON d.idDoctor = c.idDoctor
+    LEFT JOIN Usuarios uDoc ON uDoc.idUsuario = d.idUsuario
+    LEFT JOIN Procedimiento p2 ON p2.idProcedimiento = c.idProcedimiento
     WHERE c.idSucursal = ? AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? 
     ORDER BY c.HoraCita ASC;`;
 
@@ -339,13 +344,15 @@ async function DashRecepcion(Sucursal, Fecha) {
     ]);
 
     if (rowsHoy.length > 0) {
-      CitasDoctoresHoy = rowsHoy.map((elemento) => {
+      CitasHoy = rowsHoy.map((elemento) => {
         return {
           idCitas: elemento.idCitas,
           idPaciente: elemento.idPaciente,
           idDoctor: elemento.idDoctor,
+          Doctor: elemento.Doctor,
           NombresPacientes: elemento.Nombres,
           ApellidosPacientes: elemento.Apellidos,
+          Procedimiento: elemento.Procedimiento,
           HoraCita: elemento.HoraCita,
           RutaFoto: elemento.RutaFoto,
         };
@@ -363,54 +370,90 @@ async function DashRecepcion(Sucursal, Fecha) {
 
   try {
     //==================================================================================================
-    // Sala de espera
+    // Pacientes Pedidos
     const connection = await mysql.createConnection(db);
-    const consultaHoy = `SELECT c.idCitas, p.idPaciente, idDoctor, u.Nombres, CONCAT(u.ApellidoP, ' ', u.ApellidoM) AS Apellidos, 
-    DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, DATE_FORMAT(c.HoraLlegada, '%H:%i') AS HoraLlegada, u.RutaFoto, c.Nota
-    FROM Citas c
-    INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
-    INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
-    WHERE c.idStatusPaciente = 2 AND DATE(c.HoraCita) = ?
-    ORDER BY c.HoraLlegada ASC;`;
+    const Pedidos = `SELECT pp.idCitas,pp.idDoctor, Udoc.Nombres AS NombreD, Upac.Nombres AS NombreP,
+    CONCAT(Udoc.ApellidoP," ",Udoc.ApellidoM) AS ApellidoD,	CONCAT(Upac.ApellidoP," ",Upac.ApellidoM) AS ApellidoP,
+    Upac.RutaFoto AS RutaFotoP,Udoc.RutaFoto AS RutaFotoD,DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita,c.idPaciente,
+    consul.NombreConsultorio, p2.Procedimiento
+    FROM Pacientes_Pedidos pp 
+    LEFT JOIN Doctor doc ON doc.idDoctor = pp.idDoctor 
+    LEFT JOIN Usuarios Udoc ON Udoc.idUsuario = doc.idUsuario 
+    LEFT JOIN Citas c ON c.idCitas = pp.idCitas
+    LEFT JOIN Paciente p ON p.idPaciente = c.idPaciente 
+    LEFT JOIN Usuarios Upac ON Upac.idUsuario =P.idUsuario 
+    LEFT JOIN Consultorio consul ON consul.idConsultorio  = pp.idConsultorio 
+    LEFT JOIN Sucursales s ON s.idSucursal = consul.idSucursal 
+    LEFT JOIN Procedimiento p2 ON p2.idProcedimiento = c.idProcedimiento
+    WHERE s.idSucursal = ?`;
 
-    const [rowsEspera, fieldsHoy] = await connection.execute(consultaHoy, [
-      Fecha,
-    ]);
+    const [rowsPedidos, fieldsHoy] = await connection.execute(Pedidos, [Sucursal,]);
 
-    if (rowsEspera.length > 0) {
-      PacientesEsperaR = rowsEspera.map((elemento) => {
+    if (rowsPedidos.length > 0) {
+      PacientesPedidos = rowsPedidos.map((elemento) => {
         return {
+          idSucursal: Sucursal,
           idCitas: elemento.idCitas,
           idPaciente: elemento.idPaciente,
           idDoctor: elemento.idDoctor,
-          NombresPacientes: elemento.Nombres,
-          ApellidosPacientes: elemento.Apellidos,
+          NombreD: elemento.NombreD,
+          ApellidoD: elemento.ApellidoD,
+          NombreP: elemento.NombreP,
+          ApellidoP: elemento.ApellidoP,
           HoraCita: elemento.HoraCita,
-          HoraLlegada: elemento.HoraLlegada,
-          RutaFoto: elemento.RutaFoto,
-          Nota: elemento.Nota,
+          RutaFotoP: elemento.RutaFotoP,
+          RutaFotoD: elemento.RutaFotoD,
+          Cosultorio: elemento.NombreConsultorio,
+          Procedimiento: elemento.Procedimiento,
         };
       });
     }
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error en los pacientes en espera:", error);
+    console.error("Ha ocurrido un error en los pacientes pedidos:", error);
     return "Ha ocurrido un error.";
   }
 
   try {
     //==================================================================================================
     // Citas Finalizadas
+    const connection = await mysql.createConnection(db);
+    const CitasFin = `SELECT u.Nombres, CONCAT(u.ApellidoP," ",u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, 
+    s.CheckOut,u.RutaFoto, s.idPaciente, p2.Procedimiento
+    FROM Sesion s 
+    LEFT JOIN Citas c ON c.idCitas =s.idCitas 
+    LEFT JOIN Paciente p ON c.idPaciente = p.idPaciente 
+    LEFT JOIN Usuarios u ON u.idUsuario = p.idUsuario 
+    LEFT JOIN Consultorio consul ON consul.idConsultorio =s.idConsultorio 
+    LEFT JOIN Sucursales suc ON suc.idSucursal = consul.idSucursal 
+    LEFT JOIN Procedimiento p2 ON p2.idProcedimiento = c.idProcedimiento
+    WHERE c.idStatusPaciente = 4 AND suc.idSucursal = ? AND DATE(s.InicioDeSesion) = ?`;
+
+    const [rowsFin, fieldsHoy] = await connection.execute(CitasFin, [Sucursal, Fecha]);
+
+    if (rowsFin.length > 0) {
+      PacientesCheckout = rowsFin.map((elemento) => {
+        return {
+          idPaciente: elemento.idPaciente,
+          NombresPacientes: elemento.Nombres,
+          ApellidosPacientes: elemento.Apellidos,
+          HoraCita: elemento.HoraCita,
+          RutaFoto: elemento.RutaFoto,
+          CheckOut: elemento.CheckOut,
+          Procedimiento: elemento.Procedimiento,
+        };
+      });
+    }
+    connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error en los pacientes en espera:", error);
+    console.error("Ha ocurrido un error en los pacientes Finalizados:", error);
     return "Ha ocurrido un error.";
   }
 
   const InfoDashRecep = {
-    CitasDoctoresHoy: CitasDoctoresHoy,
-    PacientesEspera: PacientesEsperaR,
-    CitasFinalizadas: CitasFinalizadasR,
-    OtrosConsultorios: OtrosConsultoriosR,
+    CitasHoy: CitasHoy,
+    PacientesPedidos: PacientesPedidos,
+    PacientesCheckout: PacientesCheckout,
   };
   return InfoDashRecep;
 }
@@ -466,7 +509,8 @@ async function InfoPaciente(idPaciente) {
   // Antecedentes del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const queryAntecedentes = `SELECT hc.P_Actual AS PadecimientoActual, hc.A_HF AS Antecedentes_HF, hc.A_NP AS Antecedentes_NP, hc.A_PP AS Antecedentes_PP, hc.Alergias AS Alergias 
+    const queryAntecedentes = `SELECT hc.P_Actual AS PadecimientoActual, 
+    hc.A_HF AS Antecedentes_HF, hc.A_NP AS Antecedentes_NP, hc.A_PP AS Antecedentes_PP, hc.Alergias AS Alergias 
     FROM Paciente p 
     INNER JOIN HistorialClinico hc ON p.idPaciente = hc.idPaciente 
     WHERE p.idPaciente = ?`;
@@ -1172,12 +1216,11 @@ async function ActualizarStatus(TipodeUsuario, id, Status) {
   }
 }
 
-async function Hoy_Espera(idCita, idStatusPaciente, HoraLlegada) {
+async function Hoy_Espera(idCita, HoraLlegada) {
   try {
     const connection = await mysql.createConnection(db);
-    idStatusPaciente = idStatusPaciente + 1;
     const consulta = `UPDATE Citas SET idStatusPaciente = ?, HoraLlegada = CONCAT(CURDATE()," ", ?) WHERE idCitas = ?;`;
-    connection.execute(consulta, [idStatusPaciente, HoraLlegada, idCita]);
+    connection.execute(consulta, [2, HoraLlegada, idCita]);
     connection.end();
   } catch (error) {
     console.error("Ha ocurrido un error en la actualizacion:", error);
@@ -1185,9 +1228,76 @@ async function Hoy_Espera(idCita, idStatusPaciente, HoraLlegada) {
   }
 }
 
-async function PedirPaciente(idCita,idDoctor,idConsultorio){
-
+async function Espera_Consulta(idCita) {
+  try {
+    const connection = await mysql.createConnection(db);
+    idStatusPaciente = idStatusPaciente + 1;
+    const consulta = `UPDATE Citas SET idStatusPaciente = ? WHERE idCitas = ?;`;
+    connection.execute(consulta, [3, idCita]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error en la actualizacion:", error);
+    return "Ha ocurrido un error.";
+  }
 }
+
+async function Consulta_Checkout(idCita) {
+  try {
+    const connection = await mysql.createConnection(db);
+    idStatusPaciente = idStatusPaciente + 1;
+    const consulta = `UPDATE Citas SET idStatusPaciente = ? WHERE idCitas = ?;`;
+    connection.execute(consulta, [4, idCita]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error en la actualizacion:", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+async function PedirPaciente(idCita, idDoctor, idConsultorio) {
+  try {
+    const connection = await mysql.createConnection(db);
+
+    // Primero, verifica si la entrada ya existe en la base de datos
+    const checkQuery = `
+      SELECT 1 
+      FROM DermaTotalDB.Pacientes_Pedidos
+      WHERE idCitas = ? AND idDoctor = ? AND idConsultorio = ?;
+    `;
+    const [rows] = await connection.execute(checkQuery, [idCita, idDoctor, idConsultorio]);
+
+    if (rows.length > 0) {
+      connection.end();
+      return "Sonido";  // Retorna "Sonido" si ya existe una entrada con esas propiedades
+    }
+
+    // Si no existe, inserta la entrada en la base de datos
+    const pedir = `
+      INSERT INTO DermaTotalDB.Pacientes_Pedidos
+      (idCitas, idDoctor, idConsultorio)
+      VALUES(?, ?, ?);
+    `;
+
+    await connection.execute(pedir, [idCita, idDoctor, idConsultorio]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error pidiendo al paciente:", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
+async function AsignarP_Pedido(idCita, idConsultorio, idDoctor,idAsociado,idProcedimiento,idPaciente){
+  try {
+  
+
+
+  } catch (error) {
+    console.error("Ha ocurrido un error asignando al paciente pedido:", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
 
 
 
@@ -1211,4 +1321,6 @@ export {
   Receta,
   Busqueda,
   InsertRutaFoto,
+  PedirPaciente,
+  AsignarP_Pedido,
 };

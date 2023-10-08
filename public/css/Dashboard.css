@@ -170,6 +170,7 @@ img {
 
 .Paciente {
   display: flex;
+  justify-content: space-around;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05), 0 0 0 1px #ddd inset;
@@ -177,6 +178,7 @@ img {
   width: 100%;
   margin-bottom: 15px;
   background: #e9f9fff2;
+
 }
 
 .Paciente.ATiempo {
@@ -237,6 +239,9 @@ img {
 .Paciente.Opciones {
   background: rgb(255, 255, 255);
 }
+.Paciente.Opciones > .HeaderPaciente {
+  min-width: 0;
+}
 
 .Paciente.Pedir {
   --bg-size: 400%;
@@ -277,7 +282,7 @@ img {
   flex-wrap: wrap;
   align-items: center;
   padding: 20px;
-  width: 40%;
+  min-width: 250px;
   /* background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.05) 0%,
@@ -364,7 +369,8 @@ img {
 
 .BotonesDeAccion {
   position: relative;
-  width: 30%;
+  min-width: 150px;
+  max-height: 75px;
   display: flex;
   vertical-align: middle;
   margin: 10px;
@@ -381,6 +387,7 @@ img {
   background: #ffffffa9;
   border-radius: 10px;
   flex-grow: 1;
+
 }
 
 .BotonPedir:hover {

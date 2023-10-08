@@ -36,23 +36,23 @@
     </div>
 
     <section class="nav-bar">
-      <% //Aqui se generan los elementos del nav dependiendo del tipo de usuario %>
+      <% //Aqui se generan los elementos del nav dependiendo del tipo de usuario
+      %>
     </section>
     <%
     //==================================================================================================
     // InfoDasboard (SuperAdmin, Admin y Doctor)-->
     //==================================================================================================
-    switch (ClaseUsuario){ case 1: case 2: case 3:%>
+    switch (ClaseUsuario){ case 1: case 2: case 3:%> <%//Scripts para la paginacion en el sitio web%>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
-    <script src="/js/dashDoc.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/Dashboard/dashDoc.js"></script>
     <%//Crea la vista de opciones la cual, en un inicio estará oculta%>
     <div id="Cont_Opciones">
       <div id="Opciones">
         <h1 id="TituloOpciones">Cargando Titulo de Opciones...</h1>
         <p id="MensajeOpciones">Cargando Mensaje de las opciones...</p>
-        <div class="InfoOpciones">
-          
-        </div>
+        <div class="InfoOpciones"><%//El contenido de rellena con JS%></div>
       </div>
     </div>
     <%//Y este ya es el contenido de la vista%>
@@ -72,7 +72,9 @@
         </div>
         <% // Otros Consultorios%>
         <div class="OC">
-          <h2 class="Titulo">Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):</h2>
+          <h2 class="Titulo">
+            Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):
+          </h2>
           <div class="Otros">
             <div class="ContenidoOtrosConsultorios">
               <% // Aqui se genera el contenido de la tabla de otros consultorios%>
@@ -97,7 +99,9 @@
         </div>
         <% // Citas Finalizadas%>
         <div class="CF">
-          <h2 class="Titulo">Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):</h2>
+          <h2 class="Titulo">
+            Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):
+          </h2>
           <div class="Finalizadas">
             <div class="ContenidoCitasFinalizadas">
               <% // Aqui se genera el contenido de la tabla CitasFinalizadas%>
@@ -108,29 +112,55 @@
       </div>
     </div>
 
-    <% break; case 4: %>
-    <script src="/js/dashRecep.js"></script>
-    <h1 class="saludo">Cargando Saludo...</h1>
-    <a href="#" id="NuevoPaciente">NuevoPaciente</a>
-    <h2>Pacientes Confirmados para hoy:</h2>
-    <div class="ContenidoCitasHoyR"></div>
-
-    <% break; case 5: %>
-    <script src="/js/dashRecep.js"></script>
-    <h1 class="saludo">Cargando Saludo...</h1>
-    <a href="#" id="NuevoPaciente">NuevoPaciente</a>
-    <h2>Pacientes Confirmados para hoy:</h2>
-    <div class="ContenidoCitasHoyR"></div>
-
-    <% break; case 6: %> 
-    <h1 class="saludo">Cargando Saludo...</h1>
-    <% break; default: %> 
-    
-    <h1 class="saludo">Cargando Saludo...</h1>
-    <% break; }%>
-    <% // Copyright%>
-    <div class="footer">
-      <% // Aqui va el contenido del Footer%>
+    <% break; case 4: %> <%//Estilos personalizados para la vista de Recepcion%>
+    <link rel="stylesheet" href="/css/Dashboards/Recepcion.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/Dashboard/dashRecep.js"></script>
+    <%//Crea la vista de opciones la cual, en un inicio estará oculta%>
+    <div id="Cont_Opciones">
+      <div id="Opciones">
+        <h1 id="TituloOpciones">Cargando Titulo de Opciones...</h1>
+        <p id="MensajeOpciones">Cargando Mensaje de las opciones...</p>
+        <div class="InfoOpciones"><%//El contenido de rellena con JS%></div>
+      </div>
     </div>
+    <h1 class="saludo">Cargando Saludo...</h1>
+    <!-- <a href="#" id="NuevoPaciente">NuevoPaciente</a> -->
+    <div class="ContenidoRecepcion">
+      <div class="PacientesdeHoy">
+        <h2>Pacientes de hoy:</h2>
+        <div class="CitasHoy"></div>
+      </div>
+      <div class="PacientesPedidos">
+        <h2>Pacientes Pedidos:</h2>
+        <div class="Pedidos"></div>
+      </div>
+      <div class="PacientesCheckout">
+        <h2>Pacientes Finalizados:</h2>
+        <div class="PacientesFinalizados"></div>
+        <div class="PaginacionPF"></div>
+      </div>
+    </div>
+
+    <% break; case 5: %> <%//Estilos personalizados para la vista de Recepcion%>
+    <link rel="stylesheet" href="/css/Dashboards/Recepcion.css" />
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/Dashboard/dashRecep.js"></script>
+    <h1 class="saludo">Cargando Saludo...</h1>
+    <a href="#" id="NuevoPaciente">NuevoPaciente</a>
+    <h2>Pacientes Confirmados para hoy:</h2>
+    <div class="ContenidoCitasHoyR"></div>
+
+    <% break; case 6: %> <%//Estilos personalizados para la vista de Asociado%>
+    <link rel="stylesheet" href="/css/Dashboards/Asociado.css" />
+    <h1 class="saludo">Cargando Saludo...</h1>
+
+    <% break; default: %> <%//Estilos personalizados para la vista de Paciente%>
+    <link rel="stylesheet" href="/css/Dashboards/Paciente.css" />
+    <h1 class="saludo">Cargando Saludo...</h1>
+
+    <% break; }%> <% // Copyright%>
+    <div class="footer"><% // Aqui va el contenido del Footer%></div>
   </body>
 </html>
