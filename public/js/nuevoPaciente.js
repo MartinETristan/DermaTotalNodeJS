@@ -53,6 +53,40 @@ $.ajax({
 //Pasar los datos del formulario a un objeto JSON
 document.addEventListener('DOMContentLoaded', () => {
 
+// Le damos formato a los campos de texto para Telefonos y Correo
+function formatPhoneNumber(e) {
+  let value = e.target.value.replace(/\D/g, ''); // Eliminar todos los caracteres no numéricos
+
+  if (value.length > 3 && value.length <= 6) {
+      value = '(' + value.substring(0, 3) + ') ' + value.substring(3);
+  } else if (value.length > 6) {
+      value = '(' + value.substring(0, 3) + ') ' + value.substring(3, 6) + ' ' + value.substring(6, 10);
+  }
+
+  e.target.value = value;
+}
+
+// Función de validación de email
+function validateEmail(e) {
+    // Esta expresión regular verifica un correo con el formato x@x.com
+    const re = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]{2,4}$/;
+    const isValid = re.test(e.target.value);
+    
+    e.target.style.borderColor = isValid ? 'green' : 'red';
+}
+
+// Agregar eventos a los campos de teléfono
+['Telefono', 'TelefonoSecundario'].forEach(id => {
+  const element = document.getElementById(id);
+  element.addEventListener('input', formatPhoneNumber);
+});
+
+// Agregar evento al campo de correo
+const Correo = document.getElementById('Correo');
+Correo.addEventListener('input', validateEmail);
+
+
+
   const CrearPacienteForm = document.getElementById('DatosGenerales');
   CrearPacienteForm.addEventListener('submit', async (e) => {
     e.preventDefault();

@@ -1,42 +1,51 @@
 var Pagina = 0;
 var IReceta = [];
 var IDT = [];
+var SucursalUltimaCita = 1;
+
+// Hacemos la consulta para obtener la sucursal de la ultima cita
+$.ajax({
+  url: "/UltimaReceta",
+  method: "POST",
+  dataType: "json",
+}).then((data) => {
+  SucursalUltimaCita = data;
+});
 
 // Definimos una la funcion para obtener los datos de la receta.
-function obtenerDatos() {
-  // ====================================================
-  // Hacemos la peticion de los medicamentos de la receta
-  // ====================================================
-  $.ajax({
+async function obtenerDatos() {
+  // Creamos un array para almacenar las promesas de las peticiones AJAX
+  let promises = [];
+
+  // Primera petición AJAX
+  let promise1 = $.ajax({
     url: "/Receta",
     method: "POST",
     dataType: "json",
-    success: (data) => {
-      IReceta.push(data);
-    },
+  }).then((data) => {
+    IReceta.push(data);
   });
 
-  // ====================================================
-  // Hacemos la peticion con la info de la sucursal
-  // ====================================================
-  $.ajax({
+  promises.push(promise1);
+
+  // Segunda petición AJAX
+  let promise2 = $.ajax({
     url: "/InfoRegistros",
     method: "POST",
     dataType: "json",
-    success: (data) => {
-      IDT.push(data);
-    },
+  }).then((data) => {
+    IDT.push(data);
   });
-  // Se pone un Delay para que se cargue la info de la receta
-  setTimeout(() => {
+
+  promises.push(promise2);
+
+  // Devolvemos una Promise que se resuelve cuando ambas peticiones AJAX se han completado
+  return Promise.all(promises).then(() => {
+    // Aquí puedes realizar otras operaciones que dependan de los datos obtenidos, si es necesario
     MedicamentosReceta();
-  }, 100);
-  // Y para que en cuanto termine de cargarse, se imprima automaticamente y se cierre la ventana
-  setTimeout(() => {
-    window.print();
-    window.close();
-  }, 150);
+  });
 }
+
 // ====================================================
 // Función para formatear la receta
 // ====================================================
@@ -101,34 +110,6 @@ function FormatoReceta() {
   const divContenedorFooter = document.createElement("div");
   divContenedorFooter.className = "ContenedorFooter";
 
-  // Recorre el array de sucursales y crea la estructura HTML para cada una
-  IDT[0].Sucursales.forEach((sucursal, index) => {
-    const divSucursal = document.createElement("div");
-    divSucursal.className = `Sucursal${index + 1}`;
-
-    const pNombre = document.createElement("b");
-    pNombre.textContent = `${sucursal.NombreSucursal}`;
-
-    const pDireccion = document.createElement("p");
-    pDireccion.textContent = `${sucursal.Direccion}`;
-
-    const pTelefono = document.createElement("p");
-    pTelefono.textContent = `${sucursal.Telefono}`;
-
-    divSucursal.appendChild(pNombre);
-    divSucursal.appendChild(pDireccion);
-    divSucursal.appendChild(pTelefono);
-
-    divContenedorFooter.appendChild(divSucursal);
-
-    if (index === IDT[0].Sucursales.length - 1) {
-      const Correo = document.createElement("p");
-      Correo.className = "Correo";
-      Correo.innerHTML = `${IReceta[0][0].CorreoDoc}`;
-      divSucursal.appendChild(Correo);
-    }
-  });
-
   // Insertar el fragmento de código HTML después del bucle
   const divQR = document.createElement("div");
   divQR.className = "QRs";
@@ -137,18 +118,44 @@ function FormatoReceta() {
   <img src="/img/RCTa/qr_IG.png" alt="QR_IG" />
   `;
   divContenedorFooter.appendChild(divQR);
+
+  // Obtener la información de la sucursal
+  const InfoSucursal = IDT[0].Sucursales[SucursalUltimaCita - 1];
+  // Y creamos un nuevo div para la sucursal
+  const divSucursal = document.createElement("div");
+  divSucursal.className = `Sucursal`;
+
+  const pNombre = document.createElement("b");
+  pNombre.className = "NombreSucursal";
+  pNombre.textContent = `${InfoSucursal.NombreSucursal}`;
+
+  const pDireccion = document.createElement("p");
+  pDireccion.textContent = `${InfoSucursal.Direccion}`;
+
+  const pTelefono = document.createElement("p");
+  pTelefono.textContent = `${InfoSucursal.Telefono}`;
+
+  divSucursal.appendChild(pNombre);
+  divSucursal.appendChild(pDireccion);
+  divSucursal.appendChild(pTelefono);
+
+  divContenedorFooter.appendChild(divSucursal);
+  const Correo = document.createElement("p");
+  Correo.className = "Correo";
+  Correo.innerHTML = `${IReceta[0][0].CorreoDoc.toLowerCase()}`;
+  divSucursal.appendChild(Correo);
+
   const divLogo = document.createElement("div");
   divLogo.className = "LogoDT";
   divLogo.innerHTML = `
      <img src="/img/RCTa/DermaTotalLogo.png" alt="Logo" />
    `;
-  divContenedorFooter.appendChild(divLogo);
 
   // Crear un nuevo footer y adjuntarlo al contenedor general
   const Footer = document.createElement("div");
   Footer.className = "Footer";
   Footer.appendChild(divContenedorFooter);
-
+  Footer.appendChild(divLogo);
   // Agregar todos los elementos al div "Receta"
   divReceta.appendChild(Header);
   divReceta.appendChild(lineup);
@@ -175,16 +182,38 @@ function MedicamentosReceta() {
 
   // Función para isnertar el formato de la receta
   FormatoReceta();
+  
+  // Verificamos si es par o no
+  function isEven(num) {
+    return num % 2 === 0;
+  }
+
 
   // Función para agregar los elementos <div> al elemento .InfoReceta
   function AgregarDivsAReceta(divs) {
     // Buscar el div padre "Receta N" y dentro de él buscar el div hijo "InfoReceta"
     const padreReceta = document.querySelector(`.Receta_${contadorReceta}`);
+    // Si es par, le quitarmos el margin Bottom
+    if(isEven(contadorReceta)){
+      padreReceta.setAttribute("style", `margin-bottom: 0;     
+      page-break-after: always;
+      `);
+    }
+
     if (padreReceta) {
       const contenedorInfoReceta = padreReceta.querySelector(".InfoReceta");
       divs.forEach((div) => {
         contenedorInfoReceta.appendChild(div);
       });
+    }
+  }
+  //Aqui nos aseguramos de que no se agregue un salto de pagina al final de la ultima receta
+  function quitarUltimoSaltoDePagina() {
+    const ultimoDivReceta = document.querySelector(`.Receta_${contadorReceta}`);
+    if (ultimoDivReceta) {
+      const ultimoInfoReceta = ultimoDivReceta.querySelector(`.InfoReceta`);
+      ultimoDivReceta.style.pageBreakAfter = "auto";
+      ultimoInfoReceta.setAttribute("style", `justify-content: flex-start; gap: 10px;`);
     }
   }
 
@@ -201,7 +230,10 @@ function MedicamentosReceta() {
         const dd = document.createElement("dd");
 
         // Establecer el contenido de <dt> y <dd>
-        dt.textContent = receta[key].Medicamento; // Usar 'key' como nombre del medicamento
+        let span = document.createElement("span");
+        span.textContent = receta[key].Medicamento.toUpperCase(); // Usar 'key' como nombre del medicamento
+        dt.appendChild(span);
+        dt.appendChild(document.createTextNode(":")); // Añadir el ':' fuera del span
         dd.textContent = receta[key].Indicacion;
 
         // Agregar elementos <dt> y <dd> al elemento <dl>
@@ -237,7 +269,7 @@ function MedicamentosReceta() {
       divNota.innerHTML = `
       <div class="NotaPaciente">
         <b>NOTA:</b>
-        <p>${IReceta[0][0].Nota}</p>
+        <p>${IReceta[0][0].Nota.toUpperCase()}</p>
       </div>
       `;
       divsParaRecetaActual.push(divNota);
@@ -251,8 +283,9 @@ function MedicamentosReceta() {
 
   // Agregar el elemento principal <div> al documento HTML
   document.body.appendChild(mainDiv);
+  quitarUltimoSaltoDePagina();
 }
 
-$(document).ready(async function () {
-  obtenerDatos();
-});
+
+// Y ejecutamos la funcion principal que nos generará la receta
+obtenerDatos();

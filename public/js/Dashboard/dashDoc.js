@@ -56,7 +56,7 @@ function PacientesEnEspera(datos) {
         ElementoPaciente.appendChild(headerElement);
 
         const InfoLlegadaPaciente = [
-          { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita },
+          { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita || "- -:- -" },
           {
             TituloInfo: "Hora Llegada",
             SourceInfo: Paciente.HoraLlegada || "- -:- -",
@@ -73,7 +73,7 @@ function PacientesEnEspera(datos) {
 
         // Event listeners para el boton de accion
         Boton.addEventListener("click", function (event) {
-          if (Paciente.StatusPaciente === 3) {
+          if (Paciente.StatusPaciente === 3 ||Paciente.idSesion) {
             console.log("Informacion del Paciente Clickado:");
             console.log(Paciente);
             DatosPaciente = {
@@ -81,6 +81,8 @@ function PacientesEnEspera(datos) {
               idStatusPaciente: Paciente.idStatusPaciente,
               idCita: Paciente.idCita,
               idSucursal: Paciente.idSucursal,
+              idSesion: Paciente.idSesion,
+              idDoctor: Paciente.idDoctor,
               Nombre: Paciente.NombresPacientes,
               Apellido: Paciente.ApellidosPacientes,
               HoraCita: Paciente.HoraCita,
@@ -390,6 +392,7 @@ function CitasFinalizadas(datos) {
           console.log(Paciente);
           DatosPaciente = {
             Protocolo: "UpdateFinalizar",
+            idSesion: Paciente.idSesion,
             idStatusPaciente: Paciente.idStatusPaciente,
             CheckOut: Paciente.CheckOut,
             Nombre: Paciente.NombresPacientes,
@@ -452,7 +455,7 @@ $.ajax({
 // Socket's para actualizar el Dashboard
 //==================================================================================================
 // Citas Hoy - Pacientes en Espera
-socket.on("Hoy/Espera", function (data) {
+socket.on("Hoy_Espera", function (data) {
   $.ajax({
     url: "/DashboardDoc",
     method: "POST",
@@ -470,7 +473,7 @@ socket.on("Hoy/Espera", function (data) {
 
 
 // Pacientes en Espera - Consulta
-socket.on("Espera/Consulta", function (data) {
+socket.on("Espera_Consulta", function (data) {
   $.ajax({
     url: "/DashboardDoc",
     method: "POST",
@@ -482,11 +485,11 @@ socket.on("Espera/Consulta", function (data) {
       console.error(error);
     },
   });
-  NuevoAudio(1);
+  NuevoAudio(4);
 });
 
 // Consulta - CheckOut
-socket.on("Consulta/CheckOut", function (data) {
+socket.on("Consulta_CheckOut", function (data) {
   $.ajax({
     url: "/DashboardDoc",
     method: "POST",
@@ -499,7 +502,7 @@ socket.on("Consulta/CheckOut", function (data) {
       console.error(error);
     },
   });
-  NuevoAudio(1);
+  NuevoAudio(3);
 });
 
 // Actualizar Otros consultorios
@@ -510,6 +513,21 @@ socket.on("OtrosConsultorios", function (data) {
     dataType: "json",
     success: function (respuesta) {
       OtrosConsultorios(respuesta.OtrosConsultorios);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+});
+
+// Actualizar El CheckOut
+socket.on("Update_CheckOut", function (data) {
+  $.ajax({
+    url: "/DashboardDoc",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      CitasFinalizadas(respuesta.CitasFinalizadas);
     },
     error: function (error) {
       console.error(error);

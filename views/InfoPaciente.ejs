@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
     <link rel="icon" href="/img/favicon.ico" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
     <script src="/js/infoPaciente/General.js"></script>
@@ -48,6 +49,14 @@
     // Contenido Busqueda de pacientes --> 
     //==================================================================================================
     %>
+    <%//Crea la vista de opciones la cual, en un inicio estará oculta%>
+    <div id="Cont_Opciones">
+      <div id="Opciones">
+        <h1 id="TituloOpciones">Cargando Titulo de Opciones...</h1>
+        <p id="MensajeOpciones">Cargando Mensaje de las opciones...</p>
+        <div class="InfoOpciones"><%//El contenido de rellena con JS%></div>
+      </div>
+    </div>
     <!-- Aqui comienza el Contenido de la informacion del paciente -->
     <div class="app">
       <main class="app__content">
@@ -58,19 +67,90 @@
           <div>
             <div class="NombrePaciente">
              <h1 class="Nombre">Cargando Nombre...<br><h1 class="Apellido">Cargando Apellidos...</h1></h1>
-             <h3>Edad: <span class="Edad">Cargando edad...</span> años</h3>
+             <input type="text" name="Nombre" id="Nombre" placeholder="Nombre" style="display: none;">
+             <input type="text" name="ApellidoP" id="ApellidoP" placeholder="Apellido Paterno" style="display: none;">
+             <input type="text" name="ApellidoM" id="ApellidoM" placeholder="Apellido Materno" style="display: none;">
+             <h3 class="Eda">Edad: <span class="Edad">Cargando edad...</span> años</h3>
+             <h3 class="Alerg">Alergias: <span class="Alergias">No hay alergias</span></h3>
+             <input type="text" name="Alergias" id="Alergias" placeholder="Alergias (Opcional)" style="display: none;">
             </div>
             <br>
-            <!-- <div class="tablist">
-              <button class="tag--success">Clinica</button>
-              <button class="tag--success">Quirurgica</button>
-              <button class="tag--success">Cosmetica</button>
-              <button class="tag--success">Depilacion</button>
-            </div> -->
           </div>
           <ul class="page__controls">
-            <li><button class="page__controlbtn--split">Editar</button></li>
             <!-- <li><button class="TerminarConsulta">Terminar Consulta</button></li> -->
+            <li><button class="page__controlbtn--split">Informacion</button></li>
+            <div class="infogroup">
+              <h3>Datos DermaTotal:</h3>
+                <div class="info">
+                  <div class="info__item">
+                    <div class="info__item__content">
+                      <header class="info__item__header">
+                        <h3 class="info__item__title">Status:</h3>
+                        <button class="iconbtn--edit" id="editarStatus"></button>
+                        <button class="iconbtn--cancelar" id="cancelarStatus" style="display:none;"></button>
+                        <button class="iconbtn--confirm" id="confirmarStatus" style="display:none;">Confirmar</button>
+                      </header>
+                      <p id="textStatus">${
+                        (await datosAlmacenados.DatosDT[0].Status) || "Cargando Status..."
+                      }</p>
+                      <select name="inputStatus" id="inputStatus" style="display:none;" >
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="info">
+                  <div class="info__item">
+                    <div class="info__item__content">
+                      <header class="info__item__header">
+                        <h3 class="info__item__title">Usuario:</h3>
+                        <button class="iconbtn--passrestart" id="PassRestart">Reinciar Contraseña</button>
+                        </header>
+                        <p>${
+                          (await datosAlmacenados.DatosDT[0].Usuario) ||
+                          "Usuario no disponible"
+                        }</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="info">
+                  <div class="info__widget"></div>
+                </div>
+                <div class="info">
+                  <div class="info__item">
+                    <div class="info__item__content">
+                      <header class="info__item__header">
+                        <h3 class="info__item__title">Alta Por:</h3>
+                      </header>
+                      <div class="avatar">
+                        <div class="avatar__icon">
+                          <img src="/img/UserIco.webp" alt="Nicholas Cage" />
+                        </div>
+                        <p>
+                        ${
+                          (await datosAlmacenados.DatosDT[0].AltaPor) ||
+                          "Usuario no disponible"
+                        } <span class="avatar__role"> 
+                        ${
+                          (await datosAlmacenados.DatosDT[0].TipoUsuarioAlta) ||
+                          "Tipo de usuario no disponible"
+                        }</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="info__item">
+                    <div class="info__item__content">
+                      <header class="info__item__header">
+                        <h3 class="info__item__title">El dia:</h3>
+                      </header>
+                      <p>${
+                        (await datosAlmacenados.DatosDT[0].FechaAlta) ||
+                        "Cargando fecha de alta..."
+                      }</p>
+                    </div>
+                  </div>
+                </div>
+              </div>          
           </ul>
         </header>
     

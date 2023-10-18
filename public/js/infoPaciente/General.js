@@ -2,101 +2,12 @@
 // Creamos la vista general
 // ====================================================
 async function cargarGeneral() {
-  await obtenerDatos();
   console.log(datosAlmacenados);
   const General = document.querySelector("#infocontenido");
   var htmlString = `
     <div class="region__content" id="region__content">
-    <div class="infogroup">
-      <div class="info">
-      <h3>Antecedentes:</h3>
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Padecimineto Actual:</h3>
-              <button class="iconbtn--edit" id="editarP_Actual"></button>
-              <button class="iconbtn--cancelar" id="cancelarP_Actual" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarP_Actual" style="display:none;">Confirmar</button>
-            </header>
-            <p class="text--lg" id="textP_Actual">${await datosAlmacenados
-              .Antecedentes[0].P_Actual}</p>
-            <input type="text" name="inputP_Actual" id="inputP_Actual" value="${await datosAlmacenados
-              .Antecedentes[0].P_Actual}" style="display:none;" />
-          </div>
-        </div>
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Alergias:</h3>
-              <button class="iconbtn--edit" id="editarAlergias"></button>
-              <button class="iconbtn--cancelar" id="cancelarAlergias" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarAlergias" style="display:none;">Confirmar</button>
-            </header>
-            <p id="textAlergias">${await datosAlmacenados.Antecedentes[0]
-              .Alergias}</p>
-            <input type="text" name="inputAlergias" id="inputAlergias" value="${await datosAlmacenados
-              .Antecedentes[0].Alergias}" style="display:none;" />
-          </div>
-        </div>
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Antecedentes Heredo/Familiares:</h3>
-              <button class="iconbtn--edit" id="editarA_HF"></button>
-              <button class="iconbtn--cancelar" id="cancelarA_HF" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarA_HF" style="display:none;">Confirmar</button>
-            </header>
-            <p id="textA_HF">${await datosAlmacenados.Antecedentes[0].A_HF}</p>
-            <input type="text" name="inputA_HF" id="inputA_HF" value="${await datosAlmacenados
-              .Antecedentes[0].A_HF}" style="display:none;" />
-          </div>
-        </div>
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Antecedentes No Patologicos:</h3>
-              <button class="iconbtn--edit" id="editarA_NP"></button>
-              <button class="iconbtn--cancelar" id="cancelarA_NP" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarA_NP" style="display:none;">Confirmar</button>
-            </header>
-            <p id="textA_NP">${await datosAlmacenados.Antecedentes[0].A_NP}</p>
-            <input type="text" name="inputA_NP" id="inputA_NP" value="${await datosAlmacenados
-              .Antecedentes[0].A_NP}" style="display:none;" />
-          </div>
-        </div>
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Antecedentes Personales/Patologicos:</h3>
-              <button class="iconbtn--edit" id="editarA_PP"></button>
-              <button class="iconbtn--cancelar" id="cancelarA_PP" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarA_PP" style="display:none;">Confirmar</button>
-            </header>
-            <p id="textA_PP">${await datosAlmacenados.Antecedentes[0].A_PP}</p>
-            <input type="text" name="inputA_PP" id="inputA_PP" value="${await datosAlmacenados
-              .Antecedentes[0].A_PP}" style="display:none;"/>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-    <div class="infogroup">
-    <h3>Datos Generales:</h3>
-      <div class="info">
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Fecha de Nacimiento:</h3>
-              <button class="iconbtn--edit" id="editarFechaDeNac"></button>
-              <button class="iconbtn--cancelar" id="cancelarFechaDeNac" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarFechaDeNac" style="display:none;">Confirmar</button>
-            </header>
-            <p id="textFechaDeNac">${await datosAlmacenados.BasicInfo[0]
-              .FechadeNac}</p>
-            <input type="date" name="inputFechaDeNac" id="inputFechaDeNac" style="display:none;"/>
-          </div>
-        </div>
-      </div>
+    <div class="infogroup ficha">
+    <h3>FICHA DE IDENTIFICACIÓN:</h3>
       <div class="info">
         <div class="info__item">
           <div class="info__item__content">
@@ -111,38 +22,54 @@ async function cargarGeneral() {
             </select>
           </div>
         </div>
+        <div class="info__item">
+          <div class="info__item__content">
+            <header class="info__item__header">
+              <h3 class="info__item__title">Fecha de Nac:</h3>
+              <button class="iconbtn--edit" id="editarFechaDeNac"></button>
+              <button class="iconbtn--cancelar" id="cancelarFechaDeNac" style="display:none;"></button>
+              <button class="iconbtn--confirm" id="confirmarFechaDeNac" style="display:none;">Confirmar</button>
+            </header>
+            <p id="textFechaDeNac">${await datosAlmacenados.BasicInfo[0]
+              .FechadeNac}</p>
+            <input type="date" name="inputFechaDeNac" id="inputFechaDeNac" style="display:none;"/>
+          </div>
+        </div>
       </div>
+
       <div class="info">
         <div class="info__item">
           <div class="info__item__content">
             <header class="info__item__header">
-              <h3 class="info__item__title">Telefono:</h3>
+              <h3 class="info__item__title">Tel:</h3>
               <button class="iconbtn--edit" id="editarTel1"></button>
               <button class="iconbtn--cancelar" id="cancelarTel1" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarTel1" style="display:none;">Confirmar</button>
             </header>
-            <p id="textTel1">${
+            <a id="textTel1" href="#">${
               (await datosAlmacenados.BasicInfo[0].Tel1) ||
               "No hay telefono registrado"
-            }</p>
-            <input type="text" name="inputTel1" id="inputTel1" value="${await datosAlmacenados
-              .BasicInfo[0].Tel1}" style="display:none;"/>
+            }</a>
+            <input type="tel" name="inputTel1" id="inputTel1" value="${await datosAlmacenados
+              .BasicInfo[0]
+              .Tel1}" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
         </div>
         <div class="info__item">
           <div class="info__item__content">
             <header class="info__item__header">
-            <h3 class="info__item__title">Telefono Secundario:</h3>
+            <h3 class="info__item__title">Tel. Secundario:</h3>
             <button class="iconbtn--edit" id="editarTel2"></button>
             <button class="iconbtn--cancelar" id="cancelarTel2" style="display:none;"></button>
             <button class="iconbtn--confirm" id="confirmarTel2" style="display:none;">Confirmar</button>
             </header>
-            <p id="textTel2">${
+            <a id="textTel2" href="#">${
               (await datosAlmacenados.BasicInfo[0].Tel2) ||
               "No hay telefono secundario registrado"
-            }</p>
-            <input type="text" name="inputTel2" id="inputTel2" value="${await datosAlmacenados
-              .BasicInfo[0].Tel2}" style="display:none;"/>
+            }</a>
+            <input type="tel" name="inputTel2" id="inputTel2" value="${await datosAlmacenados
+              .BasicInfo[0]
+              .Tel2}" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
         </div>
       </div>
@@ -156,99 +83,82 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarCorreo" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarCorreo" style="display:none;">Confirmar</button>
             </header>
-            <p id="textCorreo">${
+            <a id="textCorreo" href="#">${
               (await datosAlmacenados.BasicInfo[0].Correo) ||
               "No hay correo registrado"
-            }</p>
+            }</a>
             <input type="text" name="inputCorreo" id="inputCorreo" value="${await datosAlmacenados
-              .BasicInfo[0].Correo}" style="display:none;"/>
+              .BasicInfo[0]
+              .Correo}" style="display:none;" placeholder="ejemplo@correo.com" />
           </div>
         </div>
       </div>
     </div>
-  
-    <div class="infogroup">
-    <h3>Datos DermaTotal:</h3>
+
+    <div class="infogroup antecedentes">
       <div class="info">
+      <h3>ANTECEDENTES:</h3>
         <div class="info__item">
           <div class="info__item__content">
             <header class="info__item__header">
-              <h3 class="info__item__title">Status:</h3>
-              <button class="iconbtn--edit" id="editarStatus"></button>
-              <button class="iconbtn--cancelar" id="cancelarStatus" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarStatus" style="display:none;">Confirmar</button>
+              <h3 class="info__item__title">Personales/Patologicos:</h3>
+              <button class="iconbtn--edit" id="editarA_PP"></button>
+              <button class="iconbtn--cancelar" id="cancelarA_PP" style="display:none;"></button>
+              <button class="iconbtn--confirm" id="confirmarA_PP" style="display:none;">Confirmar</button>
             </header>
-            <p id="textStatus">${
-              (await datosAlmacenados.DatosDT[0].Status) || "Cargando Status..."
-            }</p>
-            <select name="inputStatus" id="inputStatus" style="display:none;" >
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="info">
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Usuario:</h3>
-              <button class="iconbtn--passrestart" id="PassRestart">Reinciar Contraseña</button>
-              </header>
-              <p>${
-                (await datosAlmacenados.DatosDT[0].Usuario) ||
-                "Usuario no disponible"
-              }</p>
-          </div>
-        </div>
-      </div>
-      <div class="info">
-        <div class="info__widget"></div>
-      </div>
-      <div class="info">
-        <div class="info__item">
-          <div class="info__item__content">
-            <header class="info__item__header">
-              <h3 class="info__item__title">Alta Por:</h3>
-            </header>
-            <div class="avatar">
-              <div class="avatar__icon">
-                <img src="/img/UserIco.webp" alt="Nicholas Cage" />
-              </div>
-              <p>
-              ${
-                (await datosAlmacenados.DatosDT[0].AltaPor) ||
-                "Usuario no disponible"
-              } <span class="avatar__role"> 
-              ${
-                (await datosAlmacenados.DatosDT[0].TipoUsuarioAlta) ||
-                "Tipo de usuario no disponible"
-              }</span>
-              </p>
-            </div>
+            <p id="textA_PP">${await datosAlmacenados.Antecedentes[0].A_PP}</p>
+            <input type="text" name="inputA_PP" id="inputA_PP" value="${await datosAlmacenados
+              .Antecedentes[0].A_PP}" style="display:none;"/>
           </div>
         </div>
         <div class="info__item">
           <div class="info__item__content">
             <header class="info__item__header">
-              <h3 class="info__item__title">El dia:</h3>
+              <h3 class="info__item__title">No Patologicos:</h3>
+              <button class="iconbtn--edit" id="editarA_NP"></button>
+              <button class="iconbtn--cancelar" id="cancelarA_NP" style="display:none;"></button>
+              <button class="iconbtn--confirm" id="confirmarA_NP" style="display:none;">Confirmar</button>
             </header>
-            <p>${
-              (await datosAlmacenados.DatosDT[0].FechaAlta) ||
-              "Cargando fecha de alta..."
-            }</p>
+            <p id="textA_NP">${await datosAlmacenados.Antecedentes[0].A_NP}</p>
+            <input type="text" name="inputA_NP" id="inputA_NP" value="${await datosAlmacenados
+              .Antecedentes[0].A_NP}" style="display:none;" />
+          </div>
+        </div>
+        <div class="info__item">
+          <div class="info__item__content">
+            <header class="info__item__header">
+              <h3 class="info__item__title">Heredo/Familiares:</h3>
+              <button class="iconbtn--edit" id="editarA_HF"></button>
+              <button class="iconbtn--cancelar" id="cancelarA_HF" style="display:none;"></button>
+              <button class="iconbtn--confirm" id="confirmarA_HF" style="display:none;">Confirmar</button>
+            </header>
+            <p id="textA_HF">${await datosAlmacenados.Antecedentes[0].A_HF}</p>
+            <input type="text" name="inputA_HF" id="inputA_HF" value="${await datosAlmacenados
+              .Antecedentes[0].A_HF}" style="display:none;" />
           </div>
         </div>
       </div>
     </div>
   </div>
   
+<div class="Diagnosticos">
+<h2>DIAGNOSTICOS:</h2>
+<div class="info__item"></div>
+</div>
+
   <section class="region" id="RA">
-    <h2 id="Titulo_Receta">Receta Actual:</h2>
+    <h2 id="Titulo_Receta">Ultima Receta:</h2>
     <div class="infogroup">
       <div class="info__item">
         <div class="info__item__content">
           <header class="info__item__header">
             <div id="Doctor" style="font-size:18px; display:none;">Cargando Doctor...</div>
-            <button class="iconbtn--print" id="Print" style="display:none;">Imprimir Receta</button>
+            <div class="Botones"> 
+            <button class="iconbtn--cancel" id="CancelarEdit" style="display:none;">Cancelar</button>
+            <button class="iconbtn--editar" id="EditarUltimaReceta">Editar</button>
+            <button class="iconbtn--print" id="Print">Imprimir Receta</button>
+            <button class="iconbtn--save" id="GuardarCambios" style="display:none;">Guardar Cambios</button>
+            </div>
           </header>
           <div class="Receta_actual" id="Receta_actual">
           </div>
@@ -285,9 +195,6 @@ async function cargarGeneral() {
       </div>
     </div>
   </section>
-
-
-
     `;
 
   General.innerHTML = htmlString;
@@ -307,170 +214,181 @@ async function cargarGeneral() {
       });
       //Llenado para el Status
       const Status = document.getElementById("inputStatus");
-      data.StatusUsuario.forEach((element) => {
-        const ListaStat = new Option(element.Status, element.idStatus);
-        Status.appendChild(ListaStat);
-      });
+      if (Status) {
+        data.StatusUsuario.forEach((element) => {
+          const ListaStat = new Option(element.Status, element.idStatus);
+          Status.appendChild(ListaStat);
+        });
+      } else {
+        console.log("No hay status");
+      }
     },
   });
   // ========================================================================================================
   // Peticion para insertar ultima receta
   // ========================================================================================================
+  // Petición AJAX para obtener los datos de la receta
   $.ajax({
     url: "/InfoPaciente",
     method: "POST",
     dataType: "json",
     success: (data) => {
-      // Buscamos el div donde se insertara la receta
-      const Receta = document.getElementById("Receta_actual");
-      const TituloReceta = document.getElementById("Titulo_Receta");
-      const Print = document.getElementById("Print");
-      const Doctor = document.getElementById("Doctor");
-      const veriRecetas = data.Recetas.length;
-      const idPaciente = data.DatosDT[0].idPaciente;
-      // Si existen elementos en la receta:
-      if (veriRecetas != 0) {
-        // Activamos el nombre del doctor y el boton de imprimir
-        Doctor.style.display = "block";
-        Print.style.display = "inline-block";
-        // Realizamos converciones en la fecha para que se muestre correctamente:
-        const fechaOriginal = data.Recetas[0].Fecha;
-        // Parsear la fecha
-        const fecha = new Date(fechaOriginal);
-        // Obtener los componentes de la fecha (día, mes y año)
-        const dia = fecha.getDate();
-        const mes = fecha.getMonth() + 1; // Sumar 1 porque los meses comienzan en 0
-        const año = fecha.getFullYear() % 100; // Obtener los últimos dos dígitos del año
-
-        // Cambiamos el titulo
-        TituloReceta.innerHTML = `Receta actual (<span>${dia}/${mes}/${año}</span>):`;
-        //Almacenamos el id de la receta mas reciente
-        const ultimareceta = data.Recetas[0].idReceta;
-        // Añadimos el nombre del doctor que la recetó
-        Doctor.innerHTML = `<p>Recetado por: <b><span>${data.Recetas[0].Doctor}</span></b></p>`;
-        // Crea un elemento dl
-        const dl = document.createElement("dl");
-        // Filtra los datos para incluir solo aquellos con idReceta igual a ultimareceta
-        const datosFiltrados = data.Recetas.filter(
-          (item) => item.idReceta === ultimareceta
-        );
-        // Recorre los datos filtrados
-        datosFiltrados.forEach((item, index) => {
-          // Crea elementos dt y dd para cada conjunto de datos
-          const dt = document.createElement("dt");
-          // Con el nombre del medicamento en negritas
-          dt.innerHTML = `<b>${item.Medicamento}:</b>`;
-          const dd = document.createElement("dd");
-          // Y su indicacion
-          dd.innerHTML = `
-            <p>${item.Indicacion}</p>
-            <br>
-          `;
-          // Agrega los elementos dt y dd al elemento dl
-          dl.appendChild(dt);
-          dl.appendChild(dd);
-        });
-        if (data.Recetas[0].Nota) {
-          // Crea el elemento para mostrar la nota
-          const Nota = document.createElement("div");
-          const NotaTitulo = document.createElement("h3");
-          NotaTitulo.innerHTML = "Nota:";
-          const NotaP = document.createElement("p");
-          NotaP.innerHTML = data.Recetas[0].Nota;
-
-          // Agrega el elemento dl a tu página
-          Receta.appendChild(dl);
-          // Agrega el elemento de la nota
-          Nota.appendChild(NotaTitulo);
-          Nota.appendChild(NotaP);
-          Receta.appendChild(Nota);
-        } else {
-          // Agrega el elemento dl a tu página
-          Receta.appendChild(dl);
-        }
+      if (data.Recetas.length !== 0) {
+        mostrarReceta(data);
       } else {
-        // Si no hay receta, muestra un mensaje
-        Receta.innerHTML = "No hay recetas registradas.";
+        document.getElementById("Receta_actual").innerHTML;
+        const doctor = document.getElementById("Doctor");
+        doctor.style.display = "block";
+        doctor.textContent = "No hay recetas registradas.";
+        const botones = document.querySelector(".Botones");
+        botones.style.display = "none";
       }
     },
-    // Resto de la configuración de la solicitud AJAX
-
-    error: function (error) {
+    error: (error) => {
       console.error(error);
+      // Se puede proporcionar retroalimentación al usuario aquí.
     },
   });
 
-  // ========================================================================================================
-  // Funcion para escuchar los botones
-  // ========================================================================================================
-  function agregarEventListener(id, accion) {
-    const elemento = document.getElementById(id);
-    if (elemento) {
-      elemento.addEventListener("click", accion);
-    } else {
-      console.log(`No se cargó correctamente el botón ${id}`);
+  // Función para crear un elemento que representa un medicamento
+  function crearElementoMedicamento(item) {
+    const divMedicamentos = document.createElement("div");
+    divMedicamentos.classList.add("elemento-receta");
+    const dt = document.createElement("dt");
+    dt.innerHTML = `<b>${item.Medicamento}:</b>`;
+    const dd = document.createElement("dd");
+    dd.innerHTML = `<p>${item.Indicacion}</p><br>`;
+
+    divMedicamentos.appendChild(dt);
+    divMedicamentos.appendChild(dd);
+    return divMedicamentos;
+  }
+
+  // Función para crear un input para el medicamento o indicación
+  function crearInputMedicamento(item, tipo) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = `Edit${tipo}`;
+    input.placeholder = tipo;
+    input.required = true;
+    input.classList.add("input-receta", `${tipo.toLowerCase()}receta`); // Agregamos la clase 'input-receta'
+    input.value = item[tipo];
+    input.setAttribute("idMedicamento", item.idMedicamento);
+    input.setAttribute("idMedicamento_Receta", item.idMedicamento_Receta);
+    input.setAttribute("idReceta", item.idReceta);
+    return input;
+  }
+
+  // Función para mostrar la receta en el DOM
+  function mostrarReceta(data) {
+    const Receta = document.getElementById("Receta_actual");
+    const TituloReceta = document.getElementById("Titulo_Receta");
+    const Print = document.getElementById("Print");
+    const Doctor = document.getElementById("Doctor");
+
+    // Mostrar el nombre del doctor y el botón de imprimir
+    Doctor.style.display = "block";
+    Print.style.display = "inline-block";
+
+    // Formatear y mostrar la fecha de la receta
+    const { dia, mes, año } = formatearFecha(data.Recetas[0].Fecha);
+    TituloReceta.innerHTML = `Ultima Receta <span>${dia}/${mes}/${año}</span>:`;
+    Doctor.innerHTML = `<p>Recetado por: <b><span>${data.Recetas[0].Doctor}</span></b></p>`;
+
+    const dl = document.createElement("dl");
+    const formEditReceta = document.createElement("form");
+    formEditReceta.style.display = "none";
+    // Filtrar y mostrar cada medicamento de la receta
+    const ultimareceta = data.Recetas[0].idReceta;
+    const datosFiltrados = data.Recetas.filter(
+      (item) => item.idReceta === ultimareceta
+    );
+    datosFiltrados.forEach((item) => {
+      const divMedicamentos = crearElementoMedicamento(item);
+      const divinputs = document.createElement("div");
+
+      dl.appendChild(divMedicamentos);
+      divinputs.appendChild(crearInputMedicamento(item, "Medicamento"));
+      divinputs.appendChild(crearInputMedicamento(item, "Indicacion"));
+      formEditReceta.appendChild(divinputs);
+    });
+
+    Receta.appendChild(dl);
+    Receta.appendChild(formEditReceta);
+
+    // Si existe una nota, se muestra
+    if (data.Recetas[0].Nota) {
+      const Nota = document.createElement("div");
+      Nota.classList.add("Nota");
+      Nota.style.display = "block";
+      const NotaTitulo = document.createElement("h3");
+      NotaTitulo.innerHTML = "Nota:";
+      const NotaP = document.createElement("p");
+      NotaP.innerHTML = data.Recetas[0].Nota;
+      Nota.appendChild(NotaTitulo);
+      Nota.appendChild(NotaP);
+
+      const inputNota = document.createElement("input");
+      inputNota.type = "text";
+      inputNota.name = "EditNota";
+      inputNota.placeholder = "Nota";
+      inputNota.required = true;
+      inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
+      inputNota.value = data.Recetas[0].Nota;
+      inputNota.style.maxWidth = "70%";
+
+      const tituloNota = document.createElement("h3");
+      tituloNota.innerHTML = "Nota:";
+      Receta.appendChild(Nota);
+      formEditReceta.appendChild(tituloNota);
+      formEditReceta.appendChild(inputNota);
     }
   }
+
   // ========================================================================================================
-  // Para editar los datos
+  // Mapa de botones para editar datos
   // ========================================================================================================
-  agregarEventListener("editarP_Actual", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("P_Actual");
-  });
-  agregarEventListener("editarAlergias", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Alergias");
+  const editarBotones = {
+    editarAlergias: "Alergias",
+    editarA_HF: "A_HF",
+    editarA_NP: "A_NP",
+    editarA_PP: "A_PP",
+    editarFechaDeNac: "FechaDeNac",
+    editarSexo: "Sexo",
+    editarTel1: "Tel1",
+    editarTel2: "Tel2",
+    editarCorreo: "Correo",
+    editarStatus: "Status",
+    // ... (otros botones)
+  };
+
+  Object.keys(editarBotones).forEach((id) => {
+    agregarEventListener(id, () => editarDato(editarBotones[id]));
   });
 
-  agregarEventListener("editarA_HF", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("A_HF");
-  });
+  // ========================================================================================================
+  // Mapeo de botones para confirmar los cambios
+  // ========================================================================================================
 
-  agregarEventListener("editarA_NP", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("A_NP");
-  });
+  const confirmarBotones = {
+    confirmarAlergias: ["Alergias", " ", 1],
+    confirmarA_HF: ["A_HF", " ", 1],
+    confirmarA_NP: ["A_NP", " ", 1],
+    confirmarA_PP: ["A_PP", " ", 1],
+    confirmarFechaDeNac: ["FechaDeNac", "FechadeNacimiento", 2],
+    confirmarSexo: ["Sexo", "idSexo", 2],
+    confirmarTel1: ["Tel1", "Telefono", 2],
+    confirmarTel2: ["Tel2", "TelefonoSecundario", 2],
+    confirmarCorreo: ["Correo", "Correo", 2],
+    confirmarStatus: ["Status", "idStatus", 3],
+    // ... (otros botones)
+  };
 
-  agregarEventListener("editarA_PP", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("A_PP");
-  });
-
-  agregarEventListener("editarFechaDeNac", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("FechaDeNac");
-  });
-
-  agregarEventListener("editarSexo", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Sexo");
-  });
-
-  agregarEventListener("editarTel1", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Tel1");
-  });
-
-  agregarEventListener("editarTel2", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Tel2");
-  });
-
-  agregarEventListener("editarCorreo", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Correo");
-  });
-
-  agregarEventListener("editarStatus", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    editarDato("Status");
-  });
-
-  agregarEventListener("PassRestart", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    reiniciarContraseña();
+  Object.keys(confirmarBotones).forEach((id) => {
+    const [dato, otroParam, tercerParam] = confirmarBotones[id];
+    agregarEventListener(id, () =>
+      confirmarEdicion(dato, otroParam, tercerParam)
+    );
   });
 
   agregarEventListener("botonNuevaReceta", function () {
@@ -481,6 +399,49 @@ async function cargarGeneral() {
     formreceta.style.display = "block";
     botoncancelar.style.display = "block";
     botonNuevaReceta.style.display = "none";
+
+    // Creamos los campos de medicamentos e indicaciones con los valores de la ultima receta
+    // Si existen recetas
+    if (datosAlmacenados.Recetas[0]) {
+      const ultimareceta = datosAlmacenados.Recetas[0].idReceta;
+      // Almacenamos todas las recetas con el mismo id en un array
+      const datosFiltrados = datosAlmacenados.Recetas.filter(
+        (item) => item.idReceta === ultimareceta
+      );
+      // Y por cada una de ellas creamos un par de campos de medicamentos e indicaciones
+      // en caso de que no existan
+
+      const camposMedicamentos = document.getElementById("camposMedicamentos");
+      camposMedicamentos.innerHTML = ``;
+
+      datosFiltrados.forEach((item) => {
+        const medicamentoInput = document.createElement("input");
+        medicamentoInput.type = "text";
+        medicamentoInput.name = "Medicamentos";
+        medicamentoInput.placeholder = "Medicamento";
+        medicamentoInput.required = true;
+        medicamentoInput.classList.add("medicamentoreceta");
+        medicamentoInput.value = item.Medicamento;
+        camposMedicamentos.appendChild(medicamentoInput);
+
+        const indicacionInput = document.createElement("input");
+        indicacionInput.type = "text";
+        indicacionInput.name = "Indicaciones";
+        indicacionInput.placeholder = "Indicación";
+        indicacionInput.classList.add("indicacionreceta");
+        indicacionInput.required = true;
+        indicacionInput.value = item.Indicacion;
+        camposMedicamentos.appendChild(indicacionInput);
+
+        // Agregar el par de Medicamento e Indicación al array correspondiente
+        medicamentoInput.addEventListener("blur", () => {
+          agregarMedicamentoIndicacion(
+            medicamentoInput.value,
+            indicacionInput.value
+          );
+        });
+      });
+    }
   });
 
   agregarEventListener("cancelarReceta", function () {
@@ -493,62 +454,91 @@ async function cargarGeneral() {
     botonNuevaReceta.style.display = "block";
   });
 
-  // ========================================================================================================
-  // Para confirmar los cambios
-  // ========================================================================================================
+  agregarEventListener("EditarUltimaReceta", function () {
+    // Acciones a realizar cuando se haga clic en el botón
+    const botones = document.querySelector(".Botones");
+    const formEditReceta = document.querySelector("#Receta_actual form");
+    const botoncancelar = document.getElementById("CancelarEdit");
+    const botonEditar = document.getElementById("EditarUltimaReceta");
+    const botonGuardar = document.getElementById("GuardarCambios");
+    const botonPrint = document.getElementById("Print");
+    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
 
-  agregarEventListener("confirmarP_Actual", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("P_Actual", " ", 1);
-  });
-  agregarEventListener("confirmarAlergias", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Alergias", " ", 1);
-  });
+    const Nota = document.querySelector(".Nota");
+    if (Nota) {
+      Nota.style.display = "none";
+    }
 
-  agregarEventListener("confirmarA_HF", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("A_HF", " ", 1);
-  });
+    botones.style.display = "flex";
+    formEditReceta.style.display = "block";
+    botoncancelar.style.display = "flex";
+    botonEditar.style.display = "none";
+    botonGuardar.style.display = "flex";
+    botonPrint.style.display = "none";
+    botonNuevaReceta.style.display = "none";
 
-  agregarEventListener("confirmarA_NP", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("A_NP", " ", 1);
-  });
-
-  agregarEventListener("confirmarA_PP", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("A_PP", " ", 1);
-  });
-
-  agregarEventListener("confirmarFechaDeNac", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("FechaDeNac", "FechadeNacimiento", 2);
+    // Ocultamos todos los elementos generados con 'crearElementoMedicamento'
+    const elementosReceta = document.querySelectorAll(".elemento-receta");
+    elementosReceta.forEach((elemento) => {
+      elemento.style.display = "none";
+    });
   });
 
-  agregarEventListener("confirmarSexo", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Sexo", "idSexo", 2);
+  agregarEventListener("CancelarEdit", function () {
+    const formEditReceta = document.querySelector("#Receta_actual form");
+    const botones = document.querySelector(".Botones");
+    const botoncancelar = document.getElementById("CancelarEdit");
+    const botonEditar = document.getElementById("EditarUltimaReceta");
+    const botonGuardar = document.getElementById("GuardarCambios");
+    const botonPrint = document.getElementById("Print");
+    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
+
+    const Nota = document.querySelector(".Nota");
+    if (Nota) {
+      Nota.style.display = "block";
+    }
+
+    botones.style.display = "flex";
+    botoncancelar.style.display = "none";
+    botonEditar.style.display = "flex";
+    botonGuardar.style.display = "none";
+    botonPrint.style.display = "flex";
+    botonNuevaReceta.style.display = "block";
+    formEditReceta.style.display = "none";
+    // Mostramos todos los elementos generados con 'crearElementoMedicamento'
+    const elementosReceta = document.querySelectorAll(".elemento-receta");
+    elementosReceta.forEach((elemento) => {
+      elemento.style.display = "block";
+    });
   });
 
-  agregarEventListener("confirmarTel1", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Tel1", "Telefono", 2);
-  });
+  agregarEventListener("GuardarCambios", function () {
+    alert("Vamos a guardar cambios");
 
-  agregarEventListener("confirmarTel2", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Tel2", "TelefonoSecundario", 2);
-  });
+    console.log("Array de inputs:");
+    const inputData = getCombinedInputData();
+    console.log(inputData);
 
-  agregarEventListener("confirmarCorreo", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Correo", "Correo", 2);
-  });
+    const ultimareceta = datosAlmacenados.Recetas[0].idReceta;
+    // Almacenamos todas las recetas con el mismo id en un array
+    const datosFiltrados = datosAlmacenados.Recetas.filter(
+      (item) => item.idReceta === ultimareceta
+    ).map((item) => {
+      return {
+        idMedicamento: String(item.idMedicamento),
+        idMedicamento_Receta: String(item.idMedicamento_Receta),
+        idReceta: String(item.idReceta),
+        Medicamento: item.Medicamento,
+        Indicacion: item.Indicacion,
+        Nota: item.Nota,
+      };
+    });
+    console.log("Ahora el array de la receta:");
+    console.log(datosFiltrados);
+    
+    // Y llamamos a la función para comparar los datos
+    compareData(datosFiltrados, inputData);
 
-  agregarEventListener("confirmarStatus", function () {
-    // Acciones a realizar cuando se haga clic en el botón
-    confirmarEdicion("Status", "idStatus", 3);
   });
 
   // ========================================================================================================
@@ -565,7 +555,47 @@ async function cargarGeneral() {
     // Obtenemos el id de la receta
     const idReceta = datosAlmacenados.Recetas[0].idReceta;
     // Abrimos la receta en una nueva pestaña
-    window.open(`/Receta/${idPaciente}/${idReceta}`, "_blank");
+
+    //========================================================================================================
+    // Codigo para no abrir la pestaña y solo imprimir la receta
+    //========================================================================================================
+    // Función para obtener o crear el iframe basado en su atributo src
+    function getOrCreateIframeBySrc(src) {
+      // Buscar iframes en el documento y filtrar por el atributo src
+      let iframes = Array.from(document.querySelectorAll("iframe"));
+      let iframe = iframes.find((iframe) => iframe.src.endsWith(src));
+
+      // Si el iframe no existe con ese src, lo crea y lo añade al documento
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+      } else {
+        iframe.contentWindow.location.reload();
+      }
+
+      return iframe;
+    }
+
+    // Definir el src
+    let src = `/Receta/${idPaciente}/${idReceta}`;
+
+    // Usando la función getOrCreateIframeBySrc para obtener o crear el iframe
+    let iframe = getOrCreateIframeBySrc(src);
+
+    // Establece el evento onload solo si es necesario
+    if (!iframe.onload) {
+      iframe.onload = function () {
+        setTimeout(function () {
+          iframe.contentWindow.print();
+        }, 200);
+      };
+    }
+
+    // Establece el atributo src para cargar el contenido y disparar el evento onload
+    iframe.src = src;
+
+    // window.open(`/Receta/${idPaciente}/${idReceta}`, "_blank");
   });
 
   // Array para almacenar los valores de Medicamentos e Indicaciones
@@ -663,6 +693,45 @@ async function cargarGeneral() {
     // Enviar el formulario
     recetaForm.submit();
   });
+
+  // ========================================================================================================
+  // Href's
+  const tel1 = document.querySelector("#textTel1");
+  const tel2 = document.querySelector("#textTel2");
+  const correo = document.querySelector("#textCorreo");
+
+  // Validar número de teléfono
+  function isValidPhone(phone) {
+    // Esta expresión regular valida números de 10 dígitos
+    const phoneRegex = /^\(\d{3}\) \d{3} \d{4}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Validar formato de correo
+  function isValidEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailRegex.test(email);
+  }
+
+  // Establecer href si el teléfono es válido
+  if (isValidPhone(tel1.textContent)) {
+    tel1.href = `tel:${tel1.textContent}`;
+  } else {
+    tel1.removeAttribute("href");
+  }
+
+  if (isValidPhone(tel2.textContent)) {
+    tel2.href = `tel:${tel2.textContent}`;
+  } else {
+    tel2.removeAttribute("href");
+  }
+
+  // Establecer href si el correo es válido
+  if (isValidEmail(correo.textContent)) {
+    correo.href = `mailto:${correo.textContent}`;
+  } else {
+    correo.removeAttribute("href");
+  }
 }
 
 // ========================================================================================================
@@ -681,6 +750,29 @@ function editarDato(NombredelCampo) {
   botoncancelar.style.display = "inline-block";
   confirmar.style.display = "inline-block";
   texto.style.display = "none";
+
+  if (NombredelCampo == "Tel1" || NombredelCampo == "Tel2") {
+    input.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, ""); // Eliminar todos los caracteres no numéricos
+
+      // Formatear número
+      if (value.length <= 3) {
+        value = value;
+      } else if (value.length <= 6) {
+        value = "(" + value.substring(0, 3) + ") " + value.substring(3);
+      } else {
+        value =
+          "(" +
+          value.substring(0, 3) +
+          ") " +
+          value.substring(3, 6) +
+          " " +
+          value.substring(6, 10);
+      }
+
+      e.target.value = value;
+    });
+  }
 
   botoncancelar.addEventListener("click", function () {
     cancelarEdicion(NombredelCampo);
@@ -752,24 +844,4 @@ function cancelarEdicion(NombredelCampo) {
   document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
   document.getElementById(`input${NombredelCampo}`).style.display = "none";
   document.getElementById(`text${NombredelCampo}`).style.display = "block";
-}
-
-function reiniciarContraseña() {
-  // Restablecer la contraseña a el nombre de usuario
-  var resultado =
-    window.confirm(`Al reiniciar la contraseña, el usuario podrá iniciar sesión con su nombre de usuario.
-      ¿Deseas Continuar?
-    `);
-  if (resultado === true) {
-    // Hacemos el reinicio
-    fetch("/PassRestart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ usuario: NombreUsuario }),
-    });
-    // Y mostramos la confirmacion Visual
-    window.alert("La contraseña de " + NombreUsuario + " cambió con exito.");
-  }
 }

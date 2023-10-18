@@ -23,7 +23,7 @@ function PacientesHoy(datos) {
 
       // El título se puede obtener de cualquier cita del mismo doctor
       const tituloDoctor = document.createElement("h3");
-      tituloDoctor.textContent = `${Doctores[Doctor][0].Doctor}:`;
+      tituloDoctor.textContent = `${Doctores[Doctor][0].Doctor||"Otras Consultas"}:`;
       divDoctor.appendChild(tituloDoctor);
 
       const divContDoctor = document.createElement("div");
@@ -63,16 +63,17 @@ function PacientesHoy(datos) {
             DatosPaciente = {
               Protocolo: "CheckIn",
               idStatusPaciente: 1,
+              idAsociado: Paciente.idAsociado,
               idDoctor: Paciente.idDoctor,
               idCita: Paciente.idCitas,
               Procedimiento: Paciente.Procedimiento,
               Doctor: Paciente.Doctor,
+              Asociado: Paciente.Asociado,
               Nombre: Paciente.NombresPacientes,
               Apellido: Paciente.ApellidosPacientes,
               HoraCita: Paciente.HoraCita,
               Procedimiento: Paciente.Procedimiento,
               RutaFoto: rutaRelativa,
-
             };
             Accion_Paciente(DatosPaciente);
             event.stopPropagation();
@@ -188,8 +189,11 @@ function PacientesPedidos(datos) {
         Protocolo: "Asignar",
         idStatusPaciente: 2,
         idSucursal: Paciente.idSucursal,
+        idPaciente: Paciente.idPaciente,
+        idProcedimiento: Paciente.idProcedimiento,
         idDoctor: Paciente.idDoctor,
         idCita: Paciente.idCitas,
+        idConsultorio: Paciente.idConsultorio,
         NombreD: Paciente.NombreD,
         NombreP: Paciente.NombreP,
         ApellidoP: Paciente.ApellidoP,
@@ -245,7 +249,7 @@ function PacientesFinalizados(datos) {
       ElementoPaciente.appendChild(HeaderPaciente);
 
       const InfoLlegadaPaciente = [
-        { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita },
+        { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita || "N/A" },
         // Agrega aquí más información si es necesario
       ];
       createInfoSection(InfoLlegadaPaciente, HeaderPaciente);
@@ -377,3 +381,4 @@ socket.on("CheckOut", function (data) {
 socket.on("Sonido", function (data) {
   NuevoAudio(2);
 });
+

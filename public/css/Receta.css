@@ -3,20 +3,32 @@ body {
     font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
 }
 
-.Header {
+/* Estilo base para todos los divs */
+div[class^="Receta_"] {
+    margin-bottom: 40px; /* Por defecto todos los divs tendrán margin-bottom */
+}
 
+
+
+.Header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     margin-top: 30px;
+    color: #a2a2a2;
+    margin-bottom: 10px;
 }
 
+
+
 .ContenedorFooter {
+    gap: 10px;
+    max-width: 50%;
     font-size: 12px;
     height: 100px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 0 10px;
 }
@@ -26,6 +38,25 @@ body {
     align-items: center;
 }
 
+.Nombre::after{
+    content: "";
+    position: absolute;
+    width: 83px;
+    height: 10px;
+    background-color: white;
+    margin-top: 25px;
+    left: 0;
+}
+.Fecha::after{
+    content: "";
+    position: absolute;
+    width: 47px;
+    height: 10px;
+    background-color: white;
+    margin-top: 25px;
+}
+
+
 .LogoCMI>img,
 .LogoDT>img {
 
@@ -34,32 +65,43 @@ body {
 }
 
 .LogoCMI {
-    width: 50%;
+    width: 35%;
     height: auto;
 }
 
 .LogoDT {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 25%;
     overflow: hidden;
-    width: auto;
-    height: auto;
+    width: 400px;
+    height: 70px;
 }
 .InfoPaciente {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+    padding-left: 0;
 }
 
 .InfoDoc{
     display: block;
-    margin: 0 auto;
-    width: 50%;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 .InfoDoc >*{
     margin: 0;
+}
+
+.Doctor,.Especialidad{
+    font-weight: normal;
+}
+
+.Estudios{
+    font-size: 10px;
 }
 hr{
     margin: 2px;
@@ -68,22 +110,34 @@ p{
     margin: 0;
 }
 
-dt{
+dt {
     font-weight: bold;
-}
-.InfoReceta{
-    height: 250px;
-    /* min-height: 250px; */
-    /* max-height: 250px; */
+    text-decoration: none; /* Asegurarte de que el dt no esté subrayado */
 }
 
-.ContenedorFooter >*{
-    max-width: 25%;
-    /* page-break-after: always; */
+dt span {
+    text-decoration: underline; /* Subrayar solo el span */
 }
+
+dt::before {
+    content: '■';  
+    margin-right: 5px;  
+}
+
+
+.InfoReceta{
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+
 
 .Footer{
-    margin-bottom: 75px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .Correo{
@@ -92,25 +146,52 @@ dt{
 
 .QRs{
     display: flex;
-    width: 60px;
+    /* width: 100%; */
     height: auto;
     position: relative;
-    padding-right: 20px ;
+    justify-content: flex-start;
+    gap: 8px;
 }
+
 
 .QRs > *{
-    display: flex;
-    width: 100%;
+    width: 60px;
     height: auto;
-    margin-right: 5px;
 }
 
-@page {
-    size: letter; /* Tamaño carta (8.5 x 11 pulgadas) */
-    margin: 1cm; /* Márgenes de 1 centímetro en cada lado */
-  }
-  div[class^="Receta_"]:nth-child(even) {
-    page-break-after: always;
-    /* break-before: page; */
-  }
 
+@media print {
+    body::before {
+        content: "---";
+        display: block;
+        position: fixed;
+        top: 49%;
+        left: 0; /* Justificado a la izquierda */
+        height: 1px; /* Altura de la línea */
+        background: linear-gradient(to right, black 10%, transparent 10%, transparent 90%, black 90%);
+        z-index: 1;
+    }
+    
+    body::after {
+        content: "---";
+        display: block;
+        position: fixed;
+        top: 49%;
+        right: 0; /* Justificado a la derecha */
+        height: 1px; /* Altura de la línea */
+        background: linear-gradient(to right, red 10%, transparent 10%, transparent 90%, red 90%);
+        z-index: 1;
+    }  
+
+}
+
+
+
+/* Esta configuracion es para que al imprimir no se tengan margenes verticales 
+(por lo pronto para contrasrrestar la configuracion de safari) */
+/* @media print {
+    body, html, #page, .container {
+        margin: 0 !important;
+        padding: 0;
+    }
+} */

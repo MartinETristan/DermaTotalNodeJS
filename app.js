@@ -32,6 +32,10 @@ import {
   Busqueda,
   InsertRutaFoto,
   PedirPaciente,
+  AsignarP_Pedido,
+  Consulta_Checkout,
+  Update_Checkout,
+  SucursalUltimaCita,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -121,38 +125,91 @@ io.on("connection", (socket) => {
 
   // Cambios realizados en el dashboard por recepcionistas
   socket.on("CambioEstadoPaciente", (data) => {
+    let HoraLocal =
+      socket.request.session.Sucursal == 1
+        ? FechaHora().HoraS1
+        : FechaHora().HoraS2;
+
     switch (data.idStatus) {
       case 1:
-        //Registrar hora de llegada con base a la hora del recepcionista
-        if (socket.request.session.Sucursal == 1) {
-          Hoy_Espera(data.Cita,FechaHora().HoraS1);
-        } else {
-          Hoy_Espera(data.Cita,FechaHora().HoraS2);
-        }
-        io.to("Doctor" + data.Doctor).emit("Hoy/Espera");
+        // Registrar hora de llegada con base a la hora del recepcionista
+        Hoy_Espera(data.Cita, HoraLocal);
+
+        // Emitimos el cambio de estado a los doctores en caso de que sea un doctor
+        let room = data.Doctor
+          ? "Doctor" + data.Doctor
+          : "Asociado" + data.Asociado;
+        io.to(room).emit("Hoy_Espera");
         socket.except("Doctor" + data.Doctor).emit("OtrosConsultorios");
         io.to("Recepcion").emit("CheckIn");
         break;
+
       case 2:
-        io.emit("Espera/Consulta");
+        // Creamos una sesion y le asignamos los datos de la cita
+        // Si la cita es de un doctor, se le asigna el id del doctor, si no, se le asigna el id del asociado
+        let params = [
+          data.idCita,
+          data.idConsultorio,
+          data.idDoctor || null,
+          data.idAsociado || null,
+          data.idProcedimiento,
+          data.idPaciente,
+          HoraLocal,
+        ];
+        AsignarP_Pedido(...params);
+
+        if (data.idDoctor) {
+          // Mandamos actualizar la tabla de espera para el doctor
+          io.to("Doctor" + data.idDoctor).emit("Espera_Consulta");
+        }
+        socket.except("Doctor" + data.idDoctor).emit("OtrosConsultorios");
+        io.to("Recepcion").emit("P_Pedidos");
         break;
+
       case 3:
-        io.emit("Consulta/CheckOut");
+        // Registrar hora de finalizacion y checkout de la consulta
+        Consulta_Checkout(
+          data.idCita || null,
+          data.idSesion,
+          HoraLocal,
+          data.Checkout
+        );
+
+        // Emitimos el cambio de estado a los doctores en caso de que sea un doctor
+        let cuarto = data.Doctor
+          ? "Doctor" + data.Doctor
+          : "Asociado" + data.Asociado;
+        io.to(cuarto).emit("Consulta_CheckOut");
+        socket.except("Doctor" + data.Doctor).emit("OtrosConsultorios");
+        io.to("Recepcion").emit("CheckOut");
         break;
+
       default:
+        console.log("No se ha encontrado el estado para actualizar el Socket");
         break;
     }
   });
-// Socket para pedir paciente en recepcion
-socket.on("PedirPaciente", async (data) => {
-  const pedir = await PedirPaciente(data.Cita, socket.request.session.idDoctor, data.idConsultorio);
-  if (pedir === "Sonido") {
-    io.to("Recepcion").emit("Sonido");
-  }
-  else{
-    io.to("Recepcion").emit("P_Pedidos");
-  }
-});
+
+  socket.on("Update_Checkout", (data) => {
+    console.log(data);
+    Update_Checkout(data.idSesion, data.CheckOut);
+    io.to("Doctor" + socket.request.session.idDoctor).emit("Update_CheckOut");
+    io.to("Recepcion").emit("CheckOut");
+  });
+
+  // Socket para pedir paciente en recepcion
+  socket.on("PedirPaciente", async (data) => {
+    const pedir = await PedirPaciente(
+      data.Cita,
+      socket.request.session.idDoctor,
+      data.idConsultorio
+    );
+    if (pedir === "Sonido") {
+      io.to("Recepcion").emit("Sonido");
+    } else {
+      io.to("Recepcion").emit("P_Pedidos");
+    }
+  });
 
   // const rooms = io.sockets.adapter.rooms;
   // // Con esto vemos las salasdisponibles a donde se mandarán los mensajes
@@ -326,16 +383,16 @@ app.post("/CrearCita", async (req, res) => {
   if (peticion.session.idusuario) {
     // Lanzamos la creacion de la cita a la base de datos
     await NuevaCita(
-      req.body.idSucursal, 
-      req.body.idProcedimiento, 
-      req.body.idDoctor, 
-      req.body.idAsociado, 
-      req.body.idPaciente, 
+      req.body.idSucursal,
+      req.body.idProcedimiento,
+      req.body.idDoctor,
+      req.body.idAsociado,
+      req.body.idPaciente,
       req.body.idStatus,
       req.body.FechaCita,
       req.body.DuracionCita,
-      req.body.NotasCita,
-      );
+      req.body.NotasCita
+    );
   } else {
     respuesta.redirect("/");
   }
@@ -400,14 +457,13 @@ app.post("/NuevaReceta", async (req, res) => {
       req.body.Indicaciones,
       req.body.Nota
     );
-    
+
     // Redirige a la misma página actual (recargará la página)
     return res.redirect(`InfoPaciente/${req.session.idInfoUsuario}`);
   } else {
     res.redirect("/");
   }
 });
-
 
 app.post("/InfoPaciente", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
@@ -434,12 +490,22 @@ app.post("/Receta", async function (peticion, respuesta) {
   }
 });
 
-app.post("/BusquedaPacientes", async function (req, res) {
-  if (req.session.idusuario) {
-    const resBusqueda = await Busqueda(req.body.nombre, req.body.apellido, req.body.telefono_correo);
-    res.end(JSON.stringify(resBusqueda));
+app.post("/UltimaReceta", async function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+    // Ejecutamos el query para obtener la ultima receta
+    const Sucursal = await SucursalUltimaCita(peticion.session.idInfoUsuario);
+    // Y damos el output en json
+    respuesta.end(JSON.stringify(Sucursal));
   } else {
-    res.redirect("/");
+    respuesta.redirect("/");
+  }
+});
+
+app.post("/CambiosReceta", async function (peticion, respuesta) {
+  if (peticion.session.idusuario) {
+      
+  } else {
+    respuesta.redirect("/");
   }
 });
 
@@ -447,16 +513,25 @@ app.post("/BusquedaPacientes", async function (req, res) {
 
 
 
-
-
-
+app.post("/BusquedaPacientes", async function (req, res) {
+  if (req.session.idusuario) {
+    const resBusqueda = await Busqueda(
+      req.body.nombre,
+      req.body.apellido,
+      req.body.telefono_correo
+    );
+    res.end(JSON.stringify(resBusqueda));
+  } else {
+    res.redirect("/");
+  }
+});
 
 //Variable para el almacenamiento de imagenes con multer
 const almacenamiento = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
       //Creamos la carpeta del paciente
-      const rutaDestino = path.join(__dirname,"public/private/src/temp");
+      const rutaDestino = path.join(__dirname, "public/private/src/temp");
       // Y utilizamos la ruta donde se creó la carpeta
       cb(null, rutaDestino);
     } catch (error) {
@@ -493,7 +568,7 @@ async function CrearPaciente(req, res) {
       : req.session.idTipoDeUsuario;
 
     // Llamar a la función NuevoPaciente y proporcionar la ruta de la imagen si existe
-   const idUsuario = await NuevoPaciente(
+    const idUsuario = await NuevoPaciente(
       req.body.Nombres,
       req.body.ApellidoP,
       req.body.ApellidoM,
@@ -515,27 +590,25 @@ async function CrearPaciente(req, res) {
       path.join(__dirname, "public/private/src/temp", req.file.filename),
       path.join(Ruta, req.file.filename)
     );
-    
+
     // Si el protocolo es "Perfil", crear la miniatura de la imagen y moverla a la carpeta del paciente
     if (req.body.Protocolo === "Perfil") {
       const rutaImagenOriginal = path.join(Ruta, req.file.filename);
       const rutaMiniatura = path.join(Ruta, `Pequeño-${req.file.filename}`);
-    
+
       // Llamar a la función Resizer para redimensionar la imagen
-      Resizer(rutaImagenOriginal, rutaMiniatura, 50)
+      Resizer(rutaImagenOriginal, rutaMiniatura, 50);
       // Y guardar la ruta de la imagen en la base de datos
-      InsertRutaFoto(idUsuario,rutaImagenOriginal);
-    }else{
+      InsertRutaFoto(idUsuario, rutaImagenOriginal);
+    } else {
       const rutaImagenOriginal = path.join(Ruta, req.file.filename);
       const rutaMiniatura = path.join(Ruta, `Preview-${req.file.filename}`);
-    
+
       // Llamar a la función Resizer para redimensionar la imagen
-      Resizer(rutaImagenOriginal, rutaMiniatura, 100)
+      Resizer(rutaImagenOriginal, rutaMiniatura, 100);
       // Y guardar la ruta de la imagen en la base de datos
-      InsertRutaFoto(idUsuario,rutaImagenOriginal);
+      InsertRutaFoto(idUsuario, rutaImagenOriginal);
     }
-
-
 
     return res
       .status(200)
@@ -599,14 +672,6 @@ async function CarpetaPersonal(Protocolo, id) {
     throw new Error("El protocolo no es valido.");
   }
 }
-
-
-
-
-
-
-
-
 
 //==================================================================================================
 //  Vistas del sitio Web (Frontend)

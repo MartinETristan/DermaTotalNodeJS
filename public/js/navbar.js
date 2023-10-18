@@ -200,6 +200,9 @@ const ItemsNavBar = {
 // Creacion del NavBar con base al tipo de usuario
 async function CrearItemsNavBar(ClaseUsuario) {
   const section = document.querySelector(".nav-bar");
+  if (!section) {
+    location.reload();
+  }
   while (section.firstChild) {
     section.removeChild(section.firstChild);
   }

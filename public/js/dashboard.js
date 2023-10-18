@@ -74,16 +74,29 @@ function createInfoSection(infoArr, parentDiv) {
 
 // Funcion para crear botones que cambian de color dependiendo del estado del paciente
 function CrearBotonDeAccion(Paciente) {
+  console.log(Paciente);
   const Boton = document.createElement("button");
-  Boton.classList.add(
-    Paciente.StatusPaciente === 3 ? "BotonFinalizar" : "BotonPedir"
-  );
-  Boton.textContent = Paciente.StatusPaciente === 3 ? "Finalizar" : "Pedir";
+  
+  let claseBoton;
+  if (!Paciente.idSesion) {
+    claseBoton = Paciente.StatusPaciente === 3 ? "BotonFinalizar" : "BotonPedir";
+  } else {
+    claseBoton = "BotonFinalizar";
+  }
+  Boton.classList.add(claseBoton);
+  
+  if (Paciente.idSesion) {
+    Boton.textContent = "Finalizar";
+  } else {
+    Boton.textContent = Paciente.StatusPaciente === 3 ? "Finalizar" : "Pedir";
+  }
+  
   return Boton;
 }
 
+
 //==================================================================================================
-// Funcion para pedir paciente
+// Funcion para el menu de opciones
 //==================================================================================================
 
 // Se tiene que pedir la Ruta de foto de perfil, Nombre y Apellidos del paciente, Hora cita y Procedimiento
@@ -179,15 +192,15 @@ function Accion_Paciente(datos) {
   ElementoPaciente.appendChild(HeaderPaciente);
 
   var InfoLlegadaPaciente = [
-    { TituloInfo: "Procedimiento", SourceInfo: datos.Procedimiento },
-    { TituloInfo: "Hora Cita", SourceInfo: datos.HoraCita },
+    { TituloInfo: "Procedimiento", SourceInfo: datos.Procedimiento || "--" },
+    { TituloInfo: "Hora Cita", SourceInfo: datos.HoraCita || "--:--" },
   ];
 
   switch (datos.Protocolo) {
     case "Pedir":
       InfoLlegadaPaciente.push({
         TituloInfo: "Consultorio",
-        SourceInfo: ConsultoriosSucursal,
+        SourceInfo: ConsultoriosSucursal || "- -",
       });
       break;
 
@@ -199,27 +212,29 @@ function Accion_Paciente(datos) {
       break;
 
     case "CheckIn":
-      InfoLlegadaPaciente.push({
-        TituloInfo: "Doctor",
-        SourceInfo: datos.Doctor,
-      });
+      if (datos.idDoctor){
+        InfoLlegadaPaciente.push({
+          TituloInfo: "Doctor",
+          SourceInfo: datos.Doctor || "- -",
+        });
+      }else{
+        InfoLlegadaPaciente.push({
+          TituloInfo: "Asociado",
+          SourceInfo: datos.Asociado || "- -",
+        });
+      }
       break;
 
     case "Asignar":
       InfoLlegadaPaciente.pop();
       InfoLlegadaPaciente.push({
         TituloInfo: "Doctor",
-        SourceInfo: datos.NombreD,
+        SourceInfo: datos.NombreD || "- -",
       });
       InfoLlegadaPaciente.push({
         TituloInfo: "Consultorio Pedido",
         SourceInfo: datos.Consultorio || "- -",
       });
-      InfoLlegadaPaciente.push({
-        TituloInfo: "Consultorio Asignado",
-        SourceInfo: ConsultoriosSucursal,
-      });
-      console.log(ConsultoriosSucursal);
       break;
 
     case "UpdateFinalizar":
@@ -323,9 +338,21 @@ function Accion_Paciente(datos) {
         // Asi se obtiene el valor del checkout
         var valorCheckout = document.getElementById("valorCheckout").value;
         console.log(valorCheckout);
-        // Y limpiamos la vista
-        contenedor.style.visibility = "hidden";
-        contenedor.style.opacity = "0";
+        if(valorCheckout !=""){
+          socket.emit("CambioEstadoPaciente", {
+            idCita: datos.idCita,
+            idStatus: 3,
+            idSesion: datos.idSesion,
+            Doctor: datos.idDoctor,
+            Asociado: datos.idAsociado,
+            Checkout: valorCheckout,
+          });
+          // Y limpiamos la vista
+          contenedor.style.visibility = "hidden";
+          contenedor.style.opacity = "0";
+        }else{
+          alert("Por favor ingresa un valor en el checkout");
+        }
         break;
       case "CheckIn":
         // Mandamos el Socket para cambiar el estado del paciente y notificar a los doctores
@@ -333,15 +360,32 @@ function Accion_Paciente(datos) {
           Cita: datos.idCita,
           idStatus: 1,
           Doctor: datos.idDoctor,
+          Asociado: datos.idAsociado,
         });
         // Y limpiamos la vista
         contenedor.style.visibility = "hidden";
         contenedor.style.opacity = "0";
         break;
       case "Asignar":
-        // Asi se obtiene el valor del consultorio elegido
-        var idConsultorio = document.getElementById("SelectConsultorios").value;
-        console.log(idConsultorio);
+        if(datos.idDoctor){
+          socket.emit("CambioEstadoPaciente", {
+            idCita: datos.idCita,
+            idStatus: 2,
+            idConsultorio: datos.idConsultorio,
+            idDoctor: datos.idDoctor,
+            idProcedimiento: datos.idProcedimiento,
+            idPaciente: datos.idPaciente,
+          });
+        }else{
+          socket.emit("CambioEstadoPaciente", {
+            idCita: datos.idCita,
+            idStatus: 2,
+            idConsultorio: idConsultorio,
+            idAsociado: datos.idAsociado,
+            idProcedimiento: datos.idProcedimiento,
+            idPaciente: datos.idPaciente,
+          });
+        }
         // Y limpiamos la vista
         contenedor.style.visibility = "hidden";
         contenedor.style.opacity = "0";
@@ -351,6 +395,14 @@ function Accion_Paciente(datos) {
         var valorCheckout = document.getElementById("valorCheckout").value;
         console.log("Se actualizó el checkout de", datos.Nombre, "a:");
         console.log(valorCheckout);
+        if(valorCheckout !=""){
+          socket.emit("Update_Checkout", {
+            idSesion: datos.idSesion,
+            CheckOut: valorCheckout,
+          });
+        }else{
+          alert("Por favor ingresa un valor en el checkout");
+        }
         // Y limpiamos la vista
         contenedor.style.visibility = "hidden";
         contenedor.style.opacity = "0";
@@ -388,6 +440,7 @@ function Accion_Paciente(datos) {
     var Checkout = document.createElement("input");
     Checkout.setAttribute("id", "valorCheckout");
     Checkout.value = datos.CheckOut || "";
+    Checkout.required = true;
     InfoOpciones.appendChild(Checkout);
   }
 }
