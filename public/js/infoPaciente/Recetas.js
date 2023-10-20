@@ -27,6 +27,7 @@ function crearElementoMedicamento(item) {
 
 function crearElementoNota(nota) {
   const Nota = document.createElement("div");
+  Nota.className = "RecetaNota";
   const NotaTitulo = document.createElement("h3");
   NotaTitulo.innerHTML = "Nota:";
   const NotaP = document.createElement("p");
@@ -78,6 +79,7 @@ function cargarRecetas() {
 
     const TituloReceta = document.createElement("h2");
     TituloReceta.innerHTML = `Fecha <span>${dia}/${mes}/${año}</span>:`;
+    TituloReceta.className = "FechaReceta";
 
     const botonImprimir = crearBotonImprimir(receta, ultimareceta);
 
@@ -86,6 +88,7 @@ function cargarRecetas() {
 
     const Doctor = document.createElement("p");
     Doctor.innerHTML = `Recetado por: <b><span>${receta.Doctor}</span></b>`;
+    Doctor.className = "DoctorReceta";
 
     contenidoReceta.appendChild(header);
     contenidoReceta.appendChild(Doctor);

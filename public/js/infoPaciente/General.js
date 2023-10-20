@@ -152,7 +152,7 @@ async function cargarGeneral() {
       <div class="info__item">
         <div class="info__item__content">
           <header class="info__item__header">
-            <div id="Doctor" style="font-size:18px; display:none;">Cargando Doctor...</div>
+            <div id="Doctor">Cargando Doctor...</div>
             <div class="Botones"> 
             <button class="iconbtn--cancel" id="CancelarEdit" style="display:none;">Cancelar</button>
             <button class="iconbtn--editar" id="EditarUltimaReceta">Editar</button>
@@ -315,6 +315,7 @@ async function cargarGeneral() {
       const botonQuitar = document.createElement("button");
       botonQuitar.type = "button";
       botonQuitar.textContent = "Eliminar";
+      botonQuitar.classList.add("iconbtn--Eliminar");
       botonQuitar.addEventListener("click", () => {
         const divMedicamentos = botonQuitar.parentNode;
         divMedicamentos.parentNode.removeChild(divMedicamentos);
@@ -327,11 +328,33 @@ async function cargarGeneral() {
     });
     formEditReceta.appendChild(ContenedorEditMedicamentos);
 
-    Receta.appendChild(dl);
-    Receta.appendChild(formEditReceta);
 
-    // Si existe una nota, se muestra
-    if (data.Recetas[0].Nota) {
+    const contenedornota = document.createElement("div");
+    contenedornota.classList.add("ContenedorNota");
+    const contenedorbotones = document.createElement("div");
+    contenedorbotones.classList.add("Botones");
+
+    const botonAñadirMedicamento = document.createElement("button");
+    botonAñadirMedicamento.type = "button";
+    botonAñadirMedicamento.textContent = "Añadir Medicamento";
+    botonAñadirMedicamento.classList.add("AñadirMedicamento");
+    botonAñadirMedicamento.addEventListener("click", () => {
+      agregarCampos(
+        "ContenedorEditMedicamentos",
+        "EditMedicamentos",
+        "EditIndicaciones"
+      );
+    });
+
+    const botonQuitarMedicamento = document.createElement("button");
+    botonQuitarMedicamento.type = "button";
+    botonQuitarMedicamento.textContent = "Quitar Medicamento";
+    botonQuitarMedicamento.classList.add("QuitarMedicamento");
+    botonQuitarMedicamento.addEventListener("click", () => {
+      eliminarUltimosCampos("ContenedorEditMedicamentos");
+    });
+
+
       const Nota = document.createElement("div");
       Nota.classList.add("Nota");
       Nota.style.display = "block";
@@ -345,17 +368,27 @@ async function cargarGeneral() {
       const inputNota = document.createElement("input");
       inputNota.type = "text";
       inputNota.name = "EditNota";
-      inputNota.placeholder = "Nota";
+      inputNota.placeholder = "Contenido de la Nota";
       inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
-      inputNota.value = data.Recetas[0].Nota;
-      inputNota.style.maxWidth = "70%";
+      inputNota.value = data.Recetas[0].Nota || "";
 
       const tituloNota = document.createElement("h3");
       tituloNota.innerHTML = "Nota:";
       Receta.appendChild(Nota);
       formEditReceta.appendChild(tituloNota);
-      formEditReceta.appendChild(inputNota);
-    }
+
+      contenedorbotones.appendChild(botonQuitarMedicamento);
+      contenedorbotones.appendChild(botonAñadirMedicamento);
+      contenedornota.appendChild(inputNota);
+      contenedornota.appendChild(contenedorbotones);
+      formEditReceta.appendChild(contenedornota);
+
+      Receta.appendChild(dl);
+      Receta.appendChild(formEditReceta);
+  
+
+
+
   }
 
   // ========================================================================================================
@@ -442,6 +475,7 @@ async function cargarGeneral() {
         const botonQuitar = document.createElement("button");
         botonQuitar.type = "button";
         botonQuitar.textContent = "Eliminar";
+        botonQuitar.classList.add("iconbtn--Eliminar");
         botonQuitar.addEventListener("click", () => {
           const divMedicamentos = botonQuitar.parentNode;
           divMedicamentos.parentNode.removeChild(divMedicamentos);
@@ -489,23 +523,17 @@ async function cargarGeneral() {
     const botonGuardar = document.getElementById("GuardarCambios");
     const botonPrint = document.getElementById("Print");
     const botonNuevaReceta = document.getElementById("botonNuevaReceta");
+    const ContenidoMedicamentos = document.getElementById("ContenedorEditMedicamentos");
+    const form = document.querySelector("#Receta_actual form");
+    const inputNota = form.querySelector(".inputNota");
 
+  
 
     const Nota = document.querySelector(".Nota");
     if (Nota) {
       Nota.style.display = "none";
     } 
-    const veriNota = document.querySelector(".Receta_actual .Nota");
-    if (!veriNota) {
-      const inputNota = document.createElement("input");
-      inputNota.type = "text";
-      inputNota.name = "EditNota";
-      inputNota.placeholder = "Nota";
-      inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
-      inputNota.style.maxWidth = "70%";
-  
-      formEditReceta.appendChild(inputNota);
-    }
+
 
     botones.style.display = "flex";
     formEditReceta.style.display = "block";
@@ -521,25 +549,6 @@ async function cargarGeneral() {
       elemento.style.display = "none";
     });
 
-    const botonAñadirMedicamento = document.createElement("button");
-    botonAñadirMedicamento.type = "button";
-    botonAñadirMedicamento.textContent = "Añadir Medicamento";
-    botonAñadirMedicamento.addEventListener("click", () => {
-      agregarCampos(
-        "ContenedorEditMedicamentos",
-        "EditMedicamentos",
-        "EditIndicaciones"
-      );
-    });
-
-    const botonQuitarMedicamento = document.createElement("button");
-    botonQuitarMedicamento.type = "button";
-    botonQuitarMedicamento.textContent = "Quitar Medicamento";
-    botonQuitarMedicamento.addEventListener("click", () => {
-      eliminarUltimosCampos("ContenedorEditMedicamentos");
-    });
-    formEditReceta.appendChild(botonQuitarMedicamento);
-    formEditReceta.appendChild(botonAñadirMedicamento);
   });
 
   agregarEventListener("CancelarEdit", function () {

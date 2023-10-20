@@ -254,8 +254,8 @@ function MedicamentosReceta() {
         // Agregar el <div> al array de la receta actual
         divsParaRecetaActual.push(div);
 
-        // Comprobar si se han generado 3 <div>
-        if (divCount % 3 === 0) {
+        // Comprobar si se han generado 4 <div>
+        if (divCount % 4 === 0) {
           // Agregar los 4 <div> a la receta actual
           AgregarDivsAReceta(divsParaRecetaActual);
           // Limpiar el array

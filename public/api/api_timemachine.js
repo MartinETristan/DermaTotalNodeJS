@@ -1,7 +1,5 @@
-import moment from "moment-timezone";
-import { config } from "dotenv";
-config();
 
+import { moment } from "./conf_api.js";
 
  // Asi se hace una aproximacion de la zona horaria
 const AproximacionZona = moment.tz.guess();

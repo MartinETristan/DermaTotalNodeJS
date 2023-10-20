@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { config } from "dotenv";
+import moment from "moment-timezone";
 config();
 
 //==================================================================================================
@@ -14,4 +15,4 @@ const db = {
   port: process.env.MYSQLDB_PORT_DOCKER,
 };
 
-export { mysql, bcrypt, db };
+export { moment, mysql, bcrypt, db };

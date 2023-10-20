@@ -33,7 +33,14 @@ function obtenerDatos() {
 
           //Y alergias
           const Alergias = document.querySelector(".Alergias");
-          Alergias.textContent = data.Antecedentes[0].Alergias;
+          Alergias.textContent = data.Antecedentes[0].Alergias.toUpperCase();
+          if (data.Antecedentes[0].Alergias === "No hay Alergias") {
+            // Alergias.textContent = "Ninguna";
+            const Alerg = document.querySelector(".Alerg");
+            Alerg.setAttribute("style", "color: #004368;");
+            Alerg.textContent = capitalizeFirstLetters(data.Antecedentes[0].Alergias);
+
+          }
 
           // Foto de perfil
           const Avatar = document.querySelector(".fotousuario");
@@ -68,6 +75,14 @@ function obtenerDatos() {
     }
   });
 }
+
+
+function capitalizeFirstLetters(str) {
+  return str.split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }).join(' ');
+}
+
 
 //========================================================================================================
 // Funciones para la generacion de la vista General.ejs

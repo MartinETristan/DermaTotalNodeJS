@@ -138,6 +138,55 @@ h1 {
     content: "✎";
 }
 
+.iconbtn--save{
+    font-size: 15px;
+    background-color: green;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: green;
+}
+
+.iconbtn--print{
+    font-size: 15px;
+    background-color: #249DD9;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: #249DD9;
+}
+.iconbtn--print::before{
+    content: "    🖨️     ";
+}
+
+.iconbtn--editar{
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: orange;
+    color: white;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
+}
+
+.iconbtn--cancel{
+    justify-content: center;
+    align-items: center;
+    background-color: #00000000;
+    border: #00000000;
+    color: red;
+}
+.iconbtn--Eliminar{
+    background-color: rgb(229, 16, 16);
+    padding: 8px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+}
+
+
 .tag--alert {
     transition: background-color 0.5s, border-color 0.5s, color 0.5s;
     display: block;
@@ -464,7 +513,7 @@ h1 {
 
 
 
-#botonNuevaReceta,#agregarCampo{
+#botonNuevaReceta,#agregarCampo,.AñadirMedicamento{
     font-size: 15px;
     background-color: #73c235;
     color: #fff;
@@ -478,7 +527,7 @@ h1 {
     background-color: #fff;
 }
 
-#quitarCampo{
+#quitarCampo,.QuitarMedicamento{
     font-size: 15px;
     background-color: #ff0000;
     color: #fff;
@@ -523,6 +572,25 @@ h1 {
 .Nota{
     width: 65%;
     display: flex;
+}
+
+.input-receta.inputNota{
+    width: 50%;
+
+}
+
+
+.RecetaNota{
+    color: rgb(255, 145, 0);
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.RecetaNota>h3, .RecetaNota>p{
+    margin: 0;
 }
 
 
@@ -571,10 +639,24 @@ a[href^="mailto:"]:focus{
 }
 
 .Alerg{
-    margin-top: 0;
+    margin-top: 10px;
+    color: red;
 }
 .Eda{
     margin-bottom: 0;
+}
+
+dt{
+    font-size: 24px;
+    margin-left: 10px;
+}
+
+dt::before{
+    font-size: 18px;
+    content: "■ ";
+}
+dd{
+    font-size: 18px;
 }
 
 
@@ -612,6 +694,26 @@ a[href^="mailto:"]:focus{
     padding-top: 5px;
 }
 
+/* Estilo base para todos los divs */
+div[id^="receta_"] {
+    margin-bottom: 20px; /* Por defecto todos los divs tendrán margin-bottom */
+}
+
+.DoctorReceta,#Doctor{
+    display: block;
+    font-size: 18px;
+}
+
+.DoctorReceta>b>span,#Doctor>p>b>span{
+    color: #249DD9;
+    
+}
+
+.FechaReceta{
+    font-weight: bold;
+    font-size: 24px;
+    color: #004368;
+}
 
 
 /* Contenedor que se mostrará de manera diferente al accionar los botones */
@@ -631,6 +733,20 @@ a[href^="mailto:"]:focus{
     transition: .2s;
   }
   
+form > h3{
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.ContenedorNota{
+    /* position: relative; */
+    display: flex;
+    justify-content: space-between;
+    /* justify-content: flex-end; */
+    align-items: center;
+    /* right: 0; */
+}
+
 /* Otros estilos si es necesario */
 #Opciones{
     width: 50%;
@@ -658,6 +774,12 @@ a[href^="mailto:"]:focus{
     gap: 10px;
   }
   
+.Botones{
+    display: flex;
+    gap: 10px;
+}
+
+
   #valorCheckout{
     padding: 10px;
     border: 2px solid #00792e8b;
@@ -666,6 +788,14 @@ a[href^="mailto:"]:focus{
     font-size: 50px;
     width: 97%;
   }
+
+.Receta_actual{
+    margin-bottom: 20px;
+}
+
+.elemento-receta{
+    margin-top: 20px;
+}
 
 
 
