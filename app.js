@@ -10,38 +10,67 @@ import { promises as fs, constants } from "fs";
 import multer from "multer";
 import sharp from "sharp";
 
+// ==================================================================================================
 // Importacion de API's
-import {
-  VerificarUsuario,
-  UsuarioyProfesion,
+// ==================================================================================================
+// Tiempo
+import { 
+  Copyright, 
+  Saludo, 
+  FechaHora 
+} from "./public/api/api_timemachine.js";
+
+// Dashboard
+import { 
   DashDoc,
   DashRecepcion,
-  Hoy_Espera,
-  NuevoPaciente,
-  InfoRegistros,
-  logout,
-  CitasDoctor,
-  ModificacionCita,
-  InfoPaciente,
-  ActualizarAntecedentesPaciente,
-  PassRestart,
-  ActualizarDatosGenerales,
-  ActualizarStatus,
-  NuevaReceta,
-  Receta,
-  Busqueda,
-  InsertRutaFoto,
+  Hoy_Espera, 
   PedirPaciente,
   AsignarP_Pedido,
   Consulta_Checkout,
   Update_Checkout,
-  SucursalUltimaCita,
+} from "./public/api/SQL/Dashboard.js";
+
+// Recetas
+import { 
+  NuevaReceta,
+  Receta,
   UpdateReceta_Añadir,
   UpdateReceta_Editar,
   UpdateReceta_Quitar,
-  UpdateReceta_EditNota,
-} from "./public/api/api_sql.js";
-import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
+  UpdateReceta_EditNota 
+} from "./public/api/SQL/Recetas.js";
+
+// Autentificacion y Usuarios
+import { 
+ VerificarUsuario,
+ UsuarioyProfesion,
+ logout,
+ PassRestart,
+} from "./public/api/SQL/Aut&Usuarios.js";
+
+// Informacion de Pacientes
+import { 
+ InfoPaciente,
+ NuevoPaciente,
+} from "./public/api/SQL/Pacientes.js";
+
+// Citas
+import { 
+ CitasDoctor,
+ ModificacionCita,
+} from "./public/api/SQL/Citas.js";
+
+// Registros
+import { 
+  InfoRegistros,
+  ActualizarAntecedentesPaciente,
+  ActualizarDatosGenerales,
+  ActualizarStatus,
+  Busqueda,
+  InsertRutaFoto,
+  SucursalUltimaCita,
+} from "./public/api/SQL/Registros.js";
 
 //==================================================================================================
 // Configuracion del Sitio Web
@@ -567,10 +596,10 @@ app.post("/CambiosReceta", async function (peticion, respuesta) {
           console.log("Quitar");
           UpdateReceta_Quitar(cambio.item);
           break;
-          
-          case "EditNota":
-            console.log("Editar Nota");
-            UpdateReceta_EditNota(cambio.item);
+
+        case "EditNota":
+          console.log("Editar Nota");
+          UpdateReceta_EditNota(cambio.item);
           break;
 
         default:
