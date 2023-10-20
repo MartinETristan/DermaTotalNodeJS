@@ -265,6 +265,7 @@ function compareData(original, form) {
         Cambios: changes,
       }),
     });
+    location.reload();
   } else {
     return null;
   }

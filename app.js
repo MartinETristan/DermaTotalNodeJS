@@ -36,6 +36,10 @@ import {
   Consulta_Checkout,
   Update_Checkout,
   SucursalUltimaCita,
+  UpdateReceta_Añadir,
+  UpdateReceta_Editar,
+  UpdateReceta_Quitar,
+  UpdateReceta_EditNota,
 } from "./public/api/api_sql.js";
 import { Copyright, Saludo, FechaHora } from "./public/api/api_timemachine.js";
 
@@ -228,63 +232,60 @@ app.use((req, res, next) => {
   let navegador;
 
   const mapaNavegadores = {
-      "Safari": {
-          contiene: ["Safari"],
-          noContiene: ["Chrome", "OPR"],
-          encabezados: {
-              "Cache-Control": "no-cache, no-store, must-revalidate",
-              "Pragma": "no-cache",
-              "Expires": "0"
-          }
+    Safari: {
+      contiene: ["Safari"],
+      noContiene: ["Chrome", "OPR"],
+      encabezados: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
       },
-      "Chrome": {
-          contiene: ["Chrome"],
-          noContiene: ["OPR"],
-      },
-      "Opera": {
-          contiene: ["OPR"],
-      },
-      "Firefox": {
-          contiene: ["Firefox"],
-      },
-      "Edge": {
-          contiene: ["Edge"],
-      }
+    },
+    Chrome: {
+      contiene: ["Chrome"],
+      noContiene: ["OPR"],
+    },
+    Opera: {
+      contiene: ["OPR"],
+    },
+    Firefox: {
+      contiene: ["Firefox"],
+    },
+    Edge: {
+      contiene: ["Edge"],
+    },
   };
 
   for (const [clave, valor] of Object.entries(mapaNavegadores)) {
-      if (valor.contiene.every(v => agente.includes(v)) &&
-          (!valor.noContiene || valor.noContiene.every(v => !agente.includes(v)))) {
-          navegador = clave;
-          break;
-      }
+    if (
+      valor.contiene.every((v) => agente.includes(v)) &&
+      (!valor.noContiene || valor.noContiene.every((v) => !agente.includes(v)))
+    ) {
+      navegador = clave;
+      break;
+    }
   }
 
   navegador = navegador || "Otro";
 
   if (mapaNavegadores[navegador] && mapaNavegadores[navegador].encabezados) {
-      for (const [claveEncabezado, valorEncabezado] of Object.entries(mapaNavegadores[navegador].encabezados)) {
-          res.header(claveEncabezado, valorEncabezado);
-      }
+    for (const [claveEncabezado, valorEncabezado] of Object.entries(
+      mapaNavegadores[navegador].encabezados
+    )) {
+      res.header(claveEncabezado, valorEncabezado);
+    }
   }
 
   console.log(navegador);
   // req.session.Navegador = navegador === "Otro" ? "Otros" : navegador;
-  req.navegador = navegador  === "Otro" ? "Otros" : navegador;;
+  req.navegador = navegador === "Otro" ? "Otros" : navegador;
 
   next();
 });
 
-
-
-
-
 //==================================================================================================
 //  TESTING
 //==================================================================================================
-
-
-
 
 //==================================================================================================
 //  Logica del Sitio Web (Backend)
@@ -550,37 +551,39 @@ app.post("/UltimaReceta", async function (peticion, respuesta) {
 
 app.post("/CambiosReceta", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
-      console.log(peticion.body);
-      peticion.body.Cambios.forEach(cambio => {
-        switch(cambio.action){
-          case "Añadir":
-            console.log("Añadir");
+    console.log(peticion.body);
+    peticion.body.Cambios.forEach((cambio) => {
+      switch (cambio.action) {
+        case "Añadir":
+          console.log("Añadir");
+          UpdateReceta_Añadir(cambio.item);
           break;
-          case "Editar":
-            console.log("Editar");
+        case "Editar":
+          console.log("Editar");
+          UpdateReceta_Editar(cambio.item);
           break;
-  
-          case "Quitar":
-            console.log("Quitar");
+
+        case "Quitar":
+          console.log("Quitar");
+          UpdateReceta_Quitar(cambio.item);
           break;
-  
+          
           case "EditNota":
             console.log("Editar Nota");
+            UpdateReceta_EditNota(cambio.item);
           break;
-  
-          default:
-            console.log("No se ha encontrado el cambio para actualizar la receta.");
+
+        default:
+          console.log(
+            "No se ha encontrado el cambio para actualizar la receta."
+          );
           break;
-        }
-      });
+      }
+    });
   } else {
     respuesta.redirect("/");
   }
 });
-
-
-
-
 
 app.post("/BusquedaPacientes", async function (req, res) {
   if (req.session.idusuario) {
@@ -830,7 +833,7 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
     console.log(req.session.Navegador);
     // Determinar la hoja de estilos basada en el navegador
     let stylesheet = "/css/Receta/Chrome.css";
-    switch(req.navegador){
+    switch (req.navegador) {
       case "Safari":
         stylesheet = "/css/Receta/Safari.css";
         break;
@@ -853,7 +856,7 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
 
     // Y renderizamos la vista pasando el nombre de la hoja de estilos como variable
     res.render("Receta.ejs", { Navegador: stylesheet });
-  }else{
+  } else {
     res.redirect("/");
   }
 });

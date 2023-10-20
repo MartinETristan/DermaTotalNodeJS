@@ -346,7 +346,6 @@ async function cargarGeneral() {
       inputNota.type = "text";
       inputNota.name = "EditNota";
       inputNota.placeholder = "Nota";
-      inputNota.required = true;
       inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
       inputNota.value = data.Recetas[0].Nota;
       inputNota.style.maxWidth = "70%";
@@ -491,9 +490,21 @@ async function cargarGeneral() {
     const botonPrint = document.getElementById("Print");
     const botonNuevaReceta = document.getElementById("botonNuevaReceta");
 
+
     const Nota = document.querySelector(".Nota");
     if (Nota) {
       Nota.style.display = "none";
+    } 
+    const veriNota = document.querySelector(".Receta_actual .Nota");
+    if (!veriNota) {
+      const inputNota = document.createElement("input");
+      inputNota.type = "text";
+      inputNota.name = "EditNota";
+      inputNota.placeholder = "Nota";
+      inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
+      inputNota.style.maxWidth = "70%";
+  
+      formEditReceta.appendChild(inputNota);
     }
 
     botones.style.display = "flex";

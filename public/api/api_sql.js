@@ -98,7 +98,7 @@ async function UsuarioyProfesion(idUsuario) {
 }
 
 //==================================================================================================
-// Funciones para obtener la informacion del Dashboard de los doctores (Pacientes en espera, 
+// Funciones para obtener la informacion del Dashboard de los doctores (Pacientes en espera,
 //Citas del dia, Otros consultorios y Citas Finalizadas)
 //==================================================================================================
 async function DashDoc(idDoctor, Fecha) {
@@ -163,7 +163,7 @@ async function DashDoc(idDoctor, Fecha) {
           Procedimiento: elemento.Procedimiento,
           Consultorio: elemento.Consultorio,
           Nota: elemento.Nota,
-          PrecioProcedimineto: elemento.Precio
+          PrecioProcedimineto: elemento.Precio,
         };
       });
     }
@@ -318,8 +318,7 @@ async function DashDoc(idDoctor, Fecha) {
     `;
     const [rowsFin, fieldsEspera] = await connection.execute(
       consultaFinalizadas,
-      [idDoctor,
-      Fecha]
+      [idDoctor, Fecha]
     );
     if (rowsFin.length > 0) {
       CitasFinalizadas = rowsFin.map((elemento) => {
@@ -334,7 +333,7 @@ async function DashDoc(idDoctor, Fecha) {
           Consultorio: elemento.Consultorio,
           RutaFoto: elemento.RutaFoto,
           CheckOut: elemento.CheckOut,
-          PrecioProcedimineto: elemento.Precio
+          PrecioProcedimineto: elemento.Precio,
         };
       });
       connection.end();
@@ -432,7 +431,9 @@ async function DashRecepcion(Sucursal, Fecha) {
     LEFT JOIN Procedimiento p2 ON p2.idProcedimiento = c.idProcedimiento
     WHERE s.idSucursal = ?`;
 
-    const [rowsPedidos, fieldsHoy] = await connection.execute(Pedidos, [Sucursal,]);
+    const [rowsPedidos, fieldsHoy] = await connection.execute(Pedidos, [
+      Sucursal,
+    ]);
 
     if (rowsPedidos.length > 0) {
       PacientesPedidos = rowsPedidos.map((elemento) => {
@@ -476,7 +477,10 @@ async function DashRecepcion(Sucursal, Fecha) {
     LEFT JOIN Procedimiento p2 ON p2.idProcedimiento = s.idProcedimiento
     WHERE suc.idSucursal = ? AND DATE(s.FinDeSesion) = ?`;
 
-    const [rowsFin, fieldsHoy] = await connection.execute(CitasFin, [Sucursal, Fecha]);
+    const [rowsFin, fieldsHoy] = await connection.execute(CitasFin, [
+      Sucursal,
+      Fecha,
+    ]);
 
     if (rowsFin.length > 0) {
       PacientesCheckout = rowsFin.map((elemento) => {
@@ -652,8 +656,8 @@ async function InfoPaciente(idPaciente) {
     if (rowRecetas.length > 0) {
       Recetas = rowRecetas.map((elemento) => {
         return {
-          idMedicamento_Receta:elemento.idMedicamento_Receta,
-          idMedicamento:elemento.idMedicamento,
+          idMedicamento_Receta: elemento.idMedicamento_Receta,
+          idMedicamento: elemento.idMedicamento,
           idReceta: elemento.idReceta_Pacientes,
           Doctor: elemento.Doctor,
           Medicamento: elemento.Medicamento,
@@ -818,15 +822,18 @@ async function NuevoPaciente(
   }
 }
 
-async function InsertRutaFoto(idUsuario, RutaFoto){
+async function InsertRutaFoto(idUsuario, RutaFoto) {
   try {
     const connection = await mysql.createConnection(db);
     const query = `UPDATE Usuarios SET RutaFoto = ? WHERE idUsuario = ?`;
-    const [result] = await connection.execute(query, [RutaFoto,idUsuario]);
+    const [result] = await connection.execute(query, [RutaFoto, idUsuario]);
     connection.end();
     return result.insertId;
   } catch (error) {
-    console.error("Ha ocurrido un error actualizando la ruta del usuario:", error);
+    console.error(
+      "Ha ocurrido un error actualizando la ruta del usuario:",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 }
@@ -850,11 +857,9 @@ async function SucursalUltimaCita(idPaciente) {
       "Ha ocurrido un error obteniendo la sucursal de la ultima cita del paciente: ",
       error
     );
-    return "Ha ocurrido un error.";  
+    return "Ha ocurrido un error.";
   }
 }
-
-
 
 // Funcion para obtener la informacion de los registros
 async function InfoRegistros() {
@@ -1124,6 +1129,104 @@ async function Receta(idPaciente, idReceta) {
   }
 }
 
+async function UpdateReceta_Añadir(Elemento) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const InsertMedicamento = `
+    INSERT INTO Medicamento
+    (Medicamento, Indicacion)
+    VALUES(?,?);`;
+    const [result] = await connection.execute(InsertMedicamento, [
+      Elemento.Medicamento,
+      Elemento.Indicacion,
+    ]);
+    const idMedicamento = result.insertId; // Aquí obtienes el ID del medicamento insertado
+
+    const Asociar_Receta = `
+    INSERT INTO Medicamento_Receta
+    (idMedicamento, idReceta_Pacientes)
+    VALUES(?,?);`;
+    await connection.execute(Asociar_Receta, [
+      idMedicamento,
+      Elemento.idReceta,
+    ]);
+
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error añadiendo el medicamento la receta del paciente: ",
+      error
+    );
+  }
+}
+
+async function UpdateReceta_Editar(Elemento) {
+  try {
+    const connection = await mysql.createConnection(db);
+
+    const Actualizar_Meicamento = `
+    UPDATE Medicamento
+    SET Medicamento= ?, Indicacion= ?
+    WHERE idMedicamento= ?;`;
+    await connection.execute(Actualizar_Meicamento, [
+      Elemento.Medicamento,
+      Elemento.Indicacion,
+      Elemento.idMedicamento,
+    ]);
+
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error aplicando los cambios en el medicamento del paciente: ",
+      error
+    );
+  }
+}
+
+async function UpdateReceta_Quitar(Elemento) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const Eliminar_Enlace = `
+    DELETE FROM Medicamento_Receta
+    WHERE idMedicamento_Receta= ?;`;
+    await connection.execute(Eliminar_Enlace, [Elemento.idMedicamento_Receta]);
+
+    const Eliminar_Meicamento = `
+    DELETE FROM Medicamento
+    WHERE idMedicamento= ?;`;
+    await connection.execute(Eliminar_Meicamento, [Elemento.idMedicamento]);
+
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error eliminando el medicamento de la receta del paciente: ",
+      error
+    );
+  }
+}
+
+async function UpdateReceta_EditNota(Elemento) {
+  try {
+    const connection = await mysql.createConnection(db);
+    console.log(Elemento);
+    const Actualizar_Nota = `
+    UPDATE Receta_Pacientes
+    SET Nota= ?
+    WHERE idReceta_Pacientes= ?;`;
+    if (Elemento.Nota == "") {
+      Elemento.Nota = null;
+    }
+    await connection.execute(Actualizar_Nota, [Elemento.Nota,Elemento.idReceta]);
+
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error actualizando la nota en la receta del paciente: ",
+      error
+    );
+  }
+}
+
 async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
   let connection;
   try {
@@ -1324,8 +1427,7 @@ async function Hoy_Espera(idCita, HoraLlegada) {
   }
 }
 
-
-async function Consulta_Checkout(idCita,idSesion, HoraFin, CheckOut) {
+async function Consulta_Checkout(idCita, idSesion, HoraFin, CheckOut) {
   try {
     const connection = await mysql.createConnection(db);
     await connection.beginTransaction();
@@ -1346,28 +1448,34 @@ async function Consulta_Checkout(idCita,idSesion, HoraFin, CheckOut) {
     SET FinDeSesion = CONCAT(CURDATE()," ", ?), CheckOut = ?
     WHERE idSesion= ?;
     `;
-    await connection.execute(updateSesion, [HoraFin,CheckOut,idSesion]);
+    await connection.execute(updateSesion, [HoraFin, CheckOut, idSesion]);
 
     await connection.commit();
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error en la actualizacion del paciente a Checkout:", error);
+    console.error(
+      "Ha ocurrido un error en la actualizacion del paciente a Checkout:",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 }
 
-async function Update_Checkout(idSesion,CheckOut){
-try {
-  const connection = await mysql.createConnection(db);
-  const consulta = `UPDATE Sesion
+async function Update_Checkout(idSesion, CheckOut) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const consulta = `UPDATE Sesion
   SET CheckOut = ?
   WHERE idSesion = ?`;
-  connection.execute(consulta, [CheckOut,idSesion]);
-  connection.end();
-} catch (error) {
-  console.error("Ha ocurrido un error en la actualizacion del Checkout:", error);
-  return "Ha ocurrido un error.";
-}
+    connection.execute(consulta, [CheckOut, idSesion]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error en la actualizacion del Checkout:",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
 }
 
 async function PedirPaciente(idCita, idDoctor, idConsultorio) {
@@ -1380,11 +1488,15 @@ async function PedirPaciente(idCita, idDoctor, idConsultorio) {
       FROM DermaTotalDB.Pacientes_Pedidos
       WHERE idCitas = ? AND idDoctor = ? AND idConsultorio = ?;
     `;
-    const [rows] = await connection.execute(checkQuery, [idCita, idDoctor, idConsultorio]);
+    const [rows] = await connection.execute(checkQuery, [
+      idCita,
+      idDoctor,
+      idConsultorio,
+    ]);
 
     if (rows.length > 0) {
       connection.end();
-      return "Sonido";  // Retorna "Sonido" si ya existe una entrada con esas propiedades
+      return "Sonido"; // Retorna "Sonido" si ya existe una entrada con esas propiedades
     }
 
     // Si no existe, inserta la entrada en la base de datos
@@ -1404,18 +1516,26 @@ async function PedirPaciente(idCita, idDoctor, idConsultorio) {
 
 //Aqui asi como se elimina todas las citas de la tabla de PedirPaciente, se crea ua nueva sesion para el paciente
 //y se avanza un status en la cita
-async function AsignarP_Pedido(idCita, idConsultorio, idDoctor,idAsociado,idProcedimiento,idPaciente,HoraInicio){
+async function AsignarP_Pedido(
+  idCita,
+  idConsultorio,
+  idDoctor,
+  idAsociado,
+  idProcedimiento,
+  idPaciente,
+  HoraInicio
+) {
   try {
     const connection = await mysql.createConnection(db);
     await connection.beginTransaction();
 
     // elimina la entrada de la tabla
-      const deleteQuery = `
+    const deleteQuery = `
         DELETE FROM Pacientes_Pedidos
         WHERE idCitas = ? ;
       `;
-      await connection.execute(deleteQuery, [idCita]);
-    
+    await connection.execute(deleteQuery, [idCita]);
+
     // Crea una nueva sesión para el paciente
     // Si la sesion es con un Doctor
     if (idDoctor) {
@@ -1424,14 +1544,28 @@ async function AsignarP_Pedido(idCita, idConsultorio, idDoctor,idAsociado,idProc
         (idCitas, idConsultorio, idDoctor, idProcedimiento, idPaciente, InicioDeSesion)
         VALUES(?, ?, ?, ?, ?, CONCAT(CURDATE()," ", ?));
       `;
-      await connection.execute(insertSesion, [idCita,idConsultorio, idDoctor,idProcedimiento, idPaciente, HoraInicio]);
-    }else{
+      await connection.execute(insertSesion, [
+        idCita,
+        idConsultorio,
+        idDoctor,
+        idProcedimiento,
+        idPaciente,
+        HoraInicio,
+      ]);
+    } else {
       const insertSesion = `
         INSERT INTO Sesion
         (idCitas, idConsultorio, idAsociado, idProcedimiento, idPaciente, InicioDeSesion)
         VALUES(?, ?, ?, ?, ?, CONCAT(CURDATE()," ", ?)));
       `;
-      await connection.execute(insertSesion, [idCita,idConsultorio, idAsociado, idProcedimiento, idPaciente, HoraInicio]);
+      await connection.execute(insertSesion, [
+        idCita,
+        idConsultorio,
+        idAsociado,
+        idProcedimiento,
+        idPaciente,
+        HoraInicio,
+      ]);
     }
 
     // Actualiza el status de la cita
@@ -1444,15 +1578,14 @@ async function AsignarP_Pedido(idCita, idConsultorio, idDoctor,idAsociado,idProc
 
     await connection.commit();
     connection.end();
-
   } catch (error) {
-    console.error("Ha ocurrido un error creando la sesion/limpiando a pacientes pedidos:", error);
+    console.error(
+      "Ha ocurrido un error creando la sesion/limpiando a pacientes pedidos:",
+      error
+    );
     return "Ha ocurrido un error.";
   }
 }
-
-
-
 
 export {
   VerificarUsuario,
@@ -1479,4 +1612,8 @@ export {
   Consulta_Checkout,
   Update_Checkout,
   SucursalUltimaCita,
+  UpdateReceta_Añadir,
+  UpdateReceta_Editar,
+  UpdateReceta_Quitar,
+  UpdateReceta_EditNota,
 };
