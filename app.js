@@ -220,24 +220,71 @@ io.on("connection", (socket) => {
   });
 });
 
+// ==================================================================================================
+// Detectar el Navegador del usuario
+// ==================================================================================================
+app.use((req, res, next) => {
+  const agente = req.headers["user-agent"];
+  let navegador;
+
+  const mapaNavegadores = {
+      "Safari": {
+          contiene: ["Safari"],
+          noContiene: ["Chrome", "OPR"],
+          encabezados: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              "Pragma": "no-cache",
+              "Expires": "0"
+          }
+      },
+      "Chrome": {
+          contiene: ["Chrome"],
+          noContiene: ["OPR"],
+      },
+      "Opera": {
+          contiene: ["OPR"],
+      },
+      "Firefox": {
+          contiene: ["Firefox"],
+      },
+      "Edge": {
+          contiene: ["Edge"],
+      }
+  };
+
+  for (const [clave, valor] of Object.entries(mapaNavegadores)) {
+      if (valor.contiene.every(v => agente.includes(v)) &&
+          (!valor.noContiene || valor.noContiene.every(v => !agente.includes(v)))) {
+          navegador = clave;
+          break;
+      }
+  }
+
+  navegador = navegador || "Otro";
+
+  if (mapaNavegadores[navegador] && mapaNavegadores[navegador].encabezados) {
+      for (const [claveEncabezado, valorEncabezado] of Object.entries(mapaNavegadores[navegador].encabezados)) {
+          res.header(claveEncabezado, valorEncabezado);
+      }
+  }
+
+  console.log(navegador);
+  // req.session.Navegador = navegador === "Otro" ? "Otros" : navegador;
+  req.navegador = navegador  === "Otro" ? "Otros" : navegador;;
+
+  next();
+});
+
+
+
+
+
 //==================================================================================================
 //  TESTING
 //==================================================================================================
 
-app.use((req, res, next) => {
-  const agent = req.headers["user-agent"];
-  if (
-    agent.indexOf("Safari") > -1 &&
-    agent.indexOf("Chrome") === -1 &&
-    agent.indexOf("OPR") === -1
-  ) {
-    res.header("Cache-Control", "no-cache, no-store, must-revalidate");
-    res.header("Pragma", "no-cache");
-    res.header("Expires", "0");
-    console.log("Safari");
-  }
-  next();
-});
+
+
 
 //==================================================================================================
 //  Logica del Sitio Web (Backend)
@@ -503,7 +550,29 @@ app.post("/UltimaReceta", async function (peticion, respuesta) {
 
 app.post("/CambiosReceta", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
-      
+      console.log(peticion.body);
+      peticion.body.Cambios.forEach(cambio => {
+        switch(cambio.action){
+          case "Añadir":
+            console.log("Añadir");
+          break;
+          case "Editar":
+            console.log("Editar");
+          break;
+  
+          case "Quitar":
+            console.log("Quitar");
+          break;
+  
+          case "EditNota":
+            console.log("Editar Nota");
+          break;
+  
+          default:
+            console.log("No se ha encontrado el cambio para actualizar la receta.");
+          break;
+        }
+      });
   } else {
     respuesta.redirect("/");
   }
@@ -753,11 +822,39 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
   if (req.session.idusuario) {
     const idPaciente = req.params.idPaciente;
     const idReceta = req.params.idReceta;
+
     // Guardamos temporalmente el id del paciente en una Cookie para realizar la consulta
     req.session.idInfoUsuario = idPaciente;
     req.session.idReceta = idReceta;
-    //  Y renderizamos la vista
-    res.render("Receta.ejs");
+
+    console.log(req.session.Navegador);
+    // Determinar la hoja de estilos basada en el navegador
+    let stylesheet = "/css/Receta/Chrome.css";
+    switch(req.navegador){
+      case "Safari":
+        stylesheet = "/css/Receta/Safari.css";
+        break;
+      case "Chrome":
+        stylesheet = "/css/Receta/Chrome.css";
+        break;
+      case "Opera":
+        stylesheet = "/css/Receta/Opera.css";
+        break;
+      case "Firefox":
+        stylesheet = "/css/Receta/Firefox.css";
+        break;
+      case "Edge":
+        stylesheet = "/css/Receta/Edge.css";
+        break;
+      default:
+        stylesheet = "/css/Receta/Brave.css";
+        break;
+    }
+
+    // Y renderizamos la vista pasando el nombre de la hoja de estilos como variable
+    res.render("Receta.ejs", { Navegador: stylesheet });
+  }else{
+    res.redirect("/");
   }
 });
 

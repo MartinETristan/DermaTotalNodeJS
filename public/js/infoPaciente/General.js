@@ -298,20 +298,34 @@ async function cargarGeneral() {
     const dl = document.createElement("dl");
     const formEditReceta = document.createElement("form");
     formEditReceta.style.display = "none";
+
     // Filtrar y mostrar cada medicamento de la receta
     const ultimareceta = data.Recetas[0].idReceta;
     const datosFiltrados = data.Recetas.filter(
       (item) => item.idReceta === ultimareceta
     );
+
+    const ContenedorEditMedicamentos = document.createElement("div");
+    ContenedorEditMedicamentos.id = "ContenedorEditMedicamentos";
     datosFiltrados.forEach((item) => {
       const divMedicamentos = crearElementoMedicamento(item);
       const divinputs = document.createElement("div");
 
+      // Boton para eliminar el par de Medicamento e Indicación
+      const botonQuitar = document.createElement("button");
+      botonQuitar.type = "button";
+      botonQuitar.textContent = "Eliminar";
+      botonQuitar.addEventListener("click", () => {
+        const divMedicamentos = botonQuitar.parentNode;
+        divMedicamentos.parentNode.removeChild(divMedicamentos);
+      });
       dl.appendChild(divMedicamentos);
       divinputs.appendChild(crearInputMedicamento(item, "Medicamento"));
+      divinputs.appendChild(botonQuitar);
       divinputs.appendChild(crearInputMedicamento(item, "Indicacion"));
-      formEditReceta.appendChild(divinputs);
+      ContenedorEditMedicamentos.appendChild(divinputs);
     });
+    formEditReceta.appendChild(ContenedorEditMedicamentos);
 
     Receta.appendChild(dl);
     Receta.appendChild(formEditReceta);
@@ -415,6 +429,7 @@ async function cargarGeneral() {
       camposMedicamentos.innerHTML = ``;
 
       datosFiltrados.forEach((item) => {
+        const contenedor = document.createElement("div");
         const medicamentoInput = document.createElement("input");
         medicamentoInput.type = "text";
         medicamentoInput.name = "Medicamentos";
@@ -422,7 +437,17 @@ async function cargarGeneral() {
         medicamentoInput.required = true;
         medicamentoInput.classList.add("medicamentoreceta");
         medicamentoInput.value = item.Medicamento;
-        camposMedicamentos.appendChild(medicamentoInput);
+        contenedor.appendChild(medicamentoInput);
+
+        // Boton para eliminar el par de Medicamento e Indicación
+        const botonQuitar = document.createElement("button");
+        botonQuitar.type = "button";
+        botonQuitar.textContent = "Eliminar";
+        botonQuitar.addEventListener("click", () => {
+          const divMedicamentos = botonQuitar.parentNode;
+          divMedicamentos.parentNode.removeChild(divMedicamentos);
+        });
+        contenedor.appendChild(botonQuitar);
 
         const indicacionInput = document.createElement("input");
         indicacionInput.type = "text";
@@ -431,7 +456,9 @@ async function cargarGeneral() {
         indicacionInput.classList.add("indicacionreceta");
         indicacionInput.required = true;
         indicacionInput.value = item.Indicacion;
-        camposMedicamentos.appendChild(indicacionInput);
+        contenedor.appendChild(indicacionInput);
+
+        camposMedicamentos.appendChild(contenedor);
 
         // Agregar el par de Medicamento e Indicación al array correspondiente
         medicamentoInput.addEventListener("blur", () => {
@@ -482,6 +509,26 @@ async function cargarGeneral() {
     elementosReceta.forEach((elemento) => {
       elemento.style.display = "none";
     });
+
+    const botonAñadirMedicamento = document.createElement("button");
+    botonAñadirMedicamento.type = "button";
+    botonAñadirMedicamento.textContent = "Añadir Medicamento";
+    botonAñadirMedicamento.addEventListener("click", () => {
+      agregarCampos(
+        "ContenedorEditMedicamentos",
+        "EditMedicamentos",
+        "EditIndicaciones"
+      );
+    });
+
+    const botonQuitarMedicamento = document.createElement("button");
+    botonQuitarMedicamento.type = "button";
+    botonQuitarMedicamento.textContent = "Quitar Medicamento";
+    botonQuitarMedicamento.addEventListener("click", () => {
+      eliminarUltimosCampos("ContenedorEditMedicamentos");
+    });
+    formEditReceta.appendChild(botonQuitarMedicamento);
+    formEditReceta.appendChild(botonAñadirMedicamento);
   });
 
   agregarEventListener("CancelarEdit", function () {
@@ -513,6 +560,12 @@ async function cargarGeneral() {
   });
 
   agregarEventListener("GuardarCambios", function () {
+    // Verificamos si el formulario es válido
+    const form = document.querySelector("#Receta_actual form");
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
     alert("Vamos a guardar cambios");
 
     console.log("Array de inputs:");
@@ -535,10 +588,9 @@ async function cargarGeneral() {
     });
     console.log("Ahora el array de la receta:");
     console.log(datosFiltrados);
-    
+
     // Y llamamos a la función para comparar los datos
     compareData(datosFiltrados, inputData);
-
   });
 
   // ========================================================================================================
@@ -600,50 +652,7 @@ async function cargarGeneral() {
 
   // Array para almacenar los valores de Medicamentos e Indicaciones
   const medicamentosIndicaciones = [];
-  agregarCampos();
-  // Función para agregar campos de Medicamentos e Indicaciones
-  function agregarCampos() {
-    const camposMedicamentos = document.getElementById("camposMedicamentos");
-
-    const medicamentoInput = document.createElement("input");
-    medicamentoInput.type = "text";
-    medicamentoInput.name = "Medicamentos";
-    medicamentoInput.placeholder = "Medicamento";
-    medicamentoInput.required = true;
-    medicamentoInput.classList.add("medicamentoreceta");
-    camposMedicamentos.appendChild(medicamentoInput);
-
-    const indicacionInput = document.createElement("input");
-    indicacionInput.type = "text";
-    indicacionInput.name = "Indicaciones";
-    indicacionInput.placeholder = "Indicación";
-    indicacionInput.classList.add("indicacionreceta");
-    indicacionInput.required = true;
-    camposMedicamentos.appendChild(indicacionInput);
-
-    // Agregar el par de Medicamento e Indicación al array correspondiente
-    medicamentoInput.addEventListener("blur", () => {
-      agregarMedicamentoIndicacion(
-        medicamentoInput.value,
-        indicacionInput.value
-      );
-    });
-  }
-
-  function eliminarUltimosCampos() {
-    const camposMedicamentos = document.getElementById("camposMedicamentos");
-
-    // Obtén todos los elementos hijos (los pares de Medicamento e Indicación)
-    const elementosHijos =
-      camposMedicamentos.querySelectorAll("input[type='text']");
-
-    // Verifica si hay al menos un conjunto de campos para eliminar
-    if (elementosHijos.length >= 4) {
-      // Elimina el último conjunto de campos (Medicamento e Indicación)
-      camposMedicamentos.removeChild(elementosHijos[elementosHijos.length - 1]);
-      camposMedicamentos.removeChild(elementosHijos[elementosHijos.length - 2]);
-    }
-  }
+  agregarCampos("camposMedicamentos", "Medicamentos", "Indicaciones");
 
   function agregarMedicamentoIndicacion(medicamento, indicacion) {
     // Buscar si ya existe el medicamento en el array
@@ -667,7 +676,7 @@ async function cargarGeneral() {
   const agregarBoton = document.getElementById("agregarCampo");
   agregarBoton.addEventListener("click", (event) => {
     quitarBoton.style.display = "block";
-    agregarCampos();
+    agregarCampos("camposMedicamentos", "Medicamentos", "Indicaciones");
   });
 
   // Escuchar clic en el botón "quitar"
@@ -678,9 +687,9 @@ async function cargarGeneral() {
     const elementosHijos =
       camposMedicamentos.querySelectorAll("input[type='text']");
     if (elementosHijos.length > 4) {
-      eliminarUltimosCampos();
+      eliminarUltimosCampos("camposMedicamentos");
     } else {
-      eliminarUltimosCampos();
+      eliminarUltimosCampos("camposMedicamentos");
       quitarBoton.style.display = "none";
     }
   });

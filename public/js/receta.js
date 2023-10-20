@@ -165,7 +165,7 @@ function FormatoReceta() {
   divReceta.appendChild(Footer);
 
   // Finalmente, agregar el div "Receta" al documento
-  document.body.appendChild(divReceta);
+  InsertReceta.appendChild(divReceta);
   document.body.appendChild(InsertReceta);
 }
 
@@ -182,22 +182,24 @@ function MedicamentosReceta() {
 
   // Función para isnertar el formato de la receta
   FormatoReceta();
-  
+
   // Verificamos si es par o no
   function isEven(num) {
     return num % 2 === 0;
   }
-
 
   // Función para agregar los elementos <div> al elemento .InfoReceta
   function AgregarDivsAReceta(divs) {
     // Buscar el div padre "Receta N" y dentro de él buscar el div hijo "InfoReceta"
     const padreReceta = document.querySelector(`.Receta_${contadorReceta}`);
     // Si es par, le quitarmos el margin Bottom
-    if(isEven(contadorReceta)){
-      padreReceta.setAttribute("style", `margin-bottom: 0;     
+    if (isEven(contadorReceta)) {
+      padreReceta.setAttribute(
+        "style",
+        `margin-bottom: 0;     
       page-break-after: always;
-      `);
+      `
+      );
     }
 
     if (padreReceta) {
@@ -213,7 +215,10 @@ function MedicamentosReceta() {
     if (ultimoDivReceta) {
       const ultimoInfoReceta = ultimoDivReceta.querySelector(`.InfoReceta`);
       ultimoDivReceta.style.pageBreakAfter = "auto";
-      ultimoInfoReceta.setAttribute("style", `justify-content: flex-start; gap: 10px;`);
+      ultimoInfoReceta.setAttribute(
+        "style",
+        `justify-content: flex-start; gap: 10px;`
+      );
     }
   }
 
@@ -249,8 +254,8 @@ function MedicamentosReceta() {
         // Agregar el <div> al array de la receta actual
         divsParaRecetaActual.push(div);
 
-        // Comprobar si se han generado 4 <div>
-        if (divCount % 4 === 0) {
+        // Comprobar si se han generado 3 <div>
+        if (divCount % 3 === 0) {
           // Agregar los 4 <div> a la receta actual
           AgregarDivsAReceta(divsParaRecetaActual);
           // Limpiar el array
@@ -286,6 +291,6 @@ function MedicamentosReceta() {
   quitarUltimoSaltoDePagina();
 }
 
-
 // Y ejecutamos la funcion principal que nos generará la receta
 obtenerDatos();
+

@@ -168,7 +168,6 @@ dt::before {
         top: 49%;
         left: 0; /* Justificado a la izquierda */
         height: 1px; /* Altura de la línea */
-        background: linear-gradient(to right, black 10%, transparent 10%, transparent 90%, black 90%);
         z-index: 1;
     }
     
@@ -179,19 +178,9 @@ dt::before {
         top: 49%;
         right: 0; /* Justificado a la derecha */
         height: 1px; /* Altura de la línea */
-        background: linear-gradient(to right, red 10%, transparent 10%, transparent 90%, red 90%);
         z-index: 1;
     }  
 
 }
 
 
-
-/* Esta configuracion es para que al imprimir no se tengan margenes verticales 
-(por lo pronto para contrasrrestar la configuracion de safari) */
-/* @media print {
-    body, html, #page, .container {
-        margin: 0 !important;
-        padding: 0;
-    }
-} */

@@ -1,0 +1,188 @@
+body {
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+}
+
+/* Estilo base para todos los divs */
+div[class^="Receta_"] {
+    margin-bottom: 50px; /* Por defecto todos los divs tendrán margin-bottom */
+}
+
+.ContenidoReceta{
+    margin: 0;
+}
+
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    color: rgb(162, 162, 162);
+    margin-bottom: 10px;
+}
+
+.InfoReceta{
+    height: 250px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+
+
+.ContenedorFooter {
+    gap: 10px;
+    max-width: 50%;
+    font-size: 12px;
+    /* height: 100px; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0 10px;
+}
+.Nombre,.Edad,.Fecha{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Nombre::after{
+    content: "";
+    position: absolute;
+    width: 83px;
+    height: 10px;
+    background-color: white;
+    margin-top: 25px;
+    left: 0;
+}
+.Fecha::after{
+    content: "";
+    position: absolute;
+    width: 47px;
+    height: 10px;
+    background-color: white;
+    margin-top: 25px;
+}
+
+
+.LogoCMI>img,
+.LogoDT>img {
+
+    width: 100%;
+    height: auto;
+}
+
+.LogoCMI {
+    width: 35%;
+    height: auto;
+}
+
+.LogoDT {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 25%;
+    overflow: hidden;
+    width: 400px;
+    height: 70px;
+}
+.InfoPaciente {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    padding-left: 0;
+}
+
+.InfoDoc{
+    display: block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.InfoDoc >*{
+    margin: 0;
+}
+
+.Doctor,.Especialidad{
+    font-weight: normal;
+}
+
+.Estudios{
+    font-size: 10px;
+}
+hr{
+    margin: 2px;
+}
+p{
+    margin: 0;
+}
+
+dt {
+    font-weight: bold;
+    text-decoration: none; /* Asegurarte de que el dt no esté subrayado */
+}
+
+dt span {
+    text-decoration: underline; /* Subrayar solo el span */
+}
+
+dt::before {
+    content: '■';  
+    margin-right: 5px;  
+}
+
+
+
+
+
+.Footer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Correo{
+    color: #00aaff;
+}
+
+.QRs{
+    display: flex;
+    /* width: 100%; */
+    height: auto;
+    position: relative;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+
+.QRs > *{
+    width: 60px;
+    height: auto;
+}
+
+
+/* @media print {
+    body::before {
+        content: "---";
+        display: block;
+        position: fixed;
+        top: 49%;
+        left: 0;
+        height: 1px; 
+        z-index: 1;
+    }
+    
+    body::after {
+        content: "---";
+        display: block;
+        position: fixed;
+        top: 49%;
+        right: 0; 
+        height: 1px;
+        z-index: 1;
+    }  
+
+} */
+
+
