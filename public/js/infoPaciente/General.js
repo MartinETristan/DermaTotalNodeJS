@@ -276,11 +276,13 @@ async function cargarGeneral() {
     input.setAttribute("idMedicamento", item.idMedicamento);
     input.setAttribute("idMedicamento_Receta", item.idMedicamento_Receta);
     input.setAttribute("idReceta", item.idReceta);
+    input.setAttribute("Orden", item.Orden);
     return input;
   }
 
   // Función para mostrar la receta en el DOM
   function mostrarReceta(data) {
+    console.log(data.Recetas);
     const Receta = document.getElementById("Receta_actual");
     const TituloReceta = document.getElementById("Titulo_Receta");
     const Print = document.getElementById("Print");
@@ -605,6 +607,7 @@ async function cargarGeneral() {
         Medicamento: item.Medicamento,
         Indicacion: item.Indicacion,
         Nota: item.Nota,
+        Orden: String(item.Orden),
       };
     });
     console.log("Ahora el array de la receta:");

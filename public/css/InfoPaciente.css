@@ -737,15 +737,16 @@ div[id^="receta_"] {
 form > h3{
     margin: 0;
     margin-bottom: 5px;
+    margin-left: 25px;
 }
 
 .ContenedorNota{
-    /* position: relative; */
+
     display: flex;
     justify-content: space-between;
-    /* justify-content: flex-end; */
+
     align-items: center;
-    /* right: 0; */
+    margin-left: 25px;
 }
 
 /* Otros estilos si es necesario */
@@ -804,6 +805,18 @@ form > h3{
     align-items: center;
     gap: 10px;
 }
+#ContenedorEditMedicamentos .New{
+    display: flex;
+    flex-direction: column;
+    /* background-color: red; */
+    margin-left: 45px;
+    justify-content: space-between;
+    align-items:baseline;
+    gap: 10px;
+}
+
+
+
 .selector{
     width: 100%;
 }

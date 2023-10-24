@@ -94,6 +94,7 @@ async function Receta(idPaciente, idReceta) {
       LEFT JOIN Paciente p ON p.idPaciente = rp.idPaciente
       LEFT JOIN Usuarios up ON up.idUsuario = p.idUsuario
       WHERE rp.idPaciente = ? AND mr.idReceta_Pacientes = ?
+      ORDER BY mr.Orden ASC
       `;
     const [checkreceta, a] = await connection.execute(queryReceta, [
       idPaciente,
@@ -113,6 +114,7 @@ async function Receta(idPaciente, idReceta) {
 async function UpdateReceta_Añadir(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
+    // Insertamos primero en la tabla de Medicamento
     const InsertMedicamento = `
       INSERT INTO Medicamento
       (Medicamento, Indicacion)
@@ -123,13 +125,26 @@ async function UpdateReceta_Añadir(Elemento) {
     ]);
     const idMedicamento = result.insertId; // Aquí obtienes el ID del medicamento insertado
 
+    // Consultamos cual fue el ultimo numero de orden insertado en la receta 
+    const LastValueOrden =  `
+    SELECT Orden
+    FROM Medicamento_Receta 
+    WHERE idReceta_Pacientes = ?
+    ORDER BY Orden DESC
+    LIMIT 1`;
+    const [UltimoValor] = await connection.execute(LastValueOrden,[Elemento.idReceta]);
+    // Y lo almacenamos en una variable
+    const ValorOrden = UltimoValor[0].Orden+1;
+
+    // Finalmente simpelemte insertamos todo lo anterior en la tabla  de enlace
     const Asociar_Receta = `
       INSERT INTO Medicamento_Receta
-      (idMedicamento, idReceta_Pacientes)
-      VALUES(?,?);`;
+      (idMedicamento, idReceta_Pacientes, Orden)
+      VALUES(?,?,?);`;
     await connection.execute(Asociar_Receta, [
       idMedicamento,
       Elemento.idReceta,
+      ValorOrden,
     ]);
 
     connection.end();
@@ -211,6 +226,34 @@ async function UpdateReceta_EditNota(Elemento) {
   }
 }
 
+async function UpdateReceta_Orden(Elemento) {
+  try {
+    const connection = await mysql.createConnection(db);
+    console.log(Elemento);
+    const Actualizar_Orden = `
+    UPDATE Medicamento_Receta
+    SET Orden= ?
+    WHERE idMedicamento_Receta= ?;`;
+
+    await connection.execute(Actualizar_Orden, [
+      Elemento[1].NuevoOrden,
+      Elemento[0].idMedicamento_Receta,
+    ]);
+
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error actualizando el orden de los medicamentos del paciente: ",
+      error
+    );
+  }
+}
+
+
+
+
+
+
 export {
   NuevaReceta,
   Receta,
@@ -218,4 +261,5 @@ export {
   UpdateReceta_Editar,
   UpdateReceta_Quitar,
   UpdateReceta_EditNota,
+  UpdateReceta_Orden,
 };

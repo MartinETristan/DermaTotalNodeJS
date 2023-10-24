@@ -194,6 +194,7 @@ function getCombinedInputData() {
     );
     const idMedicamento = medicamentoInput.getAttribute("idmedicamento");
     const idReceta = medicamentoInput.getAttribute("idreceta");
+    const Orden = medicamentoInput.getAttribute("orden");
 
     const indicacionInput = Array.from(indicacionInputs).find(
       (input) => input.getAttribute("idmedicamento") === idMedicamento
@@ -206,6 +207,7 @@ function getCombinedInputData() {
       Medicamento: medicamentoInput.value,
       Indicacion: indicacionInput ? indicacionInput.value : "",
       Nota: notaInput ? notaInput.value : null,
+      Orden: Orden,
     });
   });
 
@@ -226,6 +228,7 @@ function compareData(original, form) {
   let changes = [];
   let hasNotaChange = false;
 
+  let contador = 1; 
   form.forEach((item) => {
     const originalItem = original.find(
       (o) =>
@@ -233,6 +236,7 @@ function compareData(original, form) {
         o.idMedicamento_Receta === item.idMedicamento_Receta &&
         o.idReceta === item.idReceta
     );
+
 
     if (!originalItem) {
       if (item.Medicamento === "" && item.Indicacion === "") {
@@ -246,6 +250,15 @@ function compareData(original, form) {
     } else if (originalItem.Nota !== item.Nota) {
       hasNotaChange = true;
     }
+
+    if (item.Orden != contador && contador <= original.length){
+      let cambios = [];
+      cambios.push(item);
+      cambios.push({NuevoOrden: contador});
+
+      changes.push({action:"Reordendar",cambios});
+    }
+    contador++;
   });
 
   original.forEach((item) => {
@@ -291,7 +304,7 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
   const camposMedicamentos = document.getElementById(`${zona}`);
   // Creamos un contenedor para los campos de Medicamento e Indicación
   const contenedor = document.createElement("div");
-
+  contenedor.classList.add("New");
   const medicamentoInput = document.createElement("input");
   medicamentoInput.type = "text";
   medicamentoInput.name = `${NombreInputMedicamento}`;

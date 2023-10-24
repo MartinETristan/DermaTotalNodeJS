@@ -130,14 +130,15 @@ async function InfoPaciente(idPaciente) {
   try {
     const connection = await mysql.createConnection(db);
     const queryRecetas = `
-      SELECT mr.idMedicamento_Receta ,mr.idReceta_Pacientes,mr.idMedicamento ,u.Nombres as Doctor,m.Medicamento, m.Indicacion, Fecha, Nota
+      SELECT mr.idMedicamento_Receta ,mr.idReceta_Pacientes,mr.idMedicamento ,u.Nombres as Doctor,
+      m.Medicamento, m.Indicacion, Fecha, Nota, mr.Orden
       FROM Receta_Pacientes rp
       LEFT JOIN Medicamento_Receta mr ON mr.idReceta_Pacientes = rp.idReceta_Pacientes
       LEFT JOIN Medicamento m ON m.idMedicamento = mr.idMedicamento
       LEFT JOIN Doctor d ON d.idDoctor = rp.idDoctor
       LEFT JOIN Usuarios u ON u.idUsuario = d.idUsuario
       WHERE rp.idPaciente = ?
-      ORDER BY Fecha DESC  
+      ORDER BY Fecha DESC, mr.Orden ASC  
       `;
     const [rowRecetas, fieldsAntecedentes] = await connection.execute(
       queryRecetas,
@@ -155,6 +156,7 @@ async function InfoPaciente(idPaciente) {
           Indicacion: elemento.Indicacion,
           Fecha: elemento.Fecha,
           Nota: elemento.Nota,
+          Orden: elemento.Orden,
         };
       });
     }

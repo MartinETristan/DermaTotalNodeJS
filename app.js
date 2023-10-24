@@ -38,7 +38,8 @@ import {
   UpdateReceta_Añadir,
   UpdateReceta_Editar,
   UpdateReceta_Quitar,
-  UpdateReceta_EditNota 
+  UpdateReceta_EditNota,
+  UpdateReceta_Orden,
 } from "./public/api/SQL/Recetas.js";
 
 // Autentificacion y Usuarios
@@ -600,6 +601,11 @@ app.post("/CambiosReceta", async function (peticion, respuesta) {
         case "EditNota":
           console.log("Editar Nota");
           UpdateReceta_EditNota(cambio.item);
+          break;
+
+        case "Reordendar":
+          console.log("Reordenar Receta");
+          UpdateReceta_Orden(cambio.cambios);
           break;
 
         default:
