@@ -307,10 +307,19 @@ async function cargarGeneral() {
 
     const ContenedorEditMedicamentos = document.createElement("div");
     ContenedorEditMedicamentos.id = "ContenedorEditMedicamentos";
+    let contador = 0;
     datosFiltrados.forEach((item) => {
+      contador = contador + 1;
       const divMedicamentos = crearElementoMedicamento(item);
       const divinputs = document.createElement("div");
+      divinputs.classList.add(contador);
 
+      const spanDrag = document.createElement("span");
+      spanDrag.ariaHidden = true;
+      spanDrag.textContent = "☰";
+      spanDrag.classList.add("drag");
+      const divSelector = document.createElement("div");
+      divSelector.classList.add("selector");
       // Boton para eliminar el par de Medicamento e Indicación
       const botonQuitar = document.createElement("button");
       botonQuitar.type = "button";
@@ -318,16 +327,18 @@ async function cargarGeneral() {
       botonQuitar.classList.add("iconbtn--Eliminar");
       botonQuitar.addEventListener("click", () => {
         const divMedicamentos = botonQuitar.parentNode;
-        divMedicamentos.parentNode.removeChild(divMedicamentos);
+        const divinputs = divMedicamentos.parentNode;
+        divinputs.parentNode.removeChild(divinputs);
       });
       dl.appendChild(divMedicamentos);
-      divinputs.appendChild(crearInputMedicamento(item, "Medicamento"));
-      divinputs.appendChild(botonQuitar);
-      divinputs.appendChild(crearInputMedicamento(item, "Indicacion"));
+      divSelector.appendChild(crearInputMedicamento(item, "Medicamento"));
+      divSelector.appendChild(botonQuitar);
+      divSelector.appendChild(crearInputMedicamento(item, "Indicacion"));
+      divinputs.appendChild(spanDrag);
+      divinputs.appendChild(divSelector);
       ContenedorEditMedicamentos.appendChild(divinputs);
     });
     formEditReceta.appendChild(ContenedorEditMedicamentos);
-
 
     const contenedornota = document.createElement("div");
     contenedornota.classList.add("ContenedorNota");
@@ -354,41 +365,38 @@ async function cargarGeneral() {
       eliminarUltimosCampos("ContenedorEditMedicamentos");
     });
 
+    const Nota = document.createElement("div");
+    Nota.classList.add("Nota");
+    Nota.style.display = "block";
+    const NotaTitulo = document.createElement("h3");
+    NotaTitulo.innerHTML = "Nota:";
+    const NotaP = document.createElement("p");
+    NotaP.innerHTML = data.Recetas[0].Nota;
+    Nota.appendChild(NotaTitulo);
+    Nota.appendChild(NotaP);
 
-      const Nota = document.createElement("div");
-      Nota.classList.add("Nota");
-      Nota.style.display = "block";
-      const NotaTitulo = document.createElement("h3");
-      NotaTitulo.innerHTML = "Nota:";
-      const NotaP = document.createElement("p");
-      NotaP.innerHTML = data.Recetas[0].Nota;
-      Nota.appendChild(NotaTitulo);
-      Nota.appendChild(NotaP);
+    const inputNota = document.createElement("input");
+    inputNota.type = "text";
+    inputNota.name = "EditNota";
+    inputNota.placeholder = "Contenido de la Nota";
+    inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
+    inputNota.value = data.Recetas[0].Nota || "";
 
-      const inputNota = document.createElement("input");
-      inputNota.type = "text";
-      inputNota.name = "EditNota";
-      inputNota.placeholder = "Contenido de la Nota";
-      inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
-      inputNota.value = data.Recetas[0].Nota || "";
+    const tituloNota = document.createElement("h3");
+    tituloNota.innerHTML = "Nota:";
+    formEditReceta.appendChild(tituloNota);
 
-      const tituloNota = document.createElement("h3");
-      tituloNota.innerHTML = "Nota:";
-      Receta.appendChild(Nota);
-      formEditReceta.appendChild(tituloNota);
+    contenedorbotones.appendChild(botonQuitarMedicamento);
+    contenedorbotones.appendChild(botonAñadirMedicamento);
+    contenedornota.appendChild(inputNota);
+    contenedornota.appendChild(contenedorbotones);
+    formEditReceta.appendChild(contenedornota);
 
-      contenedorbotones.appendChild(botonQuitarMedicamento);
-      contenedorbotones.appendChild(botonAñadirMedicamento);
-      contenedornota.appendChild(inputNota);
-      contenedornota.appendChild(contenedorbotones);
-      formEditReceta.appendChild(contenedornota);
+    Receta.appendChild(dl);
+    Receta.appendChild(Nota);
+    Receta.appendChild(formEditReceta);
 
-      Receta.appendChild(dl);
-      Receta.appendChild(formEditReceta);
-  
-
-
-
+    DragNDrop();
   }
 
   // ========================================================================================================
@@ -523,17 +531,11 @@ async function cargarGeneral() {
     const botonGuardar = document.getElementById("GuardarCambios");
     const botonPrint = document.getElementById("Print");
     const botonNuevaReceta = document.getElementById("botonNuevaReceta");
-    const ContenidoMedicamentos = document.getElementById("ContenedorEditMedicamentos");
-    const form = document.querySelector("#Receta_actual form");
-    const inputNota = form.querySelector(".inputNota");
-
-  
 
     const Nota = document.querySelector(".Nota");
     if (Nota) {
       Nota.style.display = "none";
-    } 
-
+    }
 
     botones.style.display = "flex";
     formEditReceta.style.display = "block";
@@ -548,7 +550,6 @@ async function cargarGeneral() {
     elementosReceta.forEach((elemento) => {
       elemento.style.display = "none";
     });
-
   });
 
   agregarEventListener("CancelarEdit", function () {
@@ -632,42 +633,48 @@ async function cargarGeneral() {
     // Codigo para no abrir la pestaña y solo imprimir la receta
     //========================================================================================================
     // Función para obtener o crear el iframe basado en su atributo src
-    function getOrCreateIframeBySrc(src) {
-      // Buscar iframes en el documento y filtrar por el atributo src
-      let iframes = Array.from(document.querySelectorAll("iframe"));
-      let iframe = iframes.find((iframe) => iframe.src.endsWith(src));
+    // function getOrCreateIframeBySrc(src) {
+    //   // Buscar iframes en el documento y filtrar por el atributo src
+    //   let iframes = Array.from(document.querySelectorAll("iframe"));
+    //   let iframe = iframes.find((iframe) => iframe.src.endsWith(src));
 
-      // Si el iframe no existe con ese src, lo crea y lo añade al documento
-      if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        document.body.appendChild(iframe);
-      } else {
-        iframe.contentWindow.location.reload();
-      }
+    //   // Si el iframe no existe con ese src, lo crea y lo añade al documento
+    //   if (!iframe) {
+    //     iframe = document.createElement("iframe");
+    //     iframe.style.display = "none";
+    //     document.body.appendChild(iframe);
+    //   } else {
+    //     iframe.contentWindow.location.reload();
+    //   }
 
-      return iframe;
-    }
+    //   return iframe;
+    // }
 
-    // Definir el src
-    let src = `/Receta/${idPaciente}/${idReceta}`;
+    // // Definir el src
+    // let src = `/Receta/${idPaciente}/${idReceta}`;
 
-    // Usando la función getOrCreateIframeBySrc para obtener o crear el iframe
-    let iframe = getOrCreateIframeBySrc(src);
+    // // Usando la función getOrCreateIframeBySrc para obtener o crear el iframe
+    // let iframe = getOrCreateIframeBySrc(src);
 
-    // Establece el evento onload solo si es necesario
-    if (!iframe.onload) {
-      iframe.onload = function () {
-        setTimeout(function () {
-          iframe.contentWindow.print();
-        }, 200);
-      };
-    }
+    // // Establece el evento onload solo si es necesario
+    // if (!iframe.onload) {
+    //   iframe.onload = function () {
+    //     setTimeout(function () {
+    //       iframe.contentWindow.print();
+    //     }, 200);
+    //   };
+    // }
 
-    // Establece el atributo src para cargar el contenido y disparar el evento onload
-    iframe.src = src;
+    // // Establece el atributo src para cargar el contenido y disparar el evento onload
+    // iframe.src = src;
 
-    // window.open(`/Receta/${idPaciente}/${idReceta}`, "_blank");
+    const imprimir = window.open(`/Receta/${idPaciente}/${idReceta}`, "_blank");
+
+    // Puedes mover el evento onafterprint aquí si deseas que se cierre después de imprimir la página recargada
+    // imprimir.onafterprint = () => {
+    //   imprimir.close();
+    // };
+
   });
 
   // Array para almacenar los valores de Medicamentos e Indicaciones
@@ -873,4 +880,13 @@ function cancelarEdicion(NombredelCampo) {
   document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
   document.getElementById(`input${NombredelCampo}`).style.display = "none";
   document.getElementById(`text${NombredelCampo}`).style.display = "block";
+}
+
+// DRAG AND DROP LISTA DE MEDICAMENTOS
+function DragNDrop() {
+  const zonaDragNDrop = document.getElementById("ContenedorEditMedicamentos");
+  Sortable.create(zonaDragNDrop, {
+    handle: ".drag",
+    animation: 350,
+  });
 }

@@ -67,10 +67,12 @@ async function NuevaReceta(
   }
 
   if (Array.isArray(idMedicamento) && idMedicamento.length > 0) {
+    let contador = 1;
     for (const medicamentoId of idMedicamento) {
       const insertQuery =
-        "INSERT INTO Medicamento_Receta (idMedicamento, idReceta_Pacientes) VALUES (?, ?);";
-      await connection.execute(insertQuery, [medicamentoId, idReceta]);
+        "INSERT INTO Medicamento_Receta (idMedicamento, idReceta_Pacientes, Orden) VALUES (?, ?, ?);";
+      await connection.execute(insertQuery, [medicamentoId, idReceta, contador]);
+      contador++;
     }
   }
 

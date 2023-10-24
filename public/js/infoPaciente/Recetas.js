@@ -129,42 +129,49 @@ function crearBotonImprimir(receta, ultimareceta) {
     // Codigo para no abrir la pestaña y solo imprimir la receta
     //========================================================================================================
     // Función para obtener o crear el iframe basado en su atributo src
-    function getOrCreateIframeBySrc(src) {
-      // Buscar iframes en el documento y filtrar por el atributo src
-      let iframes = Array.from(document.querySelectorAll("iframe"));
-      let iframe = iframes.find((iframe) => iframe.src.endsWith(src));
+    // function getOrCreateIframeBySrc(src) {
+    //   // Buscar iframes en el documento y filtrar por el atributo src
+    //   let iframes = Array.from(document.querySelectorAll("iframe"));
+    //   let iframe = iframes.find((iframe) => iframe.src.endsWith(src));
 
-      // Si el iframe no existe con ese src, lo crea y lo añade al documento
-      if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        document.body.appendChild(iframe);
-      } else {
-        iframe.contentWindow.location.reload();
-      }
+    //   // Si el iframe no existe con ese src, lo crea y lo añade al documento
+    //   if (!iframe) {
+    //     iframe = document.createElement("iframe");
+    //     iframe.style.display = "none";
+    //     document.body.appendChild(iframe);
+    //   } else {
+    //     iframe.contentWindow.location.reload();
+    //   }
 
-      return iframe;
-    }
+    //   return iframe;
+    // }
 
-    // Definir el src
-    let src = `/Receta/${idPaciente}/${ultimareceta}`;
+    // // Definir el src
+    // let src = `/Receta/${idPaciente}/${ultimareceta}`;
 
-    // Usando la función getOrCreateIframeBySrc para obtener o crear el iframe
-    let iframe = getOrCreateIframeBySrc(src);
+    // // Usando la función getOrCreateIframeBySrc para obtener o crear el iframe
+    // let iframe = getOrCreateIframeBySrc(src);
 
-    // Establece el evento onload solo si es necesario
-    if (!iframe.onload) {
-      iframe.onload = function () {
-        setTimeout(function () {
-          iframe.contentWindow.print();
-        }, 200);
-      };
-    }
+    // // Establece el evento onload solo si es necesario
+    // if (!iframe.onload) {
+    //   iframe.onload = function () {
+    //     setTimeout(function () {
+    //       iframe.contentWindow.print();
+    //     }, 200);
+    //   };
+    // }
 
-    // Establece el atributo src para cargar el contenido y disparar el evento onload
-    iframe.src = src;
+    // // Establece el atributo src para cargar el contenido y disparar el evento onload
+    // iframe.src = src;
 
-    // window.open(`/Receta/${idPaciente}/${ultimareceta}`, "_blank");
+
+
+    const imprimir = window.open(`/Receta/${idPaciente}/${ultimareceta}`, "_blank");
+
+    // Puedes mover el evento onafterprint aquí si deseas que se cierre después de imprimir la página recargada
+    // imprimir.onafterprint = () => {
+    //   imprimir.close();
+    // };
   });
   return botonImprimir;
 }

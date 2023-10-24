@@ -37,6 +37,7 @@
 }
 
 a {
+    font-size: 14px;
     text-decoration: none;
     color: inherit;
 }
@@ -795,6 +796,23 @@ form > h3{
 
 .elemento-receta{
     margin-top: 20px;
+}
+
+#ContenedorEditMedicamentos > div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.selector{
+    width: 100%;
+}
+
+.drag{
+    margin-left: 10px;
+    cursor: move;
+    font-size: 30px;
+    padding-bottom: 5%;
 }
 
 

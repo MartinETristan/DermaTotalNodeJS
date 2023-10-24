@@ -1,5 +1,6 @@
 body {
     font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    max-width: 800px;
 }
 
 /* Estilo base para todos los divs */
@@ -22,7 +23,7 @@ div[class^="Receta_"] {
 
 .InfoReceta{
     height: 250px;
-    font-size: 12px;
+    /* font-size: 12px; */
     display: flex;
     justify-content: space-between;
     flex-direction: column;

@@ -207,6 +207,35 @@ function MedicamentosReceta() {
       divs.forEach((div) => {
         contenedorInfoReceta.appendChild(div);
       });
+      if (
+        divs[divs.length - 1].className === "Nota" &&
+        contenedorInfoReceta.querySelector(".NotaPaciente")
+      ) {
+        if (contenedorInfoReceta.scrollHeight > 300) {
+          const lastDiv = divs[divs.length - 1];
+          contenedorInfoReceta.removeChild(lastDiv);
+          contadorReceta++;
+          FormatoReceta();
+          const RecetaNota = document.querySelector(
+            `.Receta_${contadorReceta}`
+          );
+          const InfoRecetaNota = RecetaNota.querySelector(".InfoReceta");
+          InfoRecetaNota.appendChild(lastDiv);
+        }
+      }
+
+      console.log(contenedorInfoReceta.scrollHeight);
+      // Verificar si la altura del contenedor supera los 300px
+      if (contenedorInfoReceta.scrollHeight > 300) {
+        // Remover el último div agregado
+        const lastDiv = divs[divs.length - 1];
+        contenedorInfoReceta.removeChild(lastDiv);
+
+        // Agregar el div removido al inicio de divsParaRecetaActual
+        divsParaRecetaActual.unshift(lastDiv);
+        console.log(divsParaRecetaActual);
+        overlap = true;
+      }
     }
   }
   //Aqui nos aseguramos de que no se agregue un salto de pagina al final de la ultima receta
@@ -222,9 +251,11 @@ function MedicamentosReceta() {
     }
   }
 
+  overlap = false;
+
   // Iterar sobre cada elemento en el array IReceta
   IReceta.forEach((receta) => {
-    for (const key in receta) {
+    for (let key = 0; key < receta.length; key++) {
       if (receta.hasOwnProperty(key)) {
         // Crear un elemento <div> para cada conjunto de elementos <dl>
         const div = document.createElement("div");
@@ -266,6 +297,10 @@ function MedicamentosReceta() {
           FormatoReceta();
         }
       }
+      if (overlap) {
+        key--;
+        overlap = false;
+      }
     }
     // Si se tiene una nota en la receta, se agrega al final de la receta
     if (IReceta[0][0].Nota) {
@@ -294,3 +329,6 @@ function MedicamentosReceta() {
 // Y ejecutamos la funcion principal que nos generará la receta
 obtenerDatos();
 
+$(document).on("click",function () {
+  window.print();
+});

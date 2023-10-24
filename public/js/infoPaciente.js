@@ -322,16 +322,17 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
 }
 
 function eliminarUltimosCampos(zona) {
-  const camposMedicamentos = document.getElementById(`${zona}`);
-
-  // Obtén todos los contenedores (divs que agrupan a Medicamento e Indicación)
-  const contenedores = camposMedicamentos.querySelectorAll("div");
-
-  // Verifica si hay al menos un contenedor para eliminar
-  if (contenedores.length > 0) {
-    // Elimina el último contenedor
-    camposMedicamentos.removeChild(contenedores[contenedores.length - 1]);
+  const contenedorEditMedicamentos = document.getElementById(`${zona}`);
+  
+  // Seleccionar el último div dentro del contenedor
+  const ultimoDiv = contenedorEditMedicamentos.lastElementChild;
+  
+  // Verificar que el último elemento es realmente un div antes de eliminarlo
+  if (ultimoDiv && ultimoDiv.tagName === 'DIV') {
+    contenedorEditMedicamentos.removeChild(ultimoDiv);
   }
+
+  
 }
 
 // ========================================================================================================

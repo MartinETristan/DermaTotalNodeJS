@@ -1,6 +1,7 @@
 body {
     margin: 0px 20px 0px 20px;
     font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    max-width: 800px;
 }
 
 /* Estilo base para todos los divs */
@@ -8,6 +9,9 @@ div[class^="Receta_"] {
     margin-bottom: 40px; /* Por defecto todos los divs tendrán margin-bottom */
 }
 
+.ContenidoReceta{
+    margin: 0 auto;
+}
 
 
 .Header {
