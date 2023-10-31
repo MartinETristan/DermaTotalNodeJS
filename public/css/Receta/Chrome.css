@@ -1,8 +1,9 @@
 body {
     margin: 0px 20px 0px 20px;
     font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
-    max-width: 800px;
+
 }
+
 
 /* Estilo base para todos los divs */
 div[class^="Receta_"] {
@@ -136,7 +137,9 @@ dt::before {
     flex-direction: column;
 }
 
-
+.NotaPaciente>p{
+    word-wrap: break-word;
+}
 
 .Footer{
     display: flex;
@@ -184,7 +187,6 @@ dt::before {
         height: 1px; /* Altura de la línea */
         z-index: 1;
     }  
-
 }
 
 

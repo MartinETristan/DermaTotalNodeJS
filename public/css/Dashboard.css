@@ -18,7 +18,7 @@ h1 {
   display: flex;
   justify-content: center; /* Centra horizontalmente */
   align-items: center; /* Centra verticalmente */
-  z-index: 2; /* Ajusta el índice Z según sea necesario para asegurarte de que esté por encima de todo */
+  z-index: 4; /* Ajusta el índice Z según sea necesario para asegurarte de que esté por encima de todo */
   top: 0;
   left: 0;
   visibility: hidden;

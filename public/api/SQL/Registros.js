@@ -46,36 +46,36 @@ async function InfoRegistros() {
     // Pedimos los Doctores Existentes
     const Doctores = `SELECT d.idDoctor, u.Nombres, u.RutaFoto  FROM Doctor d
       INNER JOIN Usuarios u ON d.idUsuario  = u.idUsuario `;
-    const [docs, a] = await connection.execute(Doctores);
+    const [docs] = await connection.execute(Doctores);
 
     //Pedimos el Sexo Disponible
     const Asociados = `SELECT a.idAsociado,u.Nombres, u.RutaFoto  FROM Asociado a 
       INNER JOIN Usuarios u ON a.idUsuario = u.idUsuario`;
-    const [Asoc, b] = await connection.execute(Asociados);
+    const [Asoc] = await connection.execute(Asociados);
 
     //Pedimos el Sexo Disponible
     const Sexo = `SELECT * FROM Sexo s`;
-    const [Sex, c] = await connection.execute(Sexo);
+    const [Sex] = await connection.execute(Sexo);
 
     //Pedimos las Sucursales Disponibles
     const Sucursales = `SELECT * FROM Sucursales s`;
-    const [suc, d] = await connection.execute(Sucursales);
+    const [suc] = await connection.execute(Sucursales);
 
     //Pedimos los procedimientos Dispobibles
     const Procedimiento = `SELECT idProcedimiento,Procedimiento FROM Procedimiento p`;
-    const [Proced, e] = await connection.execute(Procedimiento);
+    const [Proced] = await connection.execute(Procedimiento);
 
     //Pedimos los Estados de citas
     const EstadoC = `SELECT * FROM Estado_Citas ec `;
-    const [EstC, f] = await connection.execute(EstadoC);
+    const [EstC] = await connection.execute(EstadoC);
 
     //Pedimos los Status de los usuarios
     const StatusUsuario = ` SELECT * FROM Status s`;
-    const [Stat_U, g] = await connection.execute(StatusUsuario);
+    const [Stat_U] = await connection.execute(StatusUsuario);
 
     //Pedimos los Consultorios
     const Consultorios = ` SELECT * FROM Consultorio`;
-    const [Cons_U, h] = await connection.execute(Consultorios);
+    const [Cons_U] = await connection.execute(Consultorios);
 
     connection.end();
     const InfoparaRegistros = {

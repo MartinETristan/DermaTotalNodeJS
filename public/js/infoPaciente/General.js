@@ -1,7 +1,7 @@
 // ====================================================
 // Creamos la vista general
 // ====================================================
-async function cargarGeneral() {
+function cargarGeneral() {
   console.log(datosAlmacenados);
   const General = document.querySelector("#infocontenido");
   var htmlString = `
@@ -17,7 +17,7 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarSexo" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarSexo" style="display:none;">Confirmar</button>
             </header>
-            <p id="textSexo">${await datosAlmacenados.BasicInfo[0].Sexo}</p>
+            <p id="textSexo">${datosAlmacenados.BasicInfo[0].Sexo}</p>
             <select name="inputSexo" id="inputSexo" style="display:none;" >
             </select>
           </div>
@@ -30,8 +30,8 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarFechaDeNac" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarFechaDeNac" style="display:none;">Confirmar</button>
             </header>
-            <p id="textFechaDeNac">${await datosAlmacenados.BasicInfo[0]
-              .FechadeNac}</p>
+            <p id="textFechaDeNac">${datosAlmacenados.BasicInfo[0]
+              .FechadeNac || "--/--/----"}</p>
             <input type="date" name="inputFechaDeNac" id="inputFechaDeNac" style="display:none;"/>
           </div>
         </div>
@@ -47,10 +47,10 @@ async function cargarGeneral() {
               <button class="iconbtn--confirm" id="confirmarTel1" style="display:none;">Confirmar</button>
             </header>
             <a id="textTel1" href="#">${
-              (await datosAlmacenados.BasicInfo[0].Tel1) ||
+              (datosAlmacenados.BasicInfo[0].Tel1) ||
               "No hay telefono registrado"
             }</a>
-            <input type="tel" name="inputTel1" id="inputTel1" value="${await datosAlmacenados
+            <input type="tel" name="inputTel1" id="inputTel1" value="${datosAlmacenados
               .BasicInfo[0]
               .Tel1}" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
@@ -64,10 +64,10 @@ async function cargarGeneral() {
             <button class="iconbtn--confirm" id="confirmarTel2" style="display:none;">Confirmar</button>
             </header>
             <a id="textTel2" href="#">${
-              (await datosAlmacenados.BasicInfo[0].Tel2) ||
+              (datosAlmacenados.BasicInfo[0].Tel2) ||
               "No hay telefono secundario registrado"
             }</a>
-            <input type="tel" name="inputTel2" id="inputTel2" value="${await datosAlmacenados
+            <input type="tel" name="inputTel2" id="inputTel2" value="${datosAlmacenados
               .BasicInfo[0]
               .Tel2}" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
@@ -84,10 +84,10 @@ async function cargarGeneral() {
               <button class="iconbtn--confirm" id="confirmarCorreo" style="display:none;">Confirmar</button>
             </header>
             <a id="textCorreo" href="#">${
-              (await datosAlmacenados.BasicInfo[0].Correo) ||
+              (datosAlmacenados.BasicInfo[0].Correo) ||
               "No hay correo registrado"
             }</a>
-            <input type="text" name="inputCorreo" id="inputCorreo" value="${await datosAlmacenados
+            <input type="text" name="inputCorreo" id="inputCorreo" value="${datosAlmacenados
               .BasicInfo[0]
               .Correo}" style="display:none;" placeholder="ejemplo@correo.com" />
           </div>
@@ -106,9 +106,8 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarA_PP" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarA_PP" style="display:none;">Confirmar</button>
             </header>
-            <p id="textA_PP">${await datosAlmacenados.Antecedentes[0].A_PP}</p>
-            <input type="text" name="inputA_PP" id="inputA_PP" value="${await datosAlmacenados
-              .Antecedentes[0].A_PP}" style="display:none;"/>
+            <p id="textA_PP"></p>
+            <input type="text" name="inputA_PP" id="inputA_PP" style="display:none;"/>
           </div>
         </div>
         <div class="info__item">
@@ -119,9 +118,8 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarA_NP" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarA_NP" style="display:none;">Confirmar</button>
             </header>
-            <p id="textA_NP">${await datosAlmacenados.Antecedentes[0].A_NP}</p>
-            <input type="text" name="inputA_NP" id="inputA_NP" value="${await datosAlmacenados
-              .Antecedentes[0].A_NP}" style="display:none;" />
+            <p id="textA_NP"></p>
+            <input type="text" name="inputA_NP" id="inputA_NP" style="display:none;" />
           </div>
         </div>
         <div class="info__item">
@@ -132,19 +130,18 @@ async function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarA_HF" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarA_HF" style="display:none;">Confirmar</button>
             </header>
-            <p id="textA_HF">${await datosAlmacenados.Antecedentes[0].A_HF}</p>
-            <input type="text" name="inputA_HF" id="inputA_HF" value="${await datosAlmacenados
-              .Antecedentes[0].A_HF}" style="display:none;" />
+            <p id="textA_HF"></p>
+            <input type="text" name="inputA_HF" id="inputA_HF" style="display:none;" />
           </div>
         </div>
       </div>
     </div>
   </div>
   
-<div class="Diagnosticos">
-<h2>DIAGNOSTICOS:</h2>
-<div class="info__item"></div>
-</div>
+  <div class="Diagnosticos">
+  <h2>NOTAS DE SEGUIMIENTO:</h2>
+    <div class="region__content"></div>
+  </div>
 
   <section class="region" id="RA">
     <h2 id="Titulo_Receta">Ultima Receta:</h2>
@@ -152,7 +149,7 @@ async function cargarGeneral() {
       <div class="info__item">
         <div class="info__item__content">
           <header class="info__item__header">
-            <div id="Doctor">Cargando Doctor...</div>
+            <div id="Doctor">Cargando Receta...</div>
             <div class="Botones"> 
             <button class="iconbtn--cancel" id="CancelarEdit" style="display:none;">Cancelar</button>
             <button class="iconbtn--editar" id="EditarUltimaReceta">Editar</button>
@@ -198,214 +195,36 @@ async function cargarGeneral() {
     `;
 
   General.innerHTML = htmlString;
+
   // ========================================================================================================
-  // Peticion para llenar los selects
+  // Mapeo de valores por defecto de los valores por defecto del historial clinico
   // ========================================================================================================
-  $.ajax({
-    url: "/InfoRegistros",
-    type: "POST",
-    dataType: "json",
-    success: function (data) {
-      // Llenado para el Sexo
-      const Sexo = document.getElementById("inputSexo");
-      data.Sexo.forEach((element) => {
-        const ListaSex = new Option(element.Sexo, element.idSexo);
-        Sexo.appendChild(ListaSex);
-      });
-      //Llenado para el Status
-      const Status = document.getElementById("inputStatus");
-      if (Status) {
-        data.StatusUsuario.forEach((element) => {
-          const ListaStat = new Option(element.Status, element.idStatus);
-          Status.appendChild(ListaStat);
-        });
-      } else {
-        console.log("No hay status");
-      }
-    },
+  const HistorialClinico = {
+    "A_PP": datosAlmacenados.Antecedentes[0].A_PP,
+    "A_NP": datosAlmacenados.Antecedentes[0].A_NP,
+    "A_HF": datosAlmacenados.Antecedentes[0].A_HF,
+  };
+  // Nombre completo de los padecimientos
+  const H_ClinicFullName = {
+    "A_PP": "antecedentes personales/patologicos",
+    "A_NP": "antecedentes no patologicos",
+    "A_HF": "antecedentes heredo/familiares",
+  }
+  // Y para cada uno de ellos, llena los inputs, los placeholders y el texto mostrado
+  // cuando el valor es nulo 
+  Object.entries(HistorialClinico).forEach(([key, value]) => {
+    const text = document.getElementById(`text${key}`);
+    const input = document.getElementById(`input${key}`);
+    text.textContent = value == null ? `No hay ${H_ClinicFullName[key]} registrados.` : value;
+    input.placeholder = `Escribe aqui los ${H_ClinicFullName[key]} del paciente.`;
+    input.value = value == null ? "" : value;
   });
-  // ========================================================================================================
-  // Peticion para insertar ultima receta
-  // ========================================================================================================
-  // Petición AJAX para obtener los datos de la receta
-  $.ajax({
-    url: "/InfoPaciente",
-    method: "POST",
-    dataType: "json",
-    success: (data) => {
-      if (data.Recetas.length !== 0) {
-        mostrarReceta(data);
-      } else {
-        document.getElementById("Receta_actual").innerHTML;
-        const doctor = document.getElementById("Doctor");
-        doctor.style.display = "block";
-        doctor.textContent = "No hay recetas registradas.";
-        const botones = document.querySelector(".Botones");
-        botones.style.display = "none";
-      }
-    },
-    error: (error) => {
-      console.error(error);
-      // Se puede proporcionar retroalimentación al usuario aquí.
-    },
-  });
-
-  // Función para crear un elemento que representa un medicamento
-  function crearElementoMedicamento(item) {
-    const divMedicamentos = document.createElement("div");
-    divMedicamentos.classList.add("elemento-receta");
-    const dt = document.createElement("dt");
-    dt.innerHTML = `<b>${item.Medicamento}:</b>`;
-    const dd = document.createElement("dd");
-    dd.innerHTML = `<p>${item.Indicacion}</p><br>`;
-
-    divMedicamentos.appendChild(dt);
-    divMedicamentos.appendChild(dd);
-    return divMedicamentos;
-  }
-
-  // Función para crear un input para el medicamento o indicación
-  function crearInputMedicamento(item, tipo) {
-    const input = document.createElement("input");
-    input.type = "text";
-    input.name = `Edit${tipo}`;
-    input.placeholder = tipo;
-    input.required = true;
-    input.classList.add("input-receta", `${tipo.toLowerCase()}receta`); // Agregamos la clase 'input-receta'
-    input.value = item[tipo];
-    input.setAttribute("idMedicamento", item.idMedicamento);
-    input.setAttribute("idMedicamento_Receta", item.idMedicamento_Receta);
-    input.setAttribute("idReceta", item.idReceta);
-    input.setAttribute("Orden", item.Orden);
-    return input;
-  }
-
-  // Función para mostrar la receta en el DOM
-  function mostrarReceta(data) {
-    console.log(data.Recetas);
-    const Receta = document.getElementById("Receta_actual");
-    const TituloReceta = document.getElementById("Titulo_Receta");
-    const Print = document.getElementById("Print");
-    const Doctor = document.getElementById("Doctor");
-
-    // Mostrar el nombre del doctor y el botón de imprimir
-    Doctor.style.display = "block";
-    Print.style.display = "inline-block";
-
-    // Formatear y mostrar la fecha de la receta
-    const { dia, mes, año } = formatearFecha(data.Recetas[0].Fecha);
-    TituloReceta.innerHTML = `Ultima Receta <span>${dia}/${mes}/${año}</span>:`;
-    Doctor.innerHTML = `<p>Recetado por: <b><span>${data.Recetas[0].Doctor}</span></b></p>`;
-
-    const dl = document.createElement("dl");
-    const formEditReceta = document.createElement("form");
-    formEditReceta.style.display = "none";
-
-    // Filtrar y mostrar cada medicamento de la receta
-    const ultimareceta = data.Recetas[0].idReceta;
-    const datosFiltrados = data.Recetas.filter(
-      (item) => item.idReceta === ultimareceta
-    );
-
-    const ContenedorEditMedicamentos = document.createElement("div");
-    ContenedorEditMedicamentos.id = "ContenedorEditMedicamentos";
-    let contador = 0;
-    datosFiltrados.forEach((item) => {
-      contador = contador + 1;
-      const divMedicamentos = crearElementoMedicamento(item);
-      const divinputs = document.createElement("div");
-      divinputs.classList.add(contador);
-
-      const spanDrag = document.createElement("span");
-      spanDrag.ariaHidden = true;
-      spanDrag.textContent = "☰";
-      spanDrag.classList.add("drag");
-      const divSelector = document.createElement("div");
-      divSelector.classList.add("selector");
-      // Boton para eliminar el par de Medicamento e Indicación
-      const botonQuitar = document.createElement("button");
-      botonQuitar.type = "button";
-      botonQuitar.textContent = "Eliminar";
-      botonQuitar.classList.add("iconbtn--Eliminar");
-      botonQuitar.addEventListener("click", () => {
-        const divMedicamentos = botonQuitar.parentNode;
-        const divinputs = divMedicamentos.parentNode;
-        divinputs.parentNode.removeChild(divinputs);
-      });
-      dl.appendChild(divMedicamentos);
-      divSelector.appendChild(crearInputMedicamento(item, "Medicamento"));
-      divSelector.appendChild(botonQuitar);
-      divSelector.appendChild(crearInputMedicamento(item, "Indicacion"));
-      divinputs.appendChild(spanDrag);
-      divinputs.appendChild(divSelector);
-      ContenedorEditMedicamentos.appendChild(divinputs);
-    });
-    formEditReceta.appendChild(ContenedorEditMedicamentos);
-
-    const contenedornota = document.createElement("div");
-    contenedornota.classList.add("ContenedorNota");
-    const contenedorbotones = document.createElement("div");
-    contenedorbotones.classList.add("Botones");
-
-    const botonAñadirMedicamento = document.createElement("button");
-    botonAñadirMedicamento.type = "button";
-    botonAñadirMedicamento.textContent = "Añadir Medicamento";
-    botonAñadirMedicamento.classList.add("AñadirMedicamento");
-    botonAñadirMedicamento.addEventListener("click", () => {
-      agregarCampos(
-        "ContenedorEditMedicamentos",
-        "EditMedicamentos",
-        "EditIndicaciones"
-      );
-    });
-
-    const botonQuitarMedicamento = document.createElement("button");
-    botonQuitarMedicamento.type = "button";
-    botonQuitarMedicamento.textContent = "Quitar Medicamento";
-    botonQuitarMedicamento.classList.add("QuitarMedicamento");
-    botonQuitarMedicamento.addEventListener("click", () => {
-      eliminarUltimosCampos("ContenedorEditMedicamentos");
-    });
-
-    const Nota = document.createElement("div");
-    Nota.classList.add("Nota");
-    Nota.style.display = "block";
-    const NotaTitulo = document.createElement("h3");
-    NotaTitulo.innerHTML = "Nota:";
-    const NotaP = document.createElement("p");
-    NotaP.innerHTML = data.Recetas[0].Nota;
-    Nota.appendChild(NotaTitulo);
-    Nota.appendChild(NotaP);
-
-    const inputNota = document.createElement("input");
-    inputNota.type = "text";
-    inputNota.name = "EditNota";
-    inputNota.placeholder = "Contenido de la Nota";
-    inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
-    inputNota.value = data.Recetas[0].Nota || "";
-
-    const tituloNota = document.createElement("h3");
-    tituloNota.innerHTML = "Nota:";
-    formEditReceta.appendChild(tituloNota);
-
-    contenedorbotones.appendChild(botonQuitarMedicamento);
-    contenedorbotones.appendChild(botonAñadirMedicamento);
-    contenedornota.appendChild(inputNota);
-    contenedornota.appendChild(contenedorbotones);
-    formEditReceta.appendChild(contenedornota);
-
-    Receta.appendChild(dl);
-    Receta.appendChild(Nota);
-    Receta.appendChild(formEditReceta);
-
-    DragNDrop();
-  }
+  
 
   // ========================================================================================================
   // Mapa de botones para editar datos
   // ========================================================================================================
   const editarBotones = {
-    editarAlergias: "Alergias",
     editarA_HF: "A_HF",
     editarA_NP: "A_NP",
     editarA_PP: "A_PP",
@@ -414,7 +233,7 @@ async function cargarGeneral() {
     editarTel1: "Tel1",
     editarTel2: "Tel2",
     editarCorreo: "Correo",
-    editarStatus: "Status",
+    // editarStatus: "Status",
     // ... (otros botones)
   };
 
@@ -425,9 +244,7 @@ async function cargarGeneral() {
   // ========================================================================================================
   // Mapeo de botones para confirmar los cambios
   // ========================================================================================================
-
   const confirmarBotones = {
-    confirmarAlergias: ["Alergias", " ", 1],
     confirmarA_HF: ["A_HF", " ", 1],
     confirmarA_NP: ["A_NP", " ", 1],
     confirmarA_PP: ["A_PP", " ", 1],
@@ -436,7 +253,7 @@ async function cargarGeneral() {
     confirmarTel1: ["Tel1", "Telefono", 2],
     confirmarTel2: ["Tel2", "TelefonoSecundario", 2],
     confirmarCorreo: ["Correo", "Correo", 2],
-    confirmarStatus: ["Status", "idStatus", 3],
+    // confirmarStatus: ["Status", "idStatus", 3],
     // ... (otros botones)
   };
 
@@ -446,6 +263,16 @@ async function cargarGeneral() {
       confirmarEdicion(dato, otroParam, tercerParam)
     );
   });
+
+  // Le damos Formato a la fecha de nacimiento
+  if(datosAlmacenados.BasicInfo[0].FechadeNac){
+    const Nacimiento = formatearFecha(datosAlmacenados.BasicInfo[0].FechadeNac);
+    const valorNacimiento =
+      Nacimiento.añofull + "-" + Nacimiento.dia2d + "-" + Nacimiento.mes2d;
+  
+    // Asignamos el valor por defecto a la fecha de nacimiento
+    document.getElementById("inputFechaDeNac").value = valorNacimiento.toString();
+  }
 
   agregarEventListener("botonNuevaReceta", function () {
     // Acciones a realizar cuando se haga clic en el botón
@@ -547,7 +374,7 @@ async function cargarGeneral() {
     botonPrint.style.display = "none";
     botonNuevaReceta.style.display = "none";
 
-    // Ocultamos todos los elementos generados con 'crearElementoMedicamento'
+    // Ocultamos todos los elementos generados con 'crearElemento_DiagnosticoMedicamento'
     const elementosReceta = document.querySelectorAll(".elemento-receta");
     elementosReceta.forEach((elemento) => {
       elemento.style.display = "none";
@@ -575,7 +402,7 @@ async function cargarGeneral() {
     botonPrint.style.display = "flex";
     botonNuevaReceta.style.display = "block";
     formEditReceta.style.display = "none";
-    // Mostramos todos los elementos generados con 'crearElementoMedicamento'
+    // Mostramos todos los elementos generados con 'crearElemento_DiagnosticoMedicamento'
     const elementosReceta = document.querySelectorAll(".elemento-receta");
     elementosReceta.forEach((elemento) => {
       elemento.style.display = "block";
@@ -589,7 +416,6 @@ async function cargarGeneral() {
       form.reportValidity();
       return;
     }
-    alert("Vamos a guardar cambios");
 
     console.log("Array de inputs:");
     const inputData = getCombinedInputData();
@@ -677,7 +503,6 @@ async function cargarGeneral() {
     // imprimir.onafterprint = () => {
     //   imprimir.close();
     // };
-
   });
 
   // Array para almacenar los valores de Medicamentos e Indicaciones
@@ -771,118 +596,186 @@ async function cargarGeneral() {
   } else {
     correo.removeAttribute("href");
   }
+
+  // ========================================================================================================
+  // Diagnosticos
+  // ========================================================================================================
+  const Diagnosticos = document.querySelector(".Diagnosticos");
+  if (!Diagnosticos) return;
+  const contenidoDiag = Diagnosticos.querySelector(".region__content");
+  if (!contenidoDiag) return;
+
+  const crearInfoGroup = crearElemento_Diagnostico("infogroup");
+  const crearInfo = crearElemento_Diagnostico("info");
+
+  const numDiagnosticos = datosAlmacenados.Diagnosticos.length;
+
+  if (numDiagnosticos >= 1) {
+    console.log("hay 2 o más diagnosticos");
+    const item1b = crearInfoItem_Diagnostico(datosAlmacenados.Diagnosticos);
+    const item2b = crearInfoItem_Diagnostico("Input");
+    crearInfo.appendChild(item1b);
+    crearInfo.appendChild(item2b);
+  } else {
+    const item0 = crearInfoItem_Diagnostico("Input");
+    crearInfo.appendChild(item0);
+  }
+
+  crearInfoGroup.appendChild(crearInfo);
+  contenidoDiag.appendChild(crearInfoGroup);
+
+  llenarSelect(InfoSelects);
+  procesarInfoPaciente(datosAlmacenados);
 }
 
-// ========================================================================================================
-// Funciones para realizar cambios en los datos
-// ========================================================================================================
-function editarDato(NombredelCampo) {
-  const botoneditar = document.getElementById(`editar${NombredelCampo}`);
-  const botoncancelar = document.getElementById(`cancelar${NombredelCampo}`);
-  const input = document.getElementById(`input${NombredelCampo}`);
-  const texto = document.getElementById(`text${NombredelCampo}`);
-  const confirmar = document.getElementById(`confirmar${NombredelCampo}`);
+// Función para crear un elemento que representa un medicamento
+function crearElemento_DiagnosticoMedicamento(item) {
+  const divMedicamentos = document.createElement("div");
+  divMedicamentos.classList.add("elemento-receta");
+  const dt = document.createElement("dt");
+  dt.innerHTML = `<b>${item.Medicamento}:</b>`;
+  const dd = document.createElement("dd");
+  dd.innerHTML = `<p>${item.Indicacion}</p><br>`;
 
-  botoneditar.style.display = "none";
-  input.style.display = "flex";
-  input.style.width = "95%";
-  botoncancelar.style.display = "inline-block";
-  confirmar.style.display = "inline-block";
-  texto.style.display = "none";
+  divMedicamentos.appendChild(dt);
+  divMedicamentos.appendChild(dd);
+  return divMedicamentos;
+}
 
-  if (NombredelCampo == "Tel1" || NombredelCampo == "Tel2") {
-    input.addEventListener("input", function (e) {
-      let value = e.target.value.replace(/\D/g, ""); // Eliminar todos los caracteres no numéricos
+// Función para crear un input para el medicamento o indicación
+function crearInputMedicamento(item, tipo) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = `Edit${tipo}`;
+  input.placeholder = tipo;
+  input.required = true;
+  input.classList.add("input-receta", `${tipo.toLowerCase()}receta`); // Agregamos la clase 'input-receta'
+  input.value = item[tipo];
+  input.setAttribute("idMedicamento", item.idMedicamento);
+  input.setAttribute("idMedicamento_Receta", item.idMedicamento_Receta);
+  input.setAttribute("idReceta", item.idReceta);
+  input.setAttribute("Orden", item.Orden);
+  return input;
+}
 
-      // Formatear número
-      if (value.length <= 3) {
-        value = value;
-      } else if (value.length <= 6) {
-        value = "(" + value.substring(0, 3) + ") " + value.substring(3);
-      } else {
-        value =
-          "(" +
-          value.substring(0, 3) +
-          ") " +
-          value.substring(3, 6) +
-          " " +
-          value.substring(6, 10);
-      }
+// Función para mostrar la receta en el DOM
+function mostrarReceta(data) {
+  const Receta = document.getElementById("Receta_actual");
+  const TituloReceta = document.getElementById("Titulo_Receta");
+  const Print = document.getElementById("Print");
+  const Doctor = document.getElementById("Doctor");
 
-      e.target.value = value;
+  // Mostrar el nombre del doctor y el botón de imprimir
+  Doctor.style.display = "block";
+  Print.style.display = "inline-block";
+
+  // Formatear y mostrar la fecha de la receta
+  const { dia, mes, año } = formatearFecha(data.Recetas[0].Fecha);
+  TituloReceta.innerHTML = `Ultima Receta <span>${dia}/${mes}/${año}</span>:`;
+  Doctor.innerHTML = `<p>Recetado por: <b><span>${data.Recetas[0].Doctor}</span></b></p>`;
+
+  const dl = document.createElement("dl");
+  const formEditReceta = document.createElement("form");
+  formEditReceta.style.display = "none";
+
+  // Filtrar y mostrar cada medicamento de la receta
+  const ultimareceta = data.Recetas[0].idReceta;
+  const datosFiltrados = data.Recetas.filter(
+    (item) => item.idReceta === ultimareceta
+  );
+
+  const ContenedorEditMedicamentos = document.createElement("div");
+  ContenedorEditMedicamentos.id = "ContenedorEditMedicamentos";
+  let contador = 0;
+  datosFiltrados.forEach((item) => {
+    contador = contador + 1;
+    const divMedicamentos = crearElemento_DiagnosticoMedicamento(item);
+    const divinputs = document.createElement("div");
+    divinputs.classList.add(contador);
+
+    const spanDrag = document.createElement("span");
+    spanDrag.ariaHidden = true;
+    spanDrag.textContent = "☰";
+    spanDrag.classList.add("drag");
+    const divSelector = document.createElement("div");
+    divSelector.classList.add("selector");
+    // Boton para eliminar el par de Medicamento e Indicación
+    const botonQuitar = document.createElement("button");
+    botonQuitar.type = "button";
+    botonQuitar.textContent = "Eliminar";
+    botonQuitar.classList.add("iconbtn--Eliminar");
+    botonQuitar.addEventListener("click", () => {
+      const divMedicamentos = botonQuitar.parentNode;
+      const divinputs = divMedicamentos.parentNode;
+      divinputs.parentNode.removeChild(divinputs);
     });
-  }
-
-  botoncancelar.addEventListener("click", function () {
-    cancelarEdicion(NombredelCampo);
+    dl.appendChild(divMedicamentos);
+    divSelector.appendChild(crearInputMedicamento(item, "Medicamento"));
+    divSelector.appendChild(botonQuitar);
+    divSelector.appendChild(crearInputMedicamento(item, "Indicacion"));
+    divinputs.appendChild(spanDrag);
+    divinputs.appendChild(divSelector);
+    ContenedorEditMedicamentos.appendChild(divinputs);
   });
-}
+  formEditReceta.appendChild(ContenedorEditMedicamentos);
 
-function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
-  const input = document.getElementById(`input${NombredelCampo}`);
-  const valor = input.value;
-  // Mandamos el cambio al sistema dependiendo del tipo de cambio que se realice
-  switch (Clase) {
-    // En caso de cambios en los antecedentes
-    case 1:
-      fetch("/ActualizarAntecedentesPaciente", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Propiedad: NombredelCampo, Valor: valor }),
-      });
-      break;
-    // En caso de cambios en los datos generales
-    case 2:
-      fetch("/ActualizarInfoPersonal", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Propiedad: NombreEnSistema,
-          Valor: valor,
-          TipoUser: 7,
-        }),
-      });
-      break;
-    // En caso de cambios en los datos de DermaTotal (Status)
-    case 3:
-      fetch("/ActualizarStatus", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Propiedad: NombreEnSistema,
-          Valor: valor,
-          TipoUser: 7,
-        }),
-      });
-      break;
-    default:
-      break;
-  }
+  const contenedornota = document.createElement("div");
+  contenedornota.classList.add("ContenedorNota");
+  const contenedorbotones = document.createElement("div");
+  contenedorbotones.classList.add("Botones");
 
-  // Mostramos la vista de antes para salir del modo de edicion
-  document.getElementById(`editar${NombredelCampo}`).style.display =
-    "inline-block";
-  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`input${NombredelCampo}`).style.display = "none";
-  document.getElementById(`text${NombredelCampo}`).textContent = valor;
-  document.getElementById(`text${NombredelCampo}`).style.display = "block";
-}
+  const botonAñadirMedicamento = document.createElement("button");
+  botonAñadirMedicamento.type = "button";
+  botonAñadirMedicamento.textContent = "Añadir Medicamento";
+  botonAñadirMedicamento.classList.add("AñadirMedicamento");
+  botonAñadirMedicamento.addEventListener("click", () => {
+    agregarCampos(
+      "ContenedorEditMedicamentos",
+      "EditMedicamentos",
+      "EditIndicaciones"
+    );
+  });
 
-function cancelarEdicion(NombredelCampo) {
-  // Restablecer la interfaz
-  document.getElementById(`editar${NombredelCampo}`).style.display =
-    "inline-block";
-  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`input${NombredelCampo}`).style.display = "none";
-  document.getElementById(`text${NombredelCampo}`).style.display = "block";
+  const botonQuitarMedicamento = document.createElement("button");
+  botonQuitarMedicamento.type = "button";
+  botonQuitarMedicamento.textContent = "Quitar Medicamento";
+  botonQuitarMedicamento.classList.add("QuitarMedicamento");
+  botonQuitarMedicamento.addEventListener("click", () => {
+    eliminarUltimosCampos("ContenedorEditMedicamentos");
+  });
+
+  const Nota = document.createElement("div");
+  Nota.classList.add("Nota");
+  Nota.style.display = "block";
+  const NotaTitulo = document.createElement("h3");
+  NotaTitulo.innerHTML = "Nota:";
+  const NotaP = document.createElement("p");
+  NotaP.innerHTML = data.Recetas[0].Nota;
+  Nota.appendChild(NotaTitulo);
+  Nota.appendChild(NotaP);
+
+  const inputNota = document.createElement("input");
+  inputNota.type = "text";
+  inputNota.name = "EditNota";
+  inputNota.placeholder = "Contenido de la Nota";
+  inputNota.classList.add("input-receta", "inputNota"); // Agregamos la clase 'input-receta'
+  inputNota.value = data.Recetas[0].Nota || "";
+
+  const tituloNota = document.createElement("h3");
+  tituloNota.innerHTML = "Nota:";
+  formEditReceta.appendChild(tituloNota);
+
+  contenedorbotones.appendChild(botonQuitarMedicamento);
+  contenedorbotones.appendChild(botonAñadirMedicamento);
+  contenedornota.appendChild(inputNota);
+  contenedornota.appendChild(contenedorbotones);
+  formEditReceta.appendChild(contenedornota);
+
+  Receta.appendChild(dl);
+  Receta.appendChild(Nota);
+  Receta.appendChild(formEditReceta);
+
+  DragNDrop();
 }
 
 // DRAG AND DROP LISTA DE MEDICAMENTOS
@@ -891,5 +784,30 @@ function DragNDrop() {
   Sortable.create(zonaDragNDrop, {
     handle: ".drag",
     animation: 350,
+  });
+}
+
+// ========================================================================================================
+// Funciones para crear llenar con las peticiones ajax los campos de la pagina
+// ========================================================================================================
+function procesarInfoPaciente(data) {
+  if (data.Recetas.length !== 0) {
+    mostrarReceta(data);
+  } else {
+    document.getElementById("Receta_actual").innerHTML = "";
+    const doctor = document.getElementById("Doctor");
+    doctor.style.display = "block";
+    doctor.textContent = "No hay recetas registradas.";
+    const botones = document.querySelector(".Botones");
+    botones.style.display = "none";
+  }
+}
+
+function llenarSelect(data) {
+  // Llenado para el Sexo
+  const Sexo = document.getElementById("inputSexo");
+  data.Sexo.forEach((element) => {
+    const ListaSex = new Option(element.Sexo, element.idSexo);
+    Sexo.appendChild(ListaSex);
   });
 }

@@ -207,6 +207,7 @@ function MedicamentosReceta() {
       divs.forEach((div) => {
         contenedorInfoReceta.appendChild(div);
       });
+
       if (
         divs[divs.length - 1].className === "Nota" &&
         contenedorInfoReceta.querySelector(".NotaPaciente")
@@ -246,7 +247,7 @@ function MedicamentosReceta() {
       ultimoDivReceta.style.pageBreakAfter = "auto";
       ultimoInfoReceta.setAttribute(
         "style",
-        `justify-content: flex-start; gap: 10px;`
+        `justify-content: flex-start;`
       );
     }
   }
@@ -329,6 +330,6 @@ function MedicamentosReceta() {
 // Y ejecutamos la funcion principal que nos generará la receta
 obtenerDatos();
 
-$(document).on("click",function () {
+$(document).on("click", function () {
   window.print();
 });

@@ -10,18 +10,19 @@
 
 }
 
-.contfotousuario{
+.contfotousuario {
     z-index: 0;
-    position:relative;
+    position: relative;
     display: flex;
     justify-content: center;
     overflow: hidden;
     width: 200px;
-    height:200px;
+    height: 200px;
     border-radius: 10px;
     margin-bottom: 10px;
     align-items: center;
 }
+
 .fotousuario {
     top: 0;
     left: 0;
@@ -29,6 +30,7 @@
     height: 100%;
     width: auto;
 }
+
 .fotohistorial {
     height: 22.5%;
     width: 22.5%;
@@ -43,7 +45,7 @@ a {
 }
 
 h1 {
-    padding: 0!important;
+    padding: 0 !important;
 }
 
 .text--sm {
@@ -99,27 +101,31 @@ h1 {
     width: 100%;
     height: 100%;
 }
-.iconbtn--confirm{
+
+.iconbtn--confirm {
     border: none;
     border-radius: 5px;
     padding: 2px 10px;
     background-color: #ecf5f6;
     color: #249DD9;
 }
-.iconbtn--confirm:hover{
+
+.iconbtn--confirm:hover {
     cursor: pointer;
 }
 
-.iconbtn--passrestart{
+.iconbtn--passrestart {
     border: none;
     /* border-radius: 5px; */
     background-color: #fff;
     padding: 2px 10px;
     color: red;
 }
-.iconbtn--passrestart:hover{
+
+.iconbtn--passrestart:hover {
     cursor: pointer;
 }
+
 .iconbtn::before,
 .app__nav__link::before,
 .iconbtn--edit::before {
@@ -139,7 +145,7 @@ h1 {
     content: "✎";
 }
 
-.iconbtn--save{
+.iconbtn--save {
     font-size: 15px;
     background-color: green;
     color: #fff;
@@ -148,7 +154,7 @@ h1 {
     border: green;
 }
 
-.iconbtn--print{
+.iconbtn--print {
     font-size: 15px;
     background-color: #249DD9;
     color: #fff;
@@ -156,11 +162,12 @@ h1 {
     border-radius: 5px;
     border: #249DD9;
 }
-.iconbtn--print::before{
+
+.iconbtn--print::before {
     content: "    🖨️     ";
 }
 
-.iconbtn--editar{
+.iconbtn--editar {
     justify-content: center;
     align-items: center;
     padding: 10px;
@@ -170,15 +177,56 @@ h1 {
     border-radius: 5px;
     border: none;
 }
+.botonEditarAlergias{
+justify-content: center;
+align-items: center;
+padding: 3px 8px 3px 8px;
+background-color: orange;
+color: white;
+font-size: 15px;
+border-radius: 5px;
+border: none;
+}
 
-.iconbtn--cancel{
+
+.botonCancelarAlergias{
+    font-size: 15px;
+    background-color: red;
+    color: #fff;
+    padding: 3px 8px 3px 8px;
+    border-radius: 5px;
+    border: red;
+}
+
+.botonGuardarAlergias{
+    font-size: 15px;
+    background-color: rgb(29, 196, 29);
+    color: #fff;
+    padding: 3px 8px 3px 8px;
+    border-radius: 5px;
+    border: rgb(46, 198, 35);
+}
+
+#inputAlergias {
+    border: 0.5px solid #004368;
+    border-radius: 2px;
+    padding: 5px 10px;
+}
+
+#inputAlergias::placeholder {
+    color: #004368;
+    opacity: 0.75; /* Firefox */
+}
+
+.iconbtn--cancel {
     justify-content: center;
     align-items: center;
     background-color: #00000000;
     border: #00000000;
     color: red;
 }
-.iconbtn--Eliminar{
+
+.iconbtn--Eliminar {
     background-color: rgb(229, 16, 16);
     padding: 8px;
     margin-left: 10px;
@@ -261,14 +309,15 @@ h1 {
     margin-top: 25px;
     display: flex;
     width: 100%;
-    max-width: 1250px;
+    max-width: 1450px;
     overflow: hidden;
-    background: #e9f2f7;
+    /* background: #e9f2f7; */
+    background: #abdbff34;
 }
 
 @media (min-width: 768px) {
     .app {
-        border-radius:5px;
+        border-radius: 5px;
         box-shadow: 0 30px 50px -10px rgba(0, 0, 0, 0.15);
     }
 }
@@ -323,7 +372,7 @@ h1 {
 .app__nav__link:hover,
 .app__nav__link.is-active {
     border-left-color: #00acfe;
-    background: #e9f2f7;
+    background: #718d9c;
     color: #000;
 }
 
@@ -331,6 +380,7 @@ h1 {
     flex: 1;
     padding: 0 5px;
     overflow-y: visible;
+
 }
 
 @media (min-width: 768px) {
@@ -415,7 +465,7 @@ h1 {
 
 .infogroup {
     flex: 1;
-    margin: 0 5px 10px;
+    margin: 0 0px 10px;
 }
 
 .info,
@@ -458,7 +508,21 @@ h1 {
     justify-content: space-between;
     align-items: center;
     align-content: center;
-    font-size: 11px;
+}
+
+
+.info__item__textarea {
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    font-size: 16px;
+    resize: vertical;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 95%;
+    min-height: 50px;
+    max-height: 190px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
 }
 
 .info__item__title {
@@ -514,7 +578,9 @@ h1 {
 
 
 
-#botonNuevaReceta,#agregarCampo,.AñadirMedicamento{
+#botonNuevaReceta,
+#agregarCampo,
+.AñadirMedicamento {
     font-size: 15px;
     background-color: #73c235;
     color: #fff;
@@ -522,13 +588,15 @@ h1 {
     border-radius: 5px;
     border: #73c235;
 }
-#cancelarReceta{
+
+#cancelarReceta {
     color: red;
     border: 0;
     background-color: #fff;
 }
 
-#quitarCampo,.QuitarMedicamento{
+#quitarCampo,
+.QuitarMedicamento {
     font-size: 15px;
     background-color: #ff0000;
     color: #fff;
@@ -537,7 +605,7 @@ h1 {
     border: #ff0000;
 }
 
-#GuardarReceta{
+#GuardarReceta {
     font-size: 20px;
     margin: 20px 0px 20px 0px;
     background-color: #249DD9;
@@ -547,13 +615,14 @@ h1 {
     border: #249DD9;
 }
 
-#camposMedicamentos{
+#camposMedicamentos {
     display: flex;
     flex-direction: column;
     align-items: left;
     justify-content: center;
 }
-.medicamentoreceta{
+
+.medicamentoreceta {
     font-weight: bold;
     font-size: 25px;
     padding: 10px;
@@ -562,7 +631,7 @@ h1 {
     height: auto;
 }
 
-.indicacionreceta{
+.indicacionreceta {
     font-size: 15px;
     padding: 5px;
     margin-bottom: 50px;
@@ -570,18 +639,18 @@ h1 {
     height: auto;
 }
 
-.Nota{
+.Nota {
     width: 65%;
     display: flex;
 }
 
-.input-receta.inputNota{
+.input-receta.inputNota {
     width: 50%;
 
 }
 
 
-.RecetaNota{
+.RecetaNota {
     color: rgb(255, 145, 0);
     display: flex;
     padding: 10px;
@@ -590,7 +659,8 @@ h1 {
     align-items: center;
 }
 
-.RecetaNota>h3, .RecetaNota>p{
+.RecetaNota>h3,
+.RecetaNota>p {
     margin: 0;
 }
 
@@ -603,11 +673,16 @@ h1 {
 }
 
 
-a[href^="tel:"],a[href^="mailto:"] {
-    color: #007BFF;         /* Color azul (puedes cambiarlo) */
-    text-decoration: none; /* Quitar subrayado */
-    cursor: pointer;       /* Cambiar el cursor a mano al pasar sobre el enlace */
-    transition: color 0.3s ease; /* Transición suave al cambiar el color */
+a[href^="tel:"],
+a[href^="mailto:"] {
+    color: #007BFF;
+    /* Color azul (puedes cambiarlo) */
+    text-decoration: none;
+    /* Quitar subrayado */
+    cursor: pointer;
+    /* Cambiar el cursor a mano al pasar sobre el enlace */
+    transition: color 0.3s ease;
+    /* Transición suave al cambiar el color */
 }
 
 a[href^="tel:"]:hover,
@@ -615,18 +690,20 @@ a[href^="tel:"]:active,
 a[href^="tel:"]:focus,
 a[href^="mailto:"]:hover,
 a[href^="mailto:"]:active,
-a[href^="mailto:"]:focus{
-    color: #0056b3;  /* Color azul oscuro al pasar el mouse por encima o hacer clic */
+a[href^="mailto:"]:focus {
+    color: #0056b3;
+    /* Color azul oscuro al pasar el mouse por encima o hacer clic */
 }
 
-.infogroup.ficha>.info{
-    display:flex;
+.infogroup.ficha>.info,
+.Diagnosticos>.region__content>.infogroup>.info {
+    display: flex;
     justify-content: stretch;
     width: 100%;
     margin-top: 0;
 }
 
-.infogroup.ficha{
+.infogroup.ficha {
     display: flex;
     flex-direction: column;
     margin-right: 20%;
@@ -634,34 +711,45 @@ a[href^="mailto:"]:focus{
 }
 
 
-.infogroup.ficha>.info>*{
+.infogroup.ficha>.info>*,
+.Diagnosticos>.region__content>.infogroup>.info>* {
     flex: 1;
     margin: 2px;
 }
 
-.Alerg{
+.contenedorAlergias {
     margin-top: 10px;
+    gap: 10px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.Alerg {
+    margin: 0;
     color: red;
 }
-.Eda{
+
+.Eda {
     margin-bottom: 0;
 }
 
-dt{
+dt {
     font-size: 24px;
     margin-left: 10px;
 }
 
-dt::before{
+dt::before {
     font-size: 18px;
     content: "■ ";
 }
-dd{
+
+dd {
     font-size: 18px;
 }
 
 
-.page__controls>.infogroup{
+.page__controls>.infogroup {
     display: none;
     width: 300px;
     position: absolute;
@@ -675,42 +763,81 @@ dd{
 }
 
 
-.info__item__content>input, .info__item__content>select{
+.info__item__content>input,
+.info__item__content>select {
     padding: 5px;
 }
-.Diagnosticos>div{
+
+
+/* AREA DE DIAGNOSTICOS */
+.Diagnosticos>h2 {
+    padding-top: 5px;
     color: white;
-    padding: 40px;
+    padding-bottom: 0;
+    margin-left: 10px;
+    font-size: 28px;
 }
-.Diagnosticos{
+
+.Diagnosticos>*>*>*>*>*>*>.info__item__title {
+    color: #004368;
+    /* color: red; */
+    font-size: 24px;
+}
+
+.Diagnosticos .info__item {
+    height: 320px;
+}
+
+.Diagnosticos .info__item__content {
+    font-size: 18px;
+}
+
+.Diagnosticos {
     border-radius: 5px;
-    /* background-color: #d9e3ed; */
-    color: white;
-    /* background-color: #44abffca; */
     background: linear-gradient(-180deg, #5dc9ffc4, #1485c24c);
     margin-top: 20px;
     padding: 10px;
 }
-.Diagnosticos h2{
-    padding-top: 5px;
+
+.Diagnosticos .region__content {
+    margin-top: 5px;
 }
+
+.Contenedor__Diagnosticos {
+    padding-right: 15px;
+    height: 200px;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.Contenedor__Diagnosticos.PrimerDiagnostico {
+    padding-right: 15px;
+    height: 270px;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+
 
 /* Estilo base para todos los divs */
 div[id^="receta_"] {
-    margin-bottom: 20px; /* Por defecto todos los divs tendrán margin-bottom */
+    margin-bottom: 20px;
+    /* Por defecto todos los divs tendrán margin-bottom */
 }
 
-.DoctorReceta,#Doctor{
+.DoctorReceta,
+#Doctor {
     display: block;
     font-size: 18px;
 }
 
-.DoctorReceta>b>span,#Doctor>p>b>span{
+.DoctorReceta>b>span,
+#Doctor>p>b>span {
     color: #249DD9;
-    
+
 }
 
-.FechaReceta{
+.FechaReceta {
     font-weight: bold;
     font-size: 24px;
     color: #004368;
@@ -718,29 +845,33 @@ div[id^="receta_"] {
 
 
 /* Contenedor que se mostrará de manera diferente al accionar los botones */
-#Cont_Opciones{
+#Cont_Opciones {
     width: 100%;
     height: 100%;
     background: #00000049;
-    position: fixed; /* Cambiado de absolute a fixed para que siga el scroll de la página */
+    position: fixed;
+    /* Cambiado de absolute a fixed para que siga el scroll de la página */
     display: flex;
-    justify-content: center; /* Centra horizontalmente */
-    align-items: center; /* Centra verticalmente */
-    z-index: 2; /* Ajusta el índice Z según sea necesario para asegurarte de que esté por encima de todo */
+    justify-content: center;
+    /* Centra horizontalmente */
+    align-items: center;
+    /* Centra verticalmente */
+    z-index: 4;
+    /* Ajusta el índice Z según sea necesario para asegurarte de que esté por encima de todo */
     top: 0;
     left: 0;
     visibility: hidden;
     opacity: 0;
     transition: .2s;
-  }
-  
-form > h3{
+}
+
+form>h3 {
     margin: 0;
     margin-bottom: 5px;
     margin-left: 25px;
 }
 
-.ContenedorNota{
+.ContenedorNota {
 
     display: flex;
     justify-content: space-between;
@@ -750,78 +881,89 @@ form > h3{
 }
 
 /* Otros estilos si es necesario */
-#Opciones{
+#Opciones {
     width: 50%;
     padding: 20px;
-    background: #fff;
+    background: #f3f8ff;
     border: 2px solid #249dd98b;
     border-radius: 10px;
-  }
-  
-  #TituloOpciones{
+}
+
+#Opciones>p {
+    text-align: center;
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#TituloOpciones {
     padding: 0;
-  }
-  
-  .TituloCheckout{
+    text-align: center;
+}
+
+.TituloCheckout {
     padding-bottom: 0px;
-  }
-  .PrecioProcedimiento{
+}
+
+.PrecioProcedimiento {
     margin-top: 0px;
-  }
-  
-  .BotonesOpciones{
+}
+
+.BotonesOpciones {
     display: flex;
     justify-content: right;
     margin-top: 20px;
     gap: 10px;
-  }
-  
-.Botones{
+}
+
+.Botones {
     display: flex;
     gap: 10px;
 }
 
 
-  #valorCheckout{
+#valorCheckout {
     padding: 10px;
     border: 2px solid #00792e8b;
     border-radius: 5px;
     color: green;
     font-size: 50px;
     width: 97%;
-  }
+}
 
-.Receta_actual{
+.Receta_actual {
     margin-bottom: 20px;
 }
 
-.elemento-receta{
+.elemento-receta {
     margin-top: 20px;
 }
 
-#ContenedorEditMedicamentos > div{
+#ContenedorEditMedicamentos>div {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
 }
-#ContenedorEditMedicamentos .New{
+
+#ContenedorEditMedicamentos .New {
     display: flex;
     flex-direction: column;
     /* background-color: red; */
     margin-left: 45px;
     justify-content: space-between;
-    align-items:baseline;
+    align-items: baseline;
     gap: 10px;
 }
 
 
 
-.selector{
+
+.selector {
     width: 100%;
 }
 
-.drag{
+.drag {
     margin-left: 10px;
     cursor: move;
     font-size: 30px;
@@ -829,6 +971,64 @@ form > h3{
 }
 
 
+.InfoOpciones>.infogroup {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+}
+.InfoOpciones>.infogroup>button {
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+    border: 0;
+    border-radius: 5px;
+    background-color: red;
+}
+
+/* Estilos de la paginacion: */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+    padding: 0;
+}
+
+.pagination li {
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px;
+    background-color: #f5fcfe;
+    border: 1px solid #e2e8f6;
+}
+
+.pagination li:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.pagination li:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+.pagination li a {
+    text-decoration: none;
+    color: #249DD9;
+}
+
+.page-item.active,
+.page-item.active>* {
+    z-index: 1;
+    color: #fff;
+    background-color: #249DD9;
+    border-color: #249DD9;
+}
 
 .footer {
     display: flex;

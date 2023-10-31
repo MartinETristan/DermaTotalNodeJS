@@ -1,88 +1,280 @@
 // Declarar una variable global para almacenar los datos
 let datosAlmacenados = null;
 var NombreUsuario = null;
+let InfoSelects = null;
 
 // ========================================================================================================
 // Función para realizar la consulta AJAX y almacenar los datos
 // ========================================================================================================
 
-function obtenerDatos() {
-  return new Promise((resolve, reject) => {
-    if (datosAlmacenados) {
-      // Si los datos ya están almacenados, resuelve con esos datos
-      resolve(datosAlmacenados);
-    } else {
-      $.ajax({
+async function obtenerDatos() {
+  if (datosAlmacenados) {
+    // Si los datos ya están almacenados, simplemente retornamos esos datos
+    return datosAlmacenados;
+  }
+
+  try {
+    // Crear función para la petición de InfoPaciente
+    const fetchInfoPaciente = () => {
+      return $.ajax({
         url: "/InfoPaciente",
         method: "POST",
         dataType: "json",
-        success: (data) => {
-          // Guardamos los datos para eviar hacer la consulta AJAX nuevamente
-          datosAlmacenados = data;
-          NombreUsuario = data.DatosDT[0].Usuario;
-          // Llenamos los campos de la vista con los datos obtenidos
-          //Nombre
-          const Nombre = document.querySelector(".Nombre");
-          Nombre.textContent = data.BasicInfo[0].Nombres;
-          //Apellido
-          const Apellido = document.querySelector(".Apellido");
-          Apellido.textContent = data.BasicInfo[0].Apellidos;
-          // Edad
-          const Edad = document.querySelector(".Edad");
-          Edad.textContent = data.BasicInfo[0].Edad;
-
-          //Y alergias
-          const Alergias = document.querySelector(".Alergias");
-          Alergias.textContent = data.Antecedentes[0].Alergias.toUpperCase();
-          if (data.Antecedentes[0].Alergias === "No hay Alergias") {
-            // Alergias.textContent = "Ninguna";
-            const Alerg = document.querySelector(".Alerg");
-            Alerg.setAttribute("style", "color: #004368;");
-            Alerg.textContent = capitalizeFirstLetters(data.Antecedentes[0].Alergias);
-
-          }
-
-          // Foto de perfil
-          const Avatar = document.querySelector(".fotousuario");
-          const ruta = data.BasicInfo[0].RutaFoto;
-          let rutarelativa = ""; // Declarar la variable fuera del bloque if
-
-          if (ruta) {
-            const relativa = "/public";
-            // Encuentra la posición del texto deseado
-            const posicion = ruta.indexOf(relativa);
-
-            if (posicion !== -1) {
-              // Usa substring() para obtener los caracteres después de "Ejemplo:"
-              rutarelativa = ruta.substring(posicion + relativa.length);
-            } else {
-              console.log("Texto deseado no encontrado");
-            }
-          }
-          const nuevaURL = rutarelativa || "/img/UserIco.webp";
-
-          // En caso de error (imagen no encontrada), utiliza la imagen por defecto
-          Avatar.onerror = function () {
-            Avatar.src = "/img/UserIco.webp";
-          };
-          Avatar.src = nuevaURL;
-          resolve(data);
-        },
-        error: function (error) {
-          console.error(error);
-        },
       });
+    };
+
+    // Crear función para la petición de InfoRegistros
+    const fetchInfoRegistros = () => {
+      return $.ajax({
+        url: "/InfoRegistros",
+        type: "POST",
+        dataType: "json",
+      });
+    };
+
+    // Ejecutar ambas peticiones de manera paralela
+    const [dataPaciente, dataRegistros] = await Promise.all([
+      fetchInfoPaciente(),
+      fetchInfoRegistros(),
+    ]);
+
+    // Almacenar datos en variables globales
+    datosAlmacenados = dataPaciente;
+    InfoSelects = dataRegistros;
+
+    // Crear el Header con los datos obtenidos
+    HeaderInfoPaciente(dataPaciente);
+
+    return datosAlmacenados;
+  } catch (error) {
+    console.error(error);
+    throw error; // Lanza el error para que pueda ser manejado por quien llame a la función
+  }
+}
+
+function HeaderInfoPaciente(data) {
+  NombreUsuario = data.DatosDT[0].Usuario;
+  // Llenamos los campos de la vista con los datos obtenidos
+  //Nombre
+  const Nombre = document.querySelector(".Nombre");
+  Nombre.textContent = data.BasicInfo[0].Nombres;
+  //Apellido
+  const Apellido = document.querySelector(".Apellido");
+  Apellido.textContent = data.BasicInfo[0].Apellidos;
+  // Edad
+  const Edad = document.querySelector(".Edad");
+  Edad.textContent = data.BasicInfo[0].Edad;
+
+  //Y alergias
+  const Alergias = document.querySelector(".Alergias");
+  if (
+    data.Antecedentes[0].Alergias == "No hay Alergias" ||
+    data.Antecedentes[0].Alergias == null
+  ) {
+    // Alergias.textContent = "Ninguna";
+    const Alerg = document.querySelector(".Alerg");
+    Alerg.setAttribute("style", "color: #004368;");
+    Alerg.textContent = "No hay Alergias";
+  } else {
+    Alergias.textContent = data.Antecedentes[0].Alergias.toUpperCase();
+  }
+  const contenedorAlergias = document.querySelector(".contenedorAlergias");
+  // Creamos el boton para editar las alergias
+  const botonEditAlerg = document.createElement("button");
+  botonEditAlerg.type = "button";
+  botonEditAlerg.textContent = "Editar";
+  botonEditAlerg.classList.add("botonEditarAlergias");
+  botonEditAlerg.id = "editarAlergias";
+  // Y seleccionamos el Input para editar las alergias
+  const InputAlergias = document.getElementById("inputAlergias");
+  InputAlergias.value =
+    data.Antecedentes[0].Alergias != "No hay Alergias"
+      ? data.Antecedentes[0].Alergias
+      : "";
+  const Alerg = document.querySelector(".Alerg");
+  // Añadimos el boton al contenedor
+  contenedorAlergias.appendChild(botonEditAlerg);
+
+  // Agregamos el evento para editar las alergias
+  agregarEventListener("editarAlergias", function () {
+    editarDato("Alergias");
+  });
+  //Creamos el boton de cancelar
+  const botonCancelarAlerg = document.createElement("button");
+  botonCancelarAlerg.type = "button";
+  botonCancelarAlerg.textContent = "Cancelar";
+  botonCancelarAlerg.classList.add("botonCancelarAlergias");
+  botonCancelarAlerg.style.display = "none";
+  botonCancelarAlerg.id = "cancelarAlergias";
+  contenedorAlergias.appendChild(botonCancelarAlerg);
+
+  //Creamos el boton de guardado
+  const botonGuardarAlerg = document.createElement("button");
+  botonGuardarAlerg.type = "button";
+  botonGuardarAlerg.textContent = "Guardar";
+  botonGuardarAlerg.classList.add("botonGuardarAlergias");
+  botonGuardarAlerg.style.display = "none";
+  botonGuardarAlerg.id = "confirmarAlergias";
+  // Añadimos el boton al contenedor`
+  contenedorAlergias.appendChild(botonGuardarAlerg);
+
+  // Agregamos el evento para guardar las alergias
+  agregarEventListener("confirmarAlergias", function () {
+    confirmarEdicion("Alergias", " ", 1);
+  });
+
+  // Foto de perfil
+  const Avatar = document.querySelector(".fotousuario");
+  const ruta = data.BasicInfo[0].RutaFoto;
+  let rutarelativa = ""; // Declarar la variable fuera del bloque if
+
+  if (ruta) {
+    const relativa = "/public";
+    // Encuentra la posición del texto deseado
+    const posicion = ruta.indexOf(relativa);
+
+    if (posicion !== -1) {
+      // Usa substring() para obtener los caracteres después de "Ejemplo:"
+      rutarelativa = ruta.substring(posicion + relativa.length);
+    } else {
+      console.log("Texto deseado no encontrado");
     }
+  }
+  const nuevaURL = rutarelativa || "/img/UserIco.webp";
+
+  // En caso de error (imagen no encontrada), utiliza la imagen por defecto
+  Avatar.onerror = function () {
+    Avatar.src = "/img/UserIco.webp";
+  };
+  Avatar.src = nuevaURL;
+
+  // ========================================================================================================
+  // Escuchar el boton para reinciiar la constraseña
+  // ========================================================================================================
+  agregarEventListener("InfoDTPaciente", function () {
+    // Mostrar el contenedor de las opciones
+    const contenedor = document.getElementById("Cont_Opciones");
+    contenedor.style.visibility = "visible";
+    contenedor.style.opacity = "1";
+    // Vaciar el contenido anterior en el contenedor "InfoOpciones"
+    var InfoOpciones = document.querySelector(".InfoOpciones");
+    InfoOpciones.innerHTML = "";
+    const TituloOpciones = document.getElementById("TituloOpciones");
+    TituloOpciones.textContent = "Datos DermaTotal:";
+    const MensajeOpciones = document.getElementById("MensajeOpciones");
+    MensajeOpciones.textContent =
+      "Esta es informacion y opciones del paciente en DermaTotal";
+    InfoOpciones.innerHTML = `  
+      <div class="infogroup">
+         <div class="info">
+           <div class="info__item">
+             <div class="info__item__content">
+               <header class="info__item__header">
+                 <h3 class="info__item__title">Status:</h3>
+                 <button class="iconbtn--edit" id="editarStatus"></button>
+                 <button class="iconbtn--cancelar" id="cancelarStatus" style="display:none;"></button>
+                 <button class="iconbtn--confirm" id="confirmarStatus" style="display:none;">Confirmar</button>
+               </header>
+               <p id="textStatus">${
+                 data.DatosDT[0].Status || "Cargando Status..."
+               }</p>
+               <select name="inputStatus" id="inputStatus" style="display:none;" >
+               </select>
+             </div>
+           </div>
+         </div>
+         <div class="info">
+           <div class="info__item">
+             <div class="info__item__content">
+               <header class="info__item__header">
+                 <h3 class="info__item__title">Usuario:</h3>
+                 <button class="iconbtn--passrestart" id="PassRestart">Reinciar Contraseña</button>
+                 </header>
+                 <p>${data.DatosDT[0].Usuario || "Usuario no disponible"}</p>
+             </div>
+           </div>
+         </div>
+         <div class="info">
+           <div class="info__widget"></div>
+         </div>
+         <div class="info">
+           <div class="info__item">
+             <div class="info__item__content">
+               <header class="info__item__header">
+                 <h3 class="info__item__title">Alta Por:</h3>
+               </header>
+               <div class="avatar">
+                 <div class="avatar__icon">
+                   <img src="/img/UserIco.webp" alt="Nicholas Cage" />
+                 </div>
+                 <p>
+                 ${
+                   data.DatosDT[0].AltaPor || "Usuario no disponible"
+                 } <span class="avatar__role"> 
+                 ${
+                   data.DatosDT[0].TipoUsuarioAlta ||
+                   "Tipo de usuario no disponible"
+                 }</span>
+                 </p>
+               </div>
+             </div>
+           </div>
+           <div class="info__item">
+             <div class="info__item__content">
+               <header class="info__item__header">
+                 <h3 class="info__item__title">El dia:</h3>
+               </header>
+               <p>${
+                 data.DatosDT[0].FechaAlta || "Cargando fecha de alta..."
+               }</p>
+             </div>
+           </div>
+         </div>
+         <button id="CerrarOpciones">Cerrar</button>
+       </div>`;
+
+    agregarEventListener("editarStatus", function () {
+      editarDato("Status");
+    });
+
+    agregarEventListener("confirmarStatus", function () {
+      confirmarEdicion("Status", "idStatus", 3);
+    });
+
+    agregarEventListener("CerrarOpciones", function () {
+      contenedor.style.visibility = "hidden";
+      contenedor.style.opacity = "0";
+    });
+
+    // Llenado para el Status
+    const Status = document.getElementById("inputStatus");
+    if (Status) {
+      InfoSelects.StatusUsuario.forEach((element) => {
+        const ListaStat = new Option(element.Status, element.idStatus);
+        Status.appendChild(ListaStat);
+      });
+    } else {
+      console.log("No hay status");
+    }
+
+    // ========================================================================================================
+    // Escuchar el boton para reinciiar la constraseña
+    // ========================================================================================================
+    agregarEventListener("PassRestart", function () {
+      // Acciones a realizar cuando se haga clic en el botón
+      reiniciarContraseña();
+    });
   });
 }
 
-
 function capitalizeFirstLetters(str) {
-  return str.split(' ').map(word => {
+  return str
+    .split(" ")
+    .map((word) => {
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }).join(' ');
+    })
+    .join(" ");
 }
-
 
 //========================================================================================================
 // Funciones para la generacion de la vista General.ejs
@@ -145,12 +337,21 @@ function generate_region_content(infogroups) {
 // Funcion para dar formato a la fecha
 function formatearFecha(fechaOriginal) {
   const fecha = new Date(fechaOriginal);
+
+  // Formatea el día y el mes con 2 dígitos
+  const dia2d = ("0" + fecha.getDate()).slice(-2);
+  const mes2d = ("0" + (fecha.getMonth() + 1)).slice(-2);
+
   return {
     dia: fecha.getDate(),
+    dia2d: dia2d,
     mes: fecha.getMonth() + 1,
+    mes2d: mes2d,
     año: fecha.getFullYear() % 100,
+    añofull: fecha.getFullYear(),
   };
 }
+
 
 // Funcion para reinciar la contraseña:
 function reiniciarContraseña() {
@@ -172,11 +373,6 @@ function reiniciarContraseña() {
     window.alert("La contraseña de " + NombreUsuario + " cambió con exito.");
   }
 }
-
-agregarEventListener("PassRestart", function () {
-  // Acciones a realizar cuando se haga clic en el botón
-  reiniciarContraseña();
-});
 
 function getCombinedInputData() {
   const medicamentoInputs = document.querySelectorAll(
@@ -224,11 +420,14 @@ function itemsAreEqual(item1, item2) {
   );
 }
 
+// ========================================================================================================
+// Funcion para compara el Array original con el Array dado por los cambios
+// ========================================================================================================
 function compareData(original, form) {
   let changes = [];
   let hasNotaChange = false;
 
-  let contador = 1; 
+  let contador = 1;
   form.forEach((item) => {
     const originalItem = original.find(
       (o) =>
@@ -236,7 +435,6 @@ function compareData(original, form) {
         o.idMedicamento_Receta === item.idMedicamento_Receta &&
         o.idReceta === item.idReceta
     );
-
 
     if (!originalItem) {
       if (item.Medicamento === "" && item.Indicacion === "") {
@@ -251,12 +449,12 @@ function compareData(original, form) {
       hasNotaChange = true;
     }
 
-    if (item.Orden != contador && contador <= original.length){
+    if (item.Orden != contador && contador <= original.length) {
       let cambios = [];
       cambios.push(item);
-      cambios.push({NuevoOrden: contador});
+      cambios.push({ NuevoOrden: contador });
 
-      changes.push({action:"Reordendar",cambios});
+      changes.push({ action: "Reordendar", cambios });
     }
     contador++;
   });
@@ -281,20 +479,61 @@ function compareData(original, form) {
       item: { idReceta: notaChangeItem.idReceta, Nota: notaChangeItem.Nota },
     });
   }
-  console.log(changes);
-  // Si hay cambios, pasamos el array de cambios
-  if (changes.length > 0) {
-    fetch("/CambiosReceta", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        Cambios: changes,
-      }),
+
+  // Funcion para resetear la interfaz
+  function resetUI() {
+    const formEditReceta = document.querySelector("#Receta_actual form");
+    const botones = document.querySelector(".Botones");
+    const botoncancelar = document.getElementById("CancelarEdit");
+    const botonEditar = document.getElementById("EditarUltimaReceta");
+    const botonGuardar = document.getElementById("GuardarCambios");
+    const botonPrint = document.getElementById("Print");
+    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
+    const Nota = document.querySelector(".Nota");
+
+    if (Nota) {
+      Nota.style.display = "block";
+    }
+
+    botones.style.display = "flex";
+    botoncancelar.style.display = "none";
+    botonEditar.style.display = "flex";
+    botonGuardar.style.display = "none";
+    botonPrint.style.display = "flex";
+    botonNuevaReceta.style.display = "block";
+    formEditReceta.style.display = "none";
+
+    // Mostramos todos los elementos generados con 'crearElementoMedicamento'
+    const elementosReceta = document.querySelectorAll(".elemento-receta");
+    elementosReceta.forEach((elemento) => {
+      elemento.style.display = "block";
     });
-    location.reload();
+  }
+
+  // Si hay cambios, pasamos el array de cambios
+  // console.log(changes);
+  if (changes.length > 0) {
+    let respuesta = confirm(
+      "¿Estas seguro de guardar los cambios? Estos cambios pueden alterar el orden, medicamentos o indicaciones para el paciente."
+    );
+
+    if (respuesta) {
+      fetch("/CambiosReceta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Cambios: changes,
+        }),
+      });
+      location.reload();
+    } else {
+      resetUI();
+      return null;
+    }
   } else {
+    resetUI();
     return null;
   }
 }
@@ -336,16 +575,145 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
 
 function eliminarUltimosCampos(zona) {
   const contenedorEditMedicamentos = document.getElementById(`${zona}`);
-  
+
   // Seleccionar el último div dentro del contenedor
   const ultimoDiv = contenedorEditMedicamentos.lastElementChild;
-  
+
   // Verificar que el último elemento es realmente un div antes de eliminarlo
-  if (ultimoDiv && ultimoDiv.tagName === 'DIV') {
+  if (ultimoDiv && ultimoDiv.tagName === "DIV") {
     contenedorEditMedicamentos.removeChild(ultimoDiv);
   }
+}
 
-  
+// ========================================================================================================
+// Funcion para crear conteido de Diagnosticos
+// ========================================================================================================
+
+function crearElemento_Diagnostico(clase) {
+  const elemento = document.createElement("div");
+  elemento.classList.add(clase);
+  return elemento;
+}
+
+function crearElementoHeader_Diagnostico(Fecha, Etiquetas = []) {
+  const elemento = document.createElement("header");
+  elemento.classList.add("info__item__header");
+
+  const titulo = document.createElement("h3");
+  titulo.classList.add("info__item__title");
+  titulo.textContent = Fecha;
+  elemento.appendChild(titulo);
+
+  if (Etiquetas.length > 0) {
+    const etiquetasDiv = document.createElement("div");
+    etiquetasDiv.classList.add("info__item__tags");
+    Etiquetas.forEach((etiqueta) => {
+      const span = document.createElement("span");
+      span.classList.add("info__item__tag");
+      span.textContent = etiqueta;
+      etiquetasDiv.appendChild(span);
+    });
+    elemento.appendChild(etiquetasDiv);
+  }
+
+  return elemento;
+}
+
+function crearInfoItem_Diagnostico(contenido) {
+  const item = crearElemento_Diagnostico("info__item");
+  const itemContent = crearElemento_Diagnostico("info__item__content");
+
+  //Creamos el elemento de paginación
+  const paginacion = document.createElement("div");
+  paginacion.classList.add("paginacion");
+  itemContent.appendChild(paginacion);
+
+  //Eliminamos el ultimo por que ya se muestra en otra vista
+  if (Array.isArray(contenido)) {
+    // Suponiendo que mostrarás un ítem por página
+    const itemsPorPagina = 1;
+
+    const totalPaginas = contenido.length;
+
+    // Función para mostrar el contenido de la página actual
+    function mostrarContenido(paginaActual) {
+      // Limpiar el contenido anterior
+      itemContent.innerHTML = "";
+      const fecha = formatearFecha(contenido[paginaActual - 1].Fecha);
+      const elemento = contenido[paginaActual - 1];
+      const header = crearElementoHeader_Diagnostico(
+        "SEGUIMIENTO " + fecha.dia + "/" + fecha.mes + "/" + fecha.año + ":"
+      );
+      itemContent.appendChild(header);
+      const contenedor = document.createElement("div");
+      contenedor.classList.add("Contenedor__Diagnosticos");
+      const p = document.createElement("p");
+      p.textContent = elemento.Diagnostico;
+      contenedor.appendChild(p);
+      itemContent.appendChild(contenedor);
+
+      // Si la paginación ya está inicializada, simplemente la añadimos de nuevo al final de itemContent.
+      if (paginacion) {
+        itemContent.appendChild(paginacion);
+      }
+    }
+
+    // Iniciar mostrando la primera página
+    mostrarContenido(1);
+
+    // Crear contenedor de paginación si aún no existe
+    if (!paginacion) {
+      paginacion = document.createElement("div");
+    }
+
+    // Añadirlo al final de itemContent
+    itemContent.appendChild(paginacion);
+
+    // Inicializar twbsPagination
+    $(paginacion).twbsPagination({
+      totalPages: totalPaginas,
+      visiblePages: 5,
+      first: "Mas Reciente",
+      next: ">",
+      prev: "<",
+      last: "Mas Antigua",
+      onPageClick: function (event, page) {
+        mostrarContenido(page);
+      },
+    });
+  } else if (typeof contenido === "string") {
+    const header = crearElementoHeader_Diagnostico("SEGUIMINETO HOY:");
+
+    itemContent.appendChild(header);
+
+    const input = document.createElement("textarea");
+    input.classList.add("info__item__textarea");
+    input.placeholder = "Escribe el seguimiento aquí...";
+    input.required = true;
+    input.addEventListener("input", function () {
+      // Restablecer la altura para calcular correctamente el scrollHeight
+      this.style.height = "auto";
+      // Establecer la altura en función del contenido, pero no superará la max-height definida en CSS
+      this.style.height = this.scrollHeight + "px";
+    });
+    itemContent.appendChild(input);
+
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.textContent = "Guardar";
+    boton.style.marginLeft = "78%";
+    boton.classList.add("iconbtn--save");
+    boton.addEventListener("click", () => {
+      const diagnostico = input.value;
+      if (diagnostico) {
+        console.log(diagnostico);
+      }
+    });
+    itemContent.appendChild(boton);
+  }
+
+  item.appendChild(itemContent);
+  return item;
 }
 
 // ========================================================================================================
@@ -358,6 +726,164 @@ function agregarEventListener(id, accion) {
   } else {
     console.log(`No se cargó correctamente el botón ${id}`);
   }
+}
+
+// ========================================================================================================
+// Funcion para confirmar los cambios en las vistas
+// ========================================================================================================
+
+function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
+  const input = document.getElementById(`input${NombredelCampo}`);
+  let valor = input.value == "" ? null : input.value;
+
+
+  // Mandamos el cambio al sistema dependiendo del tipo de cambio que se realice
+  const fetchConfig = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      Propiedad: Clase === 1 ? NombredelCampo : NombreEnSistema,
+      Valor: valor,
+      TipoUser: Clase === 2 || Clase === 3 ? 7 : undefined,
+    }),
+  };
+
+  const endPoints = {
+    1: "/ActualizarAntecedentesPaciente",
+    2: "/ActualizarInfoPersonal",
+    3: "/ActualizarStatus",
+  };
+
+  if (endPoints[Clase]) {
+    fetch(endPoints[Clase], fetchConfig);
+  }
+
+  // Mostramos la vista de antes para salir del modo de edicion
+  document.getElementById(`editar${NombredelCampo}`).style.display =
+    "inline-block";
+  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`input${NombredelCampo}`).style.display = "none";
+  // Almacenamos el texto en una variable
+  const textElement = document.getElementById(`text${NombredelCampo}`);
+
+  // Y hacemos cambios para casos especificos
+  switch (NombredelCampo) {
+    case "Sexo":
+      textElement.textContent = {
+        1: "Hombre",
+        2: "Mujer"
+      }[valor] || "Valor no reconocido";
+      break;
+  
+    case "Alergias":
+      if (!valor) {
+        const Alerg = document.querySelector(".Alerg");
+        Alerg.style.color = "#004368";
+        Alerg.textContent = "No hay Alergias";
+      } else {
+        textElement.textContent = `ALERGIAS: ${valor.toUpperCase()}`;
+        textElement.style.color = "red";
+      }
+      break;
+  
+    case "Status":
+      const statusMap = {
+        "1": "Activo",
+        "2": "Inactivo",
+        "3": "Suspendido",
+        "4": "Baja"
+      };
+      textElement.textContent = statusMap[valor] || "No es un status válido";
+      break;
+
+    case "FechaDeNac":
+      // console.log("fecha");
+      const fechaReordenada = reordenarFecha(valor);
+      textElement.textContent = fechaReordenada;
+    break;
+    default:
+      textElement.textContent = valor;
+      break;
+  }
+  textElement.style.display = "block";
+}
+
+
+function reordenarFecha(fechaOriginal) {
+  if (fechaOriginal != null){
+    const partes = fechaOriginal.split('-');
+  
+    if (partes.length !== 3) {
+      throw new Error("Formato de fecha no válido");
+    }
+  
+    const año = partes[0];
+    const mes = partes[1];
+    const dia = partes[2];
+  
+    return `${dia}-${mes}-${año}`;
+  }else{
+    return "--/--/----";
+  }
+}
+
+
+function cancelarEdicion(NombredelCampo) {
+  // Restablecer la interfaz
+  document.getElementById(`editar${NombredelCampo}`).style.display =
+    "inline-block";
+  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`input${NombredelCampo}`).style.display = "none";
+  document.getElementById(`text${NombredelCampo}`).style.display = "block";
+}
+
+// ========================================================================================================
+// Funciones para realizar cambios en los datos
+// ========================================================================================================
+function editarDato(NombredelCampo) {
+  const botoneditar = document.getElementById(`editar${NombredelCampo}`);
+  const botoncancelar = document.getElementById(`cancelar${NombredelCampo}`);
+  const input = document.getElementById(`input${NombredelCampo}`);
+  const texto = document.getElementById(`text${NombredelCampo}`);
+  const confirmar = document.getElementById(`confirmar${NombredelCampo}`);
+
+  botoneditar.style.display = "none";
+  input.style.display = "flex";
+  input.style.width = "95%";
+  botoncancelar.style.display = "inline-block";
+  confirmar.style.display = "inline-block";
+  texto.style.display = "none";
+
+  if (NombredelCampo == "Tel1" || NombredelCampo == "Tel2") {
+    input.addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, ""); // Eliminar todos los caracteres no numéricos
+
+      // Formatear número
+      if (value.length <= 3) {
+        value = value;
+      } else if (value.length <= 6) {
+        value = "(" + value.substring(0, 3) + ") " + value.substring(3);
+      } else {
+        value =
+          "(" +
+          value.substring(0, 3) +
+          ") " +
+          value.substring(3, 6) +
+          " " +
+          value.substring(6, 10);
+      }
+
+      e.target.value = value;
+    });
+  }
+
+  botoncancelar.addEventListener("click", function () {
+    cancelarEdicion(NombredelCampo);
+  });
 }
 
 //Carga de contenido AJAX con los botones de la vista una vez que se cargue el doctumento

@@ -11,6 +11,7 @@
     <link rel="icon" href="/img/favicon.ico" />
     <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
     <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
@@ -72,15 +73,16 @@
              <input type="text" name="ApellidoP" id="ApellidoP" placeholder="Apellido Paterno" style="display: none;">
              <input type="text" name="ApellidoM" id="ApellidoM" placeholder="Apellido Materno" style="display: none;">
              <h3 class="Eda">Edad: <span class="Edad">Cargando edad...</span> años</h3>
-             <h3 class="Alerg">ALERGIAS: <span class="Alergias">No hay alergias</span></h3>
-             <input type="text" name="Alergias" id="Alergias" placeholder="Alergias (Opcional)" style="display: none;">
+             <div class="contenedorAlergias">
+               <h3 class="Alerg" id="textAlergias">ALERGIAS: <span class="Alergias">No hay alergias</span></h3>
+               <input type="text" name="Alergias" id="inputAlergias" placeholder="Alergias (Opcional)" style="display: none;">
+             </div>
             </div>
             <br>
           </div>
           <ul class="page__controls">
-            <!-- <li><button class="TerminarConsulta">Terminar Consulta</button></li> -->
-            <li><button class="page__controlbtn--split">Informacion</button></li>
-              
+            <li id="TerminarConsulta" style="display: none;"><button class="TerminarConsulta">Terminar Consulta</button></li>
+            <li><button class="page__controlbtn--split" id="InfoDTPaciente">Información</button></li>
           </ul>
         </header>
     

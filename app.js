@@ -581,7 +581,7 @@ app.post("/UltimaReceta", async function (peticion, respuesta) {
 
 app.post("/CambiosReceta", async function (peticion, respuesta) {
   if (peticion.session.idusuario) {
-    console.log(peticion.body);
+    // console.log(peticion.body);
     peticion.body.Cambios.forEach((cambio) => {
       switch (cambio.action) {
         case "Añadir":

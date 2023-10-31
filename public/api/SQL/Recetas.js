@@ -229,7 +229,6 @@ async function UpdateReceta_EditNota(Elemento) {
 async function UpdateReceta_Orden(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
-    console.log(Elemento);
     const Actualizar_Orden = `
     UPDATE Medicamento_Receta
     SET Orden= ?
