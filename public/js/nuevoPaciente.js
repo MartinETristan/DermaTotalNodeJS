@@ -9,6 +9,8 @@ const InputFile = document.getElementById("SubirFoto");
 const img = document.getElementById("img");
 const validImageFormats = ["image/jpeg", "image/png"];
 
+InputFile.setAttribute("accept", validImageFormats.join(",")); // Acepta solo los formatos de imagen válidos
+
 let selectedImage = null; // Almacenar la imagen seleccionada
 
 // Codigo para mostrar la imagen seleccionada en el input file

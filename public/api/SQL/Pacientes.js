@@ -3,7 +3,7 @@ import { mysql, bcrypt, db } from "../conf_api.js";
 //==================================================================================================
 // Funcion para obtener la informacion de los pacientes
 //==================================================================================================
-async function InfoPaciente(idPaciente) {
+export async function InfoPaciente(idPaciente) {
   // Llenamos los datos con valores por defecto
   let BasicInfo = [];
   let Antecedentes = [];
@@ -225,7 +225,7 @@ async function InfoPaciente(idPaciente) {
   return InfoPaciente;
 }
 
-async function NuevoPaciente(
+export async function NuevoPaciente(
   Nombres,
   ApellidoP,
   ApellidoM,
@@ -310,8 +310,3 @@ async function NuevoPaciente(
     return "Ha ocurrido un error.";
   }
 }
-
-export { 
-  InfoPaciente, 
-  NuevoPaciente 
-};

@@ -1,6 +1,6 @@
 import { mysql, db } from "../conf_api.js";
 
-async function CitasDoctor(idDoctor) {
+export async function CitasDoctor(idDoctor) {
   try {
     const connection = await mysql.createConnection(db);
     const CalendarioCitas = `SELECT c.idCitas,c.idPaciente,c.idStatusPaciente, u.Nombres, p.Procedimiento ,c.HoraCita ,c.FinCita FROM Citas c 
@@ -22,7 +22,7 @@ async function CitasDoctor(idDoctor) {
   }
 }
 
-async function ModificacionCita(idCita, HoraIncio, FinCita) {
+export async function ModificacionCita(idCita, HoraIncio, FinCita) {
   try {
     const connection = await mysql.createConnection(db);
     const CambioCita = `UPDATE Citas SET HoraCita = ?, FinCita = ? WHERE idCitas = ?;
@@ -35,7 +35,4 @@ async function ModificacionCita(idCita, HoraIncio, FinCita) {
   }
 }
 
-export { 
-  CitasDoctor, 
-  ModificacionCita 
-};
+

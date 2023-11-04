@@ -130,91 +130,94 @@ function PacientesPedidos(datos) {
   console.log(datos);
   
   const PacientesPedidosDiv = document.querySelector(".Pedidos");
-  PacientesPedidosDiv.innerHTML = "";
-  if (datos.length != 0) {
-  datos.forEach((Paciente) => {
-    const ElementoPaciente = document.createElement("div");
-    ElementoPaciente.classList.add("Paciente", "Asignar");
-    ElementoPaciente.id = Paciente.idPaciente;
+  if(PacientesPedidosDiv){
 
-    const InfoPedido = document.createElement("div");
-    InfoPedido.classList.add("InfoPedido");
-
-    const rutaRelativaPaciente = Paciente.RutaFotoP
-      ? getPacientePath(Paciente.RutaFotoP, "/public")
-      : "/img/UserIco.webp";
-
-    const rutaRelativaDoctor = Paciente.RutaFotoD
-      ? getPacientePath(Paciente.RutaFotoD, "/public")
-      : "/img/UserIco.webp";
-
-    // Sección de información del paciente
-    const PacientePedido = document.createElement("div");
-    PacientePedido.classList.add("PacientePedido");
-    PacientePedido.appendChild(
-      createHeader(
-        rutaRelativaPaciente,
-        Paciente.NombreP,
-        Paciente.ApellidoP
-      )
-    );
-    createInfoSection(
-      [{ TituloInfo: "Cita", SourceInfo: Paciente.HoraCita }],
-      PacientePedido
-    );
-    InfoPedido.appendChild(PacientePedido);
-
-    // Sección de información del doctor
-    const DrPedido = document.createElement("div");
-    DrPedido.classList.add("DrPedido");
-    DrPedido.appendChild(
-      createHeader(rutaRelativaDoctor, Paciente.NombreD, Paciente.ApellidoD)
-    );
-    createInfoSection(
-      [{ TituloInfo: "Consultorio", SourceInfo: Paciente.Cosultorio }],
-      DrPedido
-    );
-    InfoPedido.appendChild(DrPedido);
-
-    // Botones de acción
-    const ContenedorBotones = document.createElement("div");
-    ContenedorBotones.classList.add("BotonesDeAccion");
-    const Boton = document.createElement("button");
-    Boton.classList.add("BotonPedir");
-    Boton.textContent = "Asignar";
-    Boton.addEventListener("click", function (event) {
-      console.log("Informacion del Paciente Clickado:");
-      console.log(Paciente);
-      DatosPaciente = {
-        Protocolo: "Asignar",
-        idStatusPaciente: 2,
-        idSucursal: Paciente.idSucursal,
-        idPaciente: Paciente.idPaciente,
-        idProcedimiento: Paciente.idProcedimiento,
-        idDoctor: Paciente.idDoctor,
-        idCita: Paciente.idCitas,
-        idConsultorio: Paciente.idConsultorio,
-        NombreD: Paciente.NombreD,
-        NombreP: Paciente.NombreP,
-        ApellidoP: Paciente.ApellidoP,
-        ApellidoD: Paciente.ApellidoD,
-        HoraCita: Paciente.HoraCita,
-        Consultorio: Paciente.Cosultorio,
-        RutaFotoP: rutaRelativaPaciente,
-        RutaFotoD: rutaRelativaDoctor,
-        Procedimiento: Paciente.Procedimiento,
-      };
-      Accion_Paciente(DatosPaciente);
-      event.stopPropagation();
-    });
-    ContenedorBotones.appendChild(Boton);
-    ElementoPaciente.appendChild(InfoPedido);
-    ElementoPaciente.appendChild(ContenedorBotones);
-    PacientesPedidosDiv.appendChild(ElementoPaciente);
-  });} else {
-    const NoCitas = document.createElement("h2");
-    NoCitas.textContent = "No hay pacientes pedidos.";
-    PacientesPedidosDiv.appendChild(NoCitas);
+    PacientesPedidosDiv.innerHTML = "";
+    if (datos.length != 0) {
+    datos.forEach((Paciente) => {
+      const ElementoPaciente = document.createElement("div");
+      ElementoPaciente.classList.add("Paciente", "Asignar");
+      ElementoPaciente.id = Paciente.idPaciente;
+  
+      const InfoPedido = document.createElement("div");
+      InfoPedido.classList.add("InfoPedido");
+  
+      const rutaRelativaPaciente = Paciente.RutaFotoP
+        ? getPacientePath(Paciente.RutaFotoP, "/public")
+        : "/img/UserIco.webp";
+  
+      const rutaRelativaDoctor = Paciente.RutaFotoD
+        ? getPacientePath(Paciente.RutaFotoD, "/public")
+        : "/img/UserIco.webp";
+  
+      // Sección de información del paciente
+      const PacientePedido = document.createElement("div");
+      PacientePedido.classList.add("PacientePedido");
+      PacientePedido.appendChild(
+        createHeader(
+          rutaRelativaPaciente,
+          Paciente.NombreP,
+          Paciente.ApellidoP
+        )
+      );
+      createInfoSection(
+        [{ TituloInfo: "Cita", SourceInfo: Paciente.HoraCita }],
+        PacientePedido
+      );
+      InfoPedido.appendChild(PacientePedido);
+  
+      // Sección de información del doctor
+      const DrPedido = document.createElement("div");
+      DrPedido.classList.add("DrPedido");
+      DrPedido.appendChild(
+        createHeader(rutaRelativaDoctor, Paciente.NombreD, Paciente.ApellidoD)
+      );
+      createInfoSection(
+        [{ TituloInfo: "Consultorio", SourceInfo: Paciente.Cosultorio }],
+        DrPedido
+      );
+      InfoPedido.appendChild(DrPedido);
+  
+      // Botones de acción
+      const ContenedorBotones = document.createElement("div");
+      ContenedorBotones.classList.add("BotonesDeAccion");
+      const Boton = document.createElement("button");
+      Boton.classList.add("BotonPedir");
+      Boton.textContent = "Asignar";
+      Boton.addEventListener("click", function (event) {
+        console.log("Informacion del Paciente Clickado:");
+        console.log(Paciente);
+        DatosPaciente = {
+          Protocolo: "Asignar",
+          idStatusPaciente: 2,
+          idSucursal: Paciente.idSucursal,
+          idPaciente: Paciente.idPaciente,
+          idProcedimiento: Paciente.idProcedimiento,
+          idDoctor: Paciente.idDoctor,
+          idCita: Paciente.idCitas,
+          idConsultorio: Paciente.idConsultorio,
+          NombreD: Paciente.NombreD,
+          NombreP: Paciente.NombreP,
+          ApellidoP: Paciente.ApellidoP,
+          ApellidoD: Paciente.ApellidoD,
+          HoraCita: Paciente.HoraCita,
+          Consultorio: Paciente.Cosultorio,
+          RutaFotoP: rutaRelativaPaciente,
+          RutaFotoD: rutaRelativaDoctor,
+          Procedimiento: Paciente.Procedimiento,
+        };
+        Accion_Paciente(DatosPaciente);
+        event.stopPropagation();
+      });
+      ContenedorBotones.appendChild(Boton);
+      ElementoPaciente.appendChild(InfoPedido);
+      ElementoPaciente.appendChild(ContenedorBotones);
+      PacientesPedidosDiv.appendChild(ElementoPaciente);
+    });} else {
+      const NoCitas = document.createElement("h2");
+      NoCitas.textContent = "No hay pacientes pedidos.";
+      PacientesPedidosDiv.appendChild(NoCitas);
+    }
   }
 }
 

@@ -431,15 +431,17 @@ function CitasFinalizadas(datos) {
 }
 
 
+
+
+
 //==================================================================================================
-// Realizar la carga de datos y asignacion obtenidos del servidor
+// Realizar la carga y asignacion de datos obtenidos del servidor
 //==================================================================================================
 $.ajax({
   url: "/DashboardDoc",
   method: "POST",
   dataType: "json",
   success: function (respuesta) {
-    // console.log(respuesta);
     PacientesEnEspera(respuesta.PacientesEspera);
     CitasHoy(respuesta.CitasHoy);
     OtrosConsultorios(respuesta.OtrosConsultorios);
@@ -452,12 +454,12 @@ $.ajax({
 
 
 //==================================================================================================
-// Socket's para actualizar el Dashboard
+// Funciones para actualizar de manera individual las tablas del Dashboard
 //==================================================================================================
-// Citas Hoy - Pacientes en Espera
-socket.on("Hoy_Espera", function (data) {
+
+function Actualizar_Hoy_Espera() {
   $.ajax({
-    url: "/DashboardDoc",
+    url: "/DashboardDoc/Hoy_Espera",
     method: "POST",
     dataType: "json",
     success: function (respuesta) {
@@ -468,30 +470,12 @@ socket.on("Hoy_Espera", function (data) {
       console.error(error);
     },
   });
-  NuevoAudio(1);
-});
+}
 
 
-// Pacientes en Espera - Consulta
-socket.on("Espera_Consulta", function (data) {
+function Actualizar_Consulta_Checkout() {
   $.ajax({
-    url: "/DashboardDoc",
-    method: "POST",
-    dataType: "json",
-    success: function (respuesta) {
-      PacientesEnEspera(respuesta.PacientesEspera);
-    },
-    error: function (error) {
-      console.error(error);
-    },
-  });
-  NuevoAudio(4);
-});
-
-// Consulta - CheckOut
-socket.on("Consulta_CheckOut", function (data) {
-  $.ajax({
-    url: "/DashboardDoc",
+    url: "/DashboardDoc/Consulta_CheckOut",
     method: "POST",
     dataType: "json",
     success: function (respuesta) {
@@ -502,22 +486,158 @@ socket.on("Consulta_CheckOut", function (data) {
       console.error(error);
     },
   });
-  NuevoAudio(3);
-});
+}
 
-// Actualizar Otros consultorios
-socket.on("OtrosConsultorios", function (data) {
+function Actualizar_OC_Espera() {
   $.ajax({
-    url: "/DashboardDoc",
+    url: "/DashboardDoc/OC_Espera",
     method: "POST",
     dataType: "json",
     success: function (respuesta) {
-      OtrosConsultorios(respuesta.OtrosConsultorios);
+      PacientesEnEspera(respuesta.PacientesEspera);
     },
     error: function (error) {
       console.error(error);
     },
   });
+}
+
+
+
+
+
+
+
+
+
+function Actualizar_Espera(){
+  console.log("Actualizando Espera");
+  $.ajax({
+    url: "/DashboardDoc/Espera",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      PacientesEnEspera(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+function Actualizar_CitasHoy(){
+  console.log("Actualizando Citas Hoy");
+  $.ajax({
+    url: "/DashboardDoc/CitasHoy",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      CitasHoy(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+function Actualizar_OC(){
+  console.log("Actualizando Otros Consultorios");
+  $.ajax({
+    url: "/DashboardDoc/OtrosConsultorios",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      OtrosConsultorios(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+function Actualizar_CF(){
+  console.log("Actualizando Citas Finalizadas");
+  $.ajax({
+    url: "/DashboardDoc/CitasFinalizadas",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      CitasFinalizadas(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+
+
+//==================================================================================================
+// Events Listeners para actualizar las tablas del Dashboard
+//==================================================================================================
+
+$(document).ready(function () {
+  $("#ActualizarEspera").click(function () {
+    Actualizar_Espera();
+    // Añade la clase para iniciar la animación y el manejador del evento para cuando termine
+    $(".Entrada").addClass("entrando").on("animationend", function() {
+      // Quita la clase si ya no se necesita más la animación
+      $(this).removeClass("entrando");  
+      // Elimina el manejador del evento para que no se acumulen si el botón se pulsa múltiples veces
+      $(this).off("animationend");
+    });
+  });
+  
+  $("#ActualizarCitasHoy").click(function () {
+    Actualizar_CitasHoy();
+    $(".CCPH").addClass("entrando").on("animationend", function() {
+      $(this).removeClass("entrando");  
+      $(this).off("animationend");
+    });
+  });
+
+  $("#ActualizarOC").click(function () {
+    Actualizar_OC();
+    $(".Otros").addClass("entrando").on("animationend", function() {
+      $(this).removeClass("entrando");  
+      $(this).off("animationend");
+    });
+  });
+  $("#ActualizarCF").click(function () {
+    Actualizar_CF();
+    $(".Finalizadas").addClass("entrando").on("animationend", function() {
+      $(this).removeClass("entrando");  
+      $(this).off("animationend");
+    });
+  });
+}); 
+
+
+//==================================================================================================
+// Socket's para actualizar el Dashboard
+//==================================================================================================
+// Citas Hoy - Pacientes en Espera
+socket.on("Hoy_Espera", function (data) {
+  Actualizar_Hoy_Espera();
+  NuevoAudio(1);
+});
+
+
+// Pacientes en Espera - Consulta
+socket.on("Espera_Consulta", function (data) {
+  Actualizar_Espera();
+  NuevoAudio(4);
+});
+
+// Consulta - CheckOut
+socket.on("Consulta_CheckOut", function (data) {
+  Actualizar_Consulta_Checkout();
+  NuevoAudio(3);
+});
+
+// Actualizar Otros consultorios
+socket.on("OtrosConsultorios", function (data) {
+  Actualizar_OC();
 });
 
 // Actualizar El CheckOut

@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DashBoard - DermaTotal</title>
+    <%// Iconos de Bootstrap%>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/fonts/Fuentes.css" />
     <link rel="stylesheet" href="/css/Dashboard.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
@@ -61,7 +63,7 @@
       <% //Contenido de la Izquierda%>
       <div class="Izquierda">
         <h2 class="Titulo">
-          Registro de Entrada (<b class="NumeroPacientesEspera"></b>):
+          Registro de Entrada (<b class="NumeroPacientesEspera"></b>): <button class="bi-arrow-repeat" id="ActualizarEspera"></button>
         </h2>
         <% //Citas en Turno%>
         <div class="Entrada">
@@ -73,7 +75,7 @@
         <% // Otros Consultorios%>
         <div class="OC">
           <h2 class="Titulo">
-            Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>):
+            Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>): <button class="bi-arrow-repeat" id="ActualizarOC"></button>
           </h2>
           <div class="Otros">
             <div class="ContenidoOtrosConsultorios">
@@ -87,7 +89,7 @@
       <div class="Derecha">
         <% // Citas Confirmadas para hoy%>
         <h2 class="Titulo">
-          Citas para hoy (<b class="NumeroPacientesCitasHoy"></b>):
+          Citas para hoy (<b class="NumeroPacientesCitasHoy"></b>): <button class="bi-arrow-repeat" id="ActualizarCitasHoy"></button>
         </h2>
         <div class="CCPH">
           <div class="Hoy">
@@ -100,7 +102,7 @@
         <% // Citas Finalizadas%>
         <div class="CF">
           <h2 class="Titulo">
-            Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>):
+            Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>): <button class="bi-arrow-repeat" id="ActualizarCF"></button>
           </h2>
           <div class="Finalizadas">
             <div class="ContenidoCitasFinalizadas">
@@ -145,12 +147,30 @@
 
     <% break; case 5: %> <%//Estilos personalizados para la vista de Recepcion%>
     <link rel="stylesheet" href="/css/Dashboards/Recepcion.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
     <script src="/js/dashboard.js"></script>
     <script src="/js/Dashboard/dashRecep.js"></script>
+    <%//Crea la vista de opciones la cual, en un inicio estará oculta%>
+    <div id="Cont_Opciones">
+      <div id="Opciones">
+        <h1 id="TituloOpciones">Cargando Titulo de Opciones...</h1>
+        <p id="MensajeOpciones">Cargando Mensaje de las opciones...</p>
+        <div class="InfoOpciones"><%//El contenido de rellena con JS%></div>
+      </div>
+    </div>
     <h1 class="saludo">Cargando Saludo...</h1>
-    <a href="#" id="NuevoPaciente">NuevoPaciente</a>
-    <h2>Pacientes Confirmados para hoy:</h2>
-    <div class="ContenidoCitasHoyR"></div>
+    <!-- <a href="#" id="NuevoPaciente">NuevoPaciente</a> -->
+    <div class="ContenidoRecepcion">
+      <div class="PacientesdeHoy">
+        <h2>Pacientes de hoy:</h2>
+        <div class="CitasHoy"></div>
+      </div>
+      <div class="PacientesCheckout">
+        <h2>Pacientes Finalizados:</h2>
+        <div class="PacientesFinalizados"></div>
+        <div class="PaginacionPF"></div>
+      </div>
+    </div>
 
     <% break; case 6: %> <%//Estilos personalizados para la vista de Asociado%>
     <link rel="stylesheet" href="/css/Dashboards/Asociado.css" />

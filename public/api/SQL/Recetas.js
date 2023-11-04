@@ -1,6 +1,6 @@
 import { mysql, db } from "../conf_api.js";
 
-async function NuevaReceta(
+export async function NuevaReceta(
   idPaciente,
   idDoctor,
   idSesion,
@@ -79,7 +79,7 @@ async function NuevaReceta(
   await connection.end();
 }
 
-async function Receta(idPaciente, idReceta) {
+export async function Receta(idPaciente, idReceta) {
   try {
     const connection = await mysql.createConnection(db);
     const queryReceta = `
@@ -111,7 +111,7 @@ async function Receta(idPaciente, idReceta) {
   }
 }
 
-async function UpdateReceta_Añadir(Elemento) {
+export async function UpdateReceta_Añadir(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
     // Insertamos primero en la tabla de Medicamento
@@ -156,7 +156,7 @@ async function UpdateReceta_Añadir(Elemento) {
   }
 }
 
-async function UpdateReceta_Editar(Elemento) {
+export async function UpdateReceta_Editar(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
 
@@ -179,7 +179,7 @@ async function UpdateReceta_Editar(Elemento) {
   }
 }
 
-async function UpdateReceta_Quitar(Elemento) {
+export async function UpdateReceta_Quitar(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
     const Eliminar_Enlace = `
@@ -201,7 +201,7 @@ async function UpdateReceta_Quitar(Elemento) {
   }
 }
 
-async function UpdateReceta_EditNota(Elemento) {
+export async function UpdateReceta_EditNota(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
     console.log(Elemento);
@@ -226,7 +226,7 @@ async function UpdateReceta_EditNota(Elemento) {
   }
 }
 
-async function UpdateReceta_Orden(Elemento) {
+export async function UpdateReceta_Orden(Elemento) {
   try {
     const connection = await mysql.createConnection(db);
     const Actualizar_Orden = `
@@ -253,12 +253,3 @@ async function UpdateReceta_Orden(Elemento) {
 
 
 
-export {
-  NuevaReceta,
-  Receta,
-  UpdateReceta_Añadir,
-  UpdateReceta_Editar,
-  UpdateReceta_Quitar,
-  UpdateReceta_EditNota,
-  UpdateReceta_Orden,
-};

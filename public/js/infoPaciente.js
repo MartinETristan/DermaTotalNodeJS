@@ -1,14 +1,18 @@
 // Declarar una variable global para almacenar los datos
 let datosAlmacenados = null;
+// Guardamos el nombre de Usuario para el Boton de Reiniciar Contraseña
 var NombreUsuario = null;
+// Informacion de los Selects que hay en el sistema
 let InfoSelects = null;
+// Informacion de la sesion (la persona que está iniciando sesion)
+let InfoSesion = null;
 
 // ========================================================================================================
 // Función para realizar la consulta AJAX y almacenar los datos
 // ========================================================================================================
 
 async function obtenerDatos() {
-  if (datosAlmacenados) {
+  if (datosAlmacenados || InfoSelects) {
     // Si los datos ya están almacenados, simplemente retornamos esos datos
     return datosAlmacenados;
   }
@@ -32,20 +36,31 @@ async function obtenerDatos() {
       });
     };
 
+    // Crear función para la petición que obtendrá que tipo de usuario es el que está logueado
+    const fetchInfoUsuario = () => {
+      return $.ajax({
+        url: "/InfoSesion",
+        type: "POST",
+        dataType: "json",
+      });
+    };
+
     // Ejecutar ambas peticiones de manera paralela
-    const [dataPaciente, dataRegistros] = await Promise.all([
+    const [dataPaciente, dataRegistros, dataSesion] = await Promise.all([
       fetchInfoPaciente(),
       fetchInfoRegistros(),
+      fetchInfoUsuario(),
     ]);
 
     // Almacenar datos en variables globales
     datosAlmacenados = dataPaciente;
     InfoSelects = dataRegistros;
+    InfoSesion = dataSesion;
 
     // Crear el Header con los datos obtenidos
     HeaderInfoPaciente(dataPaciente);
 
-    return datosAlmacenados;
+    return console.log("Datos obtenidos correctamente");
   } catch (error) {
     console.error(error);
     throw error; // Lanza el error para que pueda ser manejado por quien llame a la función
@@ -352,7 +367,6 @@ function formatearFecha(fechaOriginal) {
   };
 }
 
-
 // Funcion para reinciar la contraseña:
 function reiniciarContraseña() {
   // Restablecer la contraseña a el nombre de usuario
@@ -552,6 +566,17 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
   medicamentoInput.classList.add("medicamentoreceta");
   contenedor.appendChild(medicamentoInput);
 
+  // Boton para eliminar el par de Medicamento e Indicación
+  const botonQuitar = document.createElement("button");
+  botonQuitar.type = "button";
+  botonQuitar.textContent = "Eliminar";
+  botonQuitar.classList.add("iconbtn--Eliminar");
+  botonQuitar.addEventListener("click", () => {
+    const divMedicamentos = botonQuitar.parentNode;
+    divMedicamentos.parentNode.removeChild(divMedicamentos);
+  });
+  contenedor.appendChild(botonQuitar);
+
   const indicacionInput = document.createElement("input");
   indicacionInput.type = "text";
   indicacionInput.name = `${NombreInputIndicacion}`;
@@ -570,18 +595,6 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
         indicacionInput.value
       );
     });
-  }
-}
-
-function eliminarUltimosCampos(zona) {
-  const contenedorEditMedicamentos = document.getElementById(`${zona}`);
-
-  // Seleccionar el último div dentro del contenedor
-  const ultimoDiv = contenedorEditMedicamentos.lastElementChild;
-
-  // Verificar que el último elemento es realmente un div antes de eliminarlo
-  if (ultimoDiv && ultimoDiv.tagName === "DIV") {
-    contenedorEditMedicamentos.removeChild(ultimoDiv);
   }
 }
 
@@ -623,15 +636,13 @@ function crearInfoItem_Diagnostico(contenido) {
   const item = crearElemento_Diagnostico("info__item");
   const itemContent = crearElemento_Diagnostico("info__item__content");
 
-  //Creamos el elemento de paginación
-  const paginacion = document.createElement("div");
-  paginacion.classList.add("paginacion");
-  itemContent.appendChild(paginacion);
-
   //Eliminamos el ultimo por que ya se muestra en otra vista
   if (Array.isArray(contenido)) {
-    // Suponiendo que mostrarás un ítem por página
-    const itemsPorPagina = 1;
+    item.classList.add("Historial_Seguimientos");
+    //Creamos el elemento de paginación
+    const paginacion = document.createElement("div");
+    paginacion.classList.add("paginacion");
+    itemContent.appendChild(paginacion);
 
     const totalPaginas = contenido.length;
 
@@ -682,6 +693,7 @@ function crearInfoItem_Diagnostico(contenido) {
       },
     });
   } else if (typeof contenido === "string") {
+    item.classList.add("SeguimientoHoy");
     const header = crearElementoHeader_Diagnostico("SEGUIMINETO HOY:");
 
     itemContent.appendChild(header);
@@ -698,18 +710,48 @@ function crearInfoItem_Diagnostico(contenido) {
     });
     itemContent.appendChild(input);
 
-    const boton = document.createElement("button");
-    boton.type = "button";
-    boton.textContent = "Guardar";
-    boton.style.marginLeft = "78%";
-    boton.classList.add("iconbtn--save");
-    boton.addEventListener("click", () => {
+    const cont_text = document.createElement("div");
+    cont_text.classList.add("Cont_Seguimiento");
+    const textinput = document.createElement("p");
+    textinput.style.display = "none";
+    textinput.style.visibility = "0";
+    cont_text.appendChild(textinput);
+    itemContent.appendChild(cont_text);
+
+
+    const botonGuardar = document.createElement("button");
+    botonGuardar.type = "button";
+    botonGuardar.textContent = "Guardar";
+    botonGuardar.style.float = "right";
+    botonGuardar.style.marginRight = "10px";
+    botonGuardar.classList.add("iconbtn--save");
+    botonGuardar.addEventListener("click", () => {
       const diagnostico = input.value;
-      if (diagnostico) {
-        console.log(diagnostico);
-      }
+        if (diagnostico) {
+          // console.log(diagnostico);
+          textinput.textContent = input.value;
+          input.style.display = "none";
+          textinput.style.display = "block";
+          botonEditar.style.display = "inline-block";
+          botonGuardar.style.display = "none";
+        }
     });
-    itemContent.appendChild(boton);
+
+    const botonEditar = document.createElement("button");
+    botonEditar.type = "button";
+    botonEditar.style.display = "none";
+    botonEditar.textContent = "Editar";
+    botonEditar.style.float = "right";
+    botonEditar.style.marginRight = "10px";
+    botonEditar.classList.add("iconbtn--editar");
+    botonEditar.addEventListener("click", () => {
+      input.style.display = "block";
+      textinput.style.display = "none";
+      botonEditar.style.display = "none";
+      botonGuardar.style.display = "block";
+    });
+    itemContent.appendChild(botonEditar);
+    itemContent.appendChild(botonGuardar);
   }
 
   item.appendChild(itemContent);
@@ -735,7 +777,6 @@ function agregarEventListener(id, accion) {
 function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
   const input = document.getElementById(`input${NombredelCampo}`);
   let valor = input.value == "" ? null : input.value;
-
 
   // Mandamos el cambio al sistema dependiendo del tipo de cambio que se realice
   const fetchConfig = {
@@ -772,12 +813,13 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
   // Y hacemos cambios para casos especificos
   switch (NombredelCampo) {
     case "Sexo":
-      textElement.textContent = {
-        1: "Hombre",
-        2: "Mujer"
-      }[valor] || "Valor no reconocido";
+      textElement.textContent =
+        {
+          1: "Hombre",
+          2: "Mujer",
+        }[valor] || "Valor no reconocido";
       break;
-  
+
     case "Alergias":
       if (!valor) {
         const Alerg = document.querySelector(".Alerg");
@@ -788,13 +830,13 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
         textElement.style.color = "red";
       }
       break;
-  
+
     case "Status":
       const statusMap = {
-        "1": "Activo",
-        "2": "Inactivo",
-        "3": "Suspendido",
-        "4": "Baja"
+        1: "Activo",
+        2: "Inactivo",
+        3: "Suspendido",
+        4: "Baja",
       };
       textElement.textContent = statusMap[valor] || "No es un status válido";
       break;
@@ -803,7 +845,7 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
       // console.log("fecha");
       const fechaReordenada = reordenarFecha(valor);
       textElement.textContent = fechaReordenada;
-    break;
+      break;
     default:
       textElement.textContent = valor;
       break;
@@ -811,25 +853,23 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
   textElement.style.display = "block";
 }
 
-
 function reordenarFecha(fechaOriginal) {
-  if (fechaOriginal != null){
-    const partes = fechaOriginal.split('-');
-  
+  if (fechaOriginal != null) {
+    const partes = fechaOriginal.split("-");
+
     if (partes.length !== 3) {
       throw new Error("Formato de fecha no válido");
     }
-  
+
     const año = partes[0];
     const mes = partes[1];
     const dia = partes[2];
-  
+
     return `${dia}-${mes}-${año}`;
-  }else{
+  } else {
     return "--/--/----";
   }
 }
-
 
 function cancelarEdicion(NombredelCampo) {
   // Restablecer la interfaz
@@ -892,33 +932,48 @@ $(document).ready(async function () {
   // Cargar la vista General.ejs al cargar la página
   cargarGeneral();
 
-  $("#Historial").removeClass("activo");
-  $("#Recetas").removeClass("activo");
-  var seccion = document.getElementById("General");
-  seccion.classList.add("activo");
-
-  // Agregar eventos de clic para cargar las vistas
-  $("#General").click(function () {
-    cargarGeneral();
+  if (InfoSesion.EsDoctor) {
     $("#Historial").removeClass("activo");
     $("#Recetas").removeClass("activo");
     var seccion = document.getElementById("General");
     seccion.classList.add("activo");
-  });
 
-  $("#Historial").click(function () {
-    cargarHistorial();
-    $("#General").removeClass("activo");
-    $("#Recetas").removeClass("activo");
-    var seccion = document.getElementById("Historial");
-    seccion.classList.add("activo");
-  });
+    // Agregar eventos de clic para cargar las vistas
+    $("#General").click(function () {
+      cargarGeneral();
+      $("#Historial").removeClass("activo");
+      $("#Recetas").removeClass("activo");
+      var seccion = document.getElementById("General");
+      seccion.classList.add("activo");
+    });
 
-  $("#Recetas").click(function () {
-    cargarRecetas();
-    $("#General").removeClass("activo");
-    $("#Historial").removeClass("activo");
-    var seccion = document.getElementById("Recetas");
-    seccion.classList.add("activo");
-  });
+    $("#Historial").click(function () {
+      cargarHistorial();
+      $("#General").removeClass("activo");
+      $("#Recetas").removeClass("activo");
+      var seccion = document.getElementById("Historial");
+      seccion.classList.add("activo");
+    });
+
+    $("#Recetas").click(function () {
+      cargarRecetas();
+      $("#General").removeClass("activo");
+      $("#Historial").removeClass("activo");
+      var seccion = document.getElementById("Recetas");
+      seccion.classList.add("activo");
+    });
+  } else {
+    $("#General").remove();
+    $("#Historial").remove();
+    $("#Recetas").remove();
+    $(".infogroup.antecedentes").remove();
+    $(".Diagnosticos").remove();
+    $("#editarAlergias").remove();
+    $("#RA").remove();
+    $("#NR").remove();
+    $(".infogroup.ficha").css({
+      "margin-right": "auto",
+      "max-width": "100%",
+    });
+  }
 });

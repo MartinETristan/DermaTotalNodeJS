@@ -28,7 +28,7 @@
     left: 0;
     object-fit: cover;
     height: 100%;
-    width: auto;
+    width: 100%;
 }
 
 .fotohistorial {
@@ -380,7 +380,7 @@ border: none;
     flex: 1;
     padding: 0 5px;
     overflow-y: visible;
-
+    min-height: 700px;
 }
 
 @media (min-width: 768px) {
@@ -516,7 +516,6 @@ border: none;
     font-size: 16px;
     resize: vertical;
     margin-top: 10px;
-    margin-bottom: 10px;
     padding: 10px;
     width: 95%;
     min-height: 50px;
@@ -947,15 +946,24 @@ form>h3 {
 }
 
 #ContenedorEditMedicamentos .New {
-    display: flex;
-    flex-direction: column;
-    /* background-color: red; */
+    display: block;
     margin-left: 45px;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 10px;
+
 }
 
+
+.Cont_Seguimiento {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 225px;
+    padding-right: 20px;
+    margin-bottom: 10px;
+}
+
+.Cont_Seguimiento > p {
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
 
 
 

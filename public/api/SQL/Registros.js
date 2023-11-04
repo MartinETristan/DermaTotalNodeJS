@@ -1,6 +1,6 @@
 import { mysql, db } from "../conf_api.js";
 
-async function InsertRutaFoto(idUsuario, RutaFoto) {
+export async function InsertRutaFoto(idUsuario, RutaFoto) {
   try {
     const connection = await mysql.createConnection(db);
     const query = `UPDATE Usuarios SET RutaFoto = ? WHERE idUsuario = ?`;
@@ -17,7 +17,7 @@ async function InsertRutaFoto(idUsuario, RutaFoto) {
 }
 
 // Funcion para obtener la sucursal de la ultima cita del paciente
-async function SucursalUltimaCita(idPaciente) {
+export async function SucursalUltimaCita(idPaciente) {
   try {
     const connection = await mysql.createConnection(db);
     const query = `SELECT idSucursal 
@@ -40,7 +40,7 @@ async function SucursalUltimaCita(idPaciente) {
 }
 
 // Funcion para obtener la informacion de los registros
-async function InfoRegistros() {
+export async function InfoRegistros() {
   try {
     const connection = await mysql.createConnection(db);
     // Pedimos los Doctores Existentes
@@ -95,7 +95,7 @@ async function InfoRegistros() {
   }
 }
 
-async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
+export async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
   let connection;
   try {
     connection = await mysql.createConnection(db);
@@ -171,7 +171,7 @@ async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
 //==================================================================================================
 // Updates estados Pacientes / Citas
 //==================================================================================================
-async function NuevaCita(
+export async function NuevaCita(
   idSucursal,
   idProcedimiento,
   idDoctor,
@@ -183,7 +183,7 @@ async function NuevaCita(
   NotasCita
 ) {}
 
-async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
+export async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
   try {
     const connection = await mysql.createConnection(db);
     const Actualizacion = `UPDATE HistorialClinico SET ${Propiedad} = ? WHERE idPaciente = ?`;
@@ -197,7 +197,7 @@ async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
   }
 }
 
-async function ActualizarDatosGenerales(id, Propiedad, Valor, TipodeUsuario) {
+export async function ActualizarDatosGenerales(id, Propiedad, Valor, TipodeUsuario) {
   // Acrtualiza la informacion del usuario basados en el tipo de usuario
   switch (TipodeUsuario) {
     case 1:
@@ -244,7 +244,7 @@ async function ActualizarDatosGenerales(id, Propiedad, Valor, TipodeUsuario) {
   }
 }
 
-async function ActualizarStatus(TipodeUsuario, id, Status) {
+export async function ActualizarStatus(TipodeUsuario, id, Status) {
   switch (TipodeUsuario) {
     case 1:
       break;
@@ -283,12 +283,3 @@ async function ActualizarStatus(TipodeUsuario, id, Status) {
   }
 }
 
-export {
-  InsertRutaFoto,
-  SucursalUltimaCita,
-  InfoRegistros,
-  Busqueda,
-  ActualizarAntecedentesPaciente,
-  ActualizarDatosGenerales,
-  ActualizarStatus,
-};

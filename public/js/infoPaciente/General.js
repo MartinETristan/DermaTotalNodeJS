@@ -30,8 +30,9 @@ function cargarGeneral() {
               <button class="iconbtn--cancelar" id="cancelarFechaDeNac" style="display:none;"></button>
               <button class="iconbtn--confirm" id="confirmarFechaDeNac" style="display:none;">Confirmar</button>
             </header>
-            <p id="textFechaDeNac">${datosAlmacenados.BasicInfo[0]
-              .FechadeNac || "--/--/----"}</p>
+            <p id="textFechaDeNac">${
+              datosAlmacenados.BasicInfo[0].FechadeNac || "--/--/----"
+            }</p>
             <input type="date" name="inputFechaDeNac" id="inputFechaDeNac" style="display:none;"/>
           </div>
         </div>
@@ -47,12 +48,11 @@ function cargarGeneral() {
               <button class="iconbtn--confirm" id="confirmarTel1" style="display:none;">Confirmar</button>
             </header>
             <a id="textTel1" href="#">${
-              (datosAlmacenados.BasicInfo[0].Tel1) ||
-              "No hay telefono registrado"
+              datosAlmacenados.BasicInfo[0].Tel1 || "No hay telefono registrado"
             }</a>
-            <input type="tel" name="inputTel1" id="inputTel1" value="${datosAlmacenados
-              .BasicInfo[0]
-              .Tel1}" style="display:none;" placeholder="(XXX) XXX XXXX" />
+            <input type="tel" name="inputTel1" id="inputTel1" value="${
+              datosAlmacenados.BasicInfo[0].Tel1 || ""
+            }" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
         </div>
         <div class="info__item">
@@ -64,12 +64,12 @@ function cargarGeneral() {
             <button class="iconbtn--confirm" id="confirmarTel2" style="display:none;">Confirmar</button>
             </header>
             <a id="textTel2" href="#">${
-              (datosAlmacenados.BasicInfo[0].Tel2) ||
+              datosAlmacenados.BasicInfo[0].Tel2 ||
               "No hay telefono secundario registrado"
             }</a>
-            <input type="tel" name="inputTel2" id="inputTel2" value="${datosAlmacenados
-              .BasicInfo[0]
-              .Tel2}" style="display:none;" placeholder="(XXX) XXX XXXX" />
+            <input type="tel" name="inputTel2" id="inputTel2" value="${
+              datosAlmacenados.BasicInfo[0].Tel2 || ""
+            }" style="display:none;" placeholder="(XXX) XXX XXXX" />
           </div>
         </div>
       </div>
@@ -84,12 +84,11 @@ function cargarGeneral() {
               <button class="iconbtn--confirm" id="confirmarCorreo" style="display:none;">Confirmar</button>
             </header>
             <a id="textCorreo" href="#">${
-              (datosAlmacenados.BasicInfo[0].Correo) ||
-              "No hay correo registrado"
+              datosAlmacenados.BasicInfo[0].Correo || "No hay correo registrado"
             }</a>
-            <input type="text" name="inputCorreo" id="inputCorreo" value="${datosAlmacenados
-              .BasicInfo[0]
-              .Correo}" style="display:none;" placeholder="ejemplo@correo.com" />
+            <input type="text" name="inputCorreo" id="inputCorreo" value="${
+              datosAlmacenados.BasicInfo[0].Correo
+            }" style="display:none;" placeholder="ejemplo@correo.com" />
           </div>
         </div>
       </div>
@@ -182,7 +181,6 @@ function cargarGeneral() {
                 <div class="Nota">
                   <input type="text" name="Nota" placeholder="Nota" class="inputNota">
                 </div>
-                <button type="button" id="quitarCampo" style="display:none;">Quitar Medicamento</button>
                 <button type="button" id="agregarCampo">Agregar Medicamento</button>
               </header>
               <button type="submit" id="GuardarReceta">Guardar Receta</button>
@@ -200,26 +198,26 @@ function cargarGeneral() {
   // Mapeo de valores por defecto de los valores por defecto del historial clinico
   // ========================================================================================================
   const HistorialClinico = {
-    "A_PP": datosAlmacenados.Antecedentes[0].A_PP,
-    "A_NP": datosAlmacenados.Antecedentes[0].A_NP,
-    "A_HF": datosAlmacenados.Antecedentes[0].A_HF,
+    A_PP: datosAlmacenados.Antecedentes[0].A_PP,
+    A_NP: datosAlmacenados.Antecedentes[0].A_NP,
+    A_HF: datosAlmacenados.Antecedentes[0].A_HF,
   };
   // Nombre completo de los padecimientos
   const H_ClinicFullName = {
-    "A_PP": "antecedentes personales/patologicos",
-    "A_NP": "antecedentes no patologicos",
-    "A_HF": "antecedentes heredo/familiares",
-  }
+    A_PP: "antecedentes personales/patologicos",
+    A_NP: "antecedentes no patologicos",
+    A_HF: "antecedentes heredo/familiares",
+  };
   // Y para cada uno de ellos, llena los inputs, los placeholders y el texto mostrado
-  // cuando el valor es nulo 
+  // cuando el valor es nulo
   Object.entries(HistorialClinico).forEach(([key, value]) => {
     const text = document.getElementById(`text${key}`);
     const input = document.getElementById(`input${key}`);
-    text.textContent = value == null ? `No hay ${H_ClinicFullName[key]} registrados.` : value;
+    text.textContent =
+      value == null ? `No hay ${H_ClinicFullName[key]} registrados.` : value;
     input.placeholder = `Escribe aqui los ${H_ClinicFullName[key]} del paciente.`;
     input.value = value == null ? "" : value;
   });
-  
 
   // ========================================================================================================
   // Mapa de botones para editar datos
@@ -265,13 +263,14 @@ function cargarGeneral() {
   });
 
   // Le damos Formato a la fecha de nacimiento
-  if(datosAlmacenados.BasicInfo[0].FechadeNac){
+  if (datosAlmacenados.BasicInfo[0].FechadeNac) {
     const Nacimiento = formatearFecha(datosAlmacenados.BasicInfo[0].FechadeNac);
     const valorNacimiento =
       Nacimiento.añofull + "-" + Nacimiento.dia2d + "-" + Nacimiento.mes2d;
-  
+
     // Asignamos el valor por defecto a la fecha de nacimiento
-    document.getElementById("inputFechaDeNac").value = valorNacimiento.toString();
+    document.getElementById("inputFechaDeNac").value =
+      valorNacimiento.toString();
   }
 
   agregarEventListener("botonNuevaReceta", function () {
@@ -527,26 +526,56 @@ function cargarGeneral() {
     }
   }
 
+  // Función para agregar campos de Medicamentos e Indicaciones
+  function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
+    const camposMedicamentos = document.getElementById(`${zona}`);
+    // Creamos un contenedor para los campos de Medicamento e Indicación
+    const contenedor = document.createElement("div");
+    contenedor.classList.add("New");
+    const medicamentoInput = document.createElement("input");
+    medicamentoInput.type = "text";
+    medicamentoInput.name = `${NombreInputMedicamento}`;
+    medicamentoInput.placeholder = "Medicamento";
+    medicamentoInput.required = true;
+    medicamentoInput.classList.add("medicamentoreceta");
+    contenedor.appendChild(medicamentoInput);
+
+    // Boton para eliminar el par de Medicamento e Indicación
+    const botonQuitar = document.createElement("button");
+    botonQuitar.type = "button";
+    botonQuitar.textContent = "Eliminar";
+    botonQuitar.classList.add("iconbtn--Eliminar");
+    botonQuitar.addEventListener("click", () => {
+      const divMedicamentos = botonQuitar.parentNode;
+      divMedicamentos.parentNode.removeChild(divMedicamentos);
+    });
+    contenedor.appendChild(botonQuitar);
+
+    const indicacionInput = document.createElement("input");
+    indicacionInput.type = "text";
+    indicacionInput.name = `${NombreInputIndicacion}`;
+    indicacionInput.placeholder = "Indicación";
+    indicacionInput.classList.add("indicacionreceta");
+    indicacionInput.required = true;
+    contenedor.appendChild(indicacionInput);
+
+    camposMedicamentos.appendChild(contenedor);
+
+    if (zona === "camposMedicamentos") {
+      // Agregar el par de Medicamento e Indicación al array correspondiente
+      medicamentoInput.addEventListener("blur", () => {
+        agregarMedicamentoIndicacion(
+          medicamentoInput.value,
+          indicacionInput.value
+        );
+      });
+    }
+  }
+
   // Escuchar clic en el botón "Agregar"
   const agregarBoton = document.getElementById("agregarCampo");
   agregarBoton.addEventListener("click", (event) => {
-    quitarBoton.style.display = "block";
     agregarCampos("camposMedicamentos", "Medicamentos", "Indicaciones");
-  });
-
-  // Escuchar clic en el botón "quitar"
-  const quitarBoton = document.getElementById("quitarCampo");
-  quitarBoton.addEventListener("click", (event) => {
-    const camposMedicamentos = document.getElementById("camposMedicamentos");
-    // Obtén todos los elementos hijos (los pares de Medicamento e Indicación)
-    const elementosHijos =
-      camposMedicamentos.querySelectorAll("input[type='text']");
-    if (elementosHijos.length > 4) {
-      eliminarUltimosCampos("camposMedicamentos");
-    } else {
-      eliminarUltimosCampos("camposMedicamentos");
-      quitarBoton.style.display = "none";
-    }
   });
 
   // Enviar el formulario con los datos recolectados
@@ -610,13 +639,14 @@ function cargarGeneral() {
 
   const numDiagnosticos = datosAlmacenados.Diagnosticos.length;
 
+  // Si detecta que hay más de un diagnóstico, crea un elemento para cada uno
   if (numDiagnosticos >= 1) {
-    console.log("hay 2 o más diagnosticos");
     const item1b = crearInfoItem_Diagnostico(datosAlmacenados.Diagnosticos);
     const item2b = crearInfoItem_Diagnostico("Input");
     crearInfo.appendChild(item1b);
     crearInfo.appendChild(item2b);
   } else {
+    // Si no hay diagnósticos, crea un elemento vacío
     const item0 = crearInfoItem_Diagnostico("Input");
     crearInfo.appendChild(item0);
   }
@@ -736,14 +766,6 @@ function mostrarReceta(data) {
     );
   });
 
-  const botonQuitarMedicamento = document.createElement("button");
-  botonQuitarMedicamento.type = "button";
-  botonQuitarMedicamento.textContent = "Quitar Medicamento";
-  botonQuitarMedicamento.classList.add("QuitarMedicamento");
-  botonQuitarMedicamento.addEventListener("click", () => {
-    eliminarUltimosCampos("ContenedorEditMedicamentos");
-  });
-
   const Nota = document.createElement("div");
   Nota.classList.add("Nota");
   Nota.style.display = "block";
@@ -765,7 +787,6 @@ function mostrarReceta(data) {
   tituloNota.innerHTML = "Nota:";
   formEditReceta.appendChild(tituloNota);
 
-  contenedorbotones.appendChild(botonQuitarMedicamento);
   contenedorbotones.appendChild(botonAñadirMedicamento);
   contenedornota.appendChild(inputNota);
   contenedornota.appendChild(contenedorbotones);

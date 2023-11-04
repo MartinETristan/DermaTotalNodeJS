@@ -8,6 +8,23 @@ h1 {
     background-position: var(--bg-size) 0;
   }
 }
+@keyframes respirar {
+  0%, 100% {
+    background-color: #ffffff00;
+  }
+  50% {
+    background-color: rgba(255, 245, 221, 0.7);
+  }
+}
+
+/* Aplicando la animación a la clase que se añadirá dinámicamente */
+.entrando {  
+  --bg-size: 400%;
+  animation: respirar .5s ease-in-out;
+}
+
+
+
 
 /* Contenedor que se mostrará de manera diferente al accionar los botones */
 #Cont_Opciones{
@@ -62,6 +79,23 @@ h1 {
   font-size: 50px;
   width: 97%;
 }
+
+
+.bi-arrow-repeat{
+  color: white;
+  font-size: 22px;
+  border: 0;
+  background-color: #00a6ff74;
+  border-radius: 3px;
+  transition: .2s;
+}
+
+.bi-arrow-repeat:hover{
+  /* background-color: #00a6ff; */
+  background-color:orange;
+  transition: .2s;
+}
+
 
 
 
@@ -405,7 +439,7 @@ img {
   color: #fff;
   background: rgba(5, 173, 5, 0.500);
   box-shadow: 0 0px 10px rgba(5, 173, 5, 0.0);
-  transition: .2s;
+  transition: .5s;
 }
 .AceptarOpciones:hover {
   background: rgb(5, 173, 5);
@@ -421,6 +455,7 @@ img {
   background: #ffffffa9;
   border-radius: 10px;
   flex-grow: 1;
+  transition: 0.5s;
 }
 
 .BotonFinalizar:hover {

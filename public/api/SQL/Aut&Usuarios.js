@@ -3,7 +3,7 @@ import { mysql, bcrypt, db } from "../conf_api.js";
 //==================================================================================================
 // Función para verificar el usuario y contraseña en varias tablas
 //==================================================================================================
-async function VerificarUsuario(usuario, contrasena) {
+export async function VerificarUsuario(usuario, contrasena) {
   try {
     const connection = await mysql.createConnection(db);
     // Tablas donde se verificará el inicio de sesion
@@ -53,7 +53,7 @@ async function VerificarUsuario(usuario, contrasena) {
 //==================================================================================================
 // Función para obtener el nombre del usuario y si es o no doctor
 //==================================================================================================
-async function UsuarioyProfesion(idUsuario) {
+export async function UsuarioyProfesion(idUsuario) {
   try {
     const connection = await mysql.createConnection(db);
     const consulta = `SELECT * FROM Usuarios WHERE idUsuario = ?`;
@@ -83,7 +83,7 @@ async function UsuarioyProfesion(idUsuario) {
   }
 }
 
-async function logout(idUsuario) {
+export async function logout(idUsuario) {
   try {
     const connection = await mysql.createConnection(db);
     const registro =
@@ -100,7 +100,7 @@ async function logout(idUsuario) {
 }
 
 // Cambia la contraseña de los pacientes
-async function CambiarContraseñaPaciente(idPaciente, NuevaContraseña) {
+export async function CambiarContraseñaPaciente(idPaciente, NuevaContraseña) {
   try {
     // Encriptamos la contraseña
     const salt = await bcrypt.genSalt(10);
@@ -117,10 +117,10 @@ async function CambiarContraseñaPaciente(idPaciente, NuevaContraseña) {
   }
 }
 // Cambia la contraseña del Personal
-async function CambiarContraseña(Usuario, NuevaContraseña) {}
+export async function CambiarContraseña(Usuario, NuevaContraseña) {}
 
 // Reinicia la contraseña por el nombre de usuario
-async function PassRestart(Usuario) {
+export async function PassRestart(Usuario) {
   try {
     const connection = await mysql.createConnection(db);
     // Tablas donde se realizara la busqueda para el usuario
@@ -152,8 +152,3 @@ async function PassRestart(Usuario) {
   }
 }
 
-export { 
-  VerificarUsuario, 
-  UsuarioyProfesion, 
-  logout, 
-  PassRestart };

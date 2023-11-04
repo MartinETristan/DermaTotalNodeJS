@@ -10,7 +10,7 @@ const ZonaSucursal02 = "America/Monterrey";
 // .format("YYYY-MM-DD HH:mm:ss");
 
 // Funcion para obtener la hora y el saludo
-function Saludo() {
+export function Saludo() {
   const HoraActual = moment().tz(ZonaSucursal01).format("HH:mm:ss"); // Obtener hora en la zona horaria
   const Hora = moment().tz(ZonaSucursal01).format("HH"); // Obtener hora en la zona horaria
 
@@ -27,7 +27,7 @@ function Saludo() {
 };
 
 // Funcion para obtener la fecha y hora
-function FechaHora() {
+export function FechaHora() {
   const HoraS1 = moment().tz(ZonaSucursal01).format("HH:mm:ss"); // Obtener hora en la Sucursal 01
   const HoraS2 = moment().tz(ZonaSucursal02).format("HH:mm:ss"); // Obtener hora en la Sucursal 02
   const Año = moment().tz(AproximacionZona).format("YYYY"); // Obtener el año
@@ -46,7 +46,7 @@ function FechaHora() {
 
 
 // Funcion para obtener la informacion del copyrigth
-function Copyright() {
+export function Copyright() {
   const Año = moment().format("YYYY");
   // const Año = moment().tz(zonaHoraria).format("YYYY");
   const InfoCopy = {
@@ -59,8 +59,4 @@ function Copyright() {
 }
 
 
-export{ 
-    Copyright,
-    Saludo,
-    FechaHora
-}
+
