@@ -1,5 +1,6 @@
 import { mysql, db } from "../conf_api.js";
 
+// Muestra las citas que tiene el doctor en el dia de hoy
 export async function CitasDoctor(idDoctor) {
   try {
     const connection = await mysql.createConnection(db);
@@ -22,6 +23,7 @@ export async function CitasDoctor(idDoctor) {
   }
 }
 
+// Modigica la fecha y duracion de la cita
 export async function ModificacionCita(idCita, HoraIncio, FinCita) {
   try {
     const connection = await mysql.createConnection(db);
@@ -33,6 +35,43 @@ export async function ModificacionCita(idCita, HoraIncio, FinCita) {
     console.error("Ha ocurrido un error actualizando la cita: ", error);
     return "Ha ocurrido un error.";
   }
+}
+
+// Actualiza el Checkout de la Sesions
+export async function Update_Checkout(idSesion, CheckOut) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const consulta = `UPDATE Sesion
+  SET CheckOut = ?
+  WHERE idSesion = ?`;
+    connection.execute(consulta, [CheckOut, idSesion]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error en la actualizacion del Checkout:",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
+}
+
+// Actualiza el seguimiento de la sesion de la cita
+export async function UpdateSeguimiento(idSesion, Seguimiento){
+try {
+  const connection = await mysql.createConnection(db);
+  const consulta = `UPDATE Sesion
+  SET Seguimiento = ?
+  WHERE idSesion = ?`;
+  connection.execute(consulta, [Seguimiento, idSesion]);
+  connection.end();
+}catch (error) {
+  console.error(
+    "Ha ocurrido un error en la actualizacion del seguimiento:",
+    error
+  );
+  return "Ha ocurrido un error.";
+}
+
 }
 
 

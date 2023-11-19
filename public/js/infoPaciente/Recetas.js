@@ -1,17 +1,6 @@
 // ========================================================================================================
 // Función para cargar la vista Recetas.ejs
 // ========================================================================================================
-datosAlmacenadosReceta = [];
-// Hacemos la peticoon ajax para obtener las recetas del paciente
-$.ajax({
-  url: "/InfoPaciente",
-  method: "POST",
-  dataType: "json",
-  success: (data) => {
-    // Guardamos los datos para eviar hacer la consulta AJAX nuevamente
-    datosAlmacenadosReceta.push(data);
-  },
-});
 
 function crearElementoMedicamento(item) {
   const divMedicamentos = document.createElement("div");
@@ -42,7 +31,10 @@ function cargarRecetas() {
   const Recetas = document.querySelector("#infocontenido");
   Recetas.innerHTML = `<h3>Historial de Recetas:</h3>`;
 
-  const recetas = datosAlmacenadosReceta[0].Recetas;
+  // Asignamos los datos guardados en el localStorage a una variable (recetas)
+  const recetas = datosAlmacenados.Recetas;
+  // Y los diagnosticos a otra variable (sesiones)
+  const sesiones = datosAlmacenados.Seguimientos;
 
   if (recetas.length === 0) {
     Recetas.innerHTML = `
@@ -71,11 +63,50 @@ function cargarRecetas() {
     divReceta.className = "info__item";
     divReceta.id = `receta_${ultimareceta}`;
 
+    // Este es el div que contiene la información de la receta
     const contenidoReceta = document.createElement("div");
     contenidoReceta.className = "info__item__content";
 
-    const header = document.createElement("header");
-    header.className = "info__item__header";
+    // Solo buscar el diagnóstico si idSesion no es nulo
+    if (receta.idSesion != null) {
+      // Encontrar la sesión que corresponde al idSesion de la receta
+      const sesionCorrespondiente = sesiones.find(
+        (sesion) => sesion.idSesion == receta.idSesion
+      );
+      // Si encontramos una sesión correspondiente, añadimos el diagnóstico
+      if (sesionCorrespondiente) {
+        const diagnostico = sesionCorrespondiente.Diagnostico;
+        const headerDiagnostico = document.createElement("header");
+        headerDiagnostico.className = "info__item__header";
+
+        const DoctorDiagnostico = document.createElement("p");
+        DoctorDiagnostico.innerHTML = `Seguimiento por: <span>${sesionCorrespondiente.Doctor}</span>`;
+        DoctorDiagnostico.classList.add("DoctorDiagnostico");
+        headerDiagnostico.appendChild(DoctorDiagnostico);
+
+        const contenedorDiagnostico = document.createElement("div");
+        contenedorDiagnostico.classList.add("Cont_Diagnostico");
+        const tituloDiagnostico = document.createElement("h2");
+        tituloDiagnostico.innerHTML = "NOTA DE SEGUIMIENTO:";
+        tituloDiagnostico.classList.add("DiagnosticoTitulo");
+        contenedorDiagnostico.appendChild(tituloDiagnostico);
+
+        const Diagnostico = document.createElement("p");
+        Diagnostico.textContent = diagnostico;
+        Diagnostico.classList.add("Diagnostico_Receta");
+        contenedorDiagnostico.appendChild(Diagnostico);
+
+        // Division para separar los diagnosticos de la receta
+        const division = document.createElement("hr");
+        contenidoReceta.appendChild(headerDiagnostico);
+        contenidoReceta.appendChild(contenedorDiagnostico);
+        contenidoReceta.appendChild(division);
+      }
+    }
+
+    // Este es el header de la receta
+    const headerReceta = document.createElement("header");
+    headerReceta.className = "info__item__header";
 
     const TituloReceta = document.createElement("h2");
     TituloReceta.innerHTML = `Fecha <span>${dia}/${mes}/${año}</span>:`;
@@ -83,14 +114,14 @@ function cargarRecetas() {
 
     const botonImprimir = crearBotonImprimir(receta, ultimareceta);
 
-    header.appendChild(TituloReceta);
-    header.appendChild(botonImprimir);
+    headerReceta.appendChild(TituloReceta);
+    headerReceta.appendChild(botonImprimir);
 
     const Doctor = document.createElement("p");
     Doctor.innerHTML = `Recetado por: <b><span>${receta.Doctor}</span></b>`;
     Doctor.className = "DoctorReceta";
 
-    contenidoReceta.appendChild(header);
+    contenidoReceta.appendChild(headerReceta);
     contenidoReceta.appendChild(Doctor);
 
     const datosFiltrados = recetas.filter(
@@ -164,9 +195,10 @@ function crearBotonImprimir(receta, ultimareceta) {
     // // Establece el atributo src para cargar el contenido y disparar el evento onload
     // iframe.src = src;
 
-
-
-    const imprimir = window.open(`/Receta/${idPaciente}/${ultimareceta}`, "_blank");
+    const imprimir = window.open(
+      `/Receta/${idPaciente}/${ultimareceta}`,
+      "_blank"
+    );
 
     // Puedes mover el evento onafterprint aquí si deseas que se cierre después de imprimir la página recargada
     // imprimir.onafterprint = () => {

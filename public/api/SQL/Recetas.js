@@ -4,15 +4,15 @@ export async function NuevaReceta(
   idPaciente,
   idDoctor,
   idSesion,
-  Medicamentos,
-  Indicaciones,
+  Medicamento_Indicacion,
   Nota
 ) {
+  // Inicializamos las variables
   let idReceta = 0;
   let idMedicamento = [];
 
   const connection = await mysql.createConnection(db);
-
+  // Insertamos primero en la tabla de Receta_Pacientes la estructura general de la receta
   try {
     const NewReceta = `INSERT INTO Receta_Pacientes
         (idPaciente, idDoctor, idSesion, Fecha, Nota)
@@ -32,28 +32,21 @@ export async function NuevaReceta(
     return "Ha ocurrido un error.";
   }
 
-  if (Medicamentos.length > 0) {
-    const medicamentosToInsert = Array.isArray(Medicamentos)
-      ? Medicamentos
-      : [Medicamentos];
-
-    const indicacionesToInsert = Array.isArray(Indicaciones)
-      ? Indicaciones
-      : [Indicaciones];
-
-    for (let i = 0; i < medicamentosToInsert.length; i++) {
-      const Medicamento = medicamentosToInsert[i];
-      const Indicacion = indicacionesToInsert[i] || "";
+  // Insertamos en la tabla de Medicamento los medicamentoss y indicaciones
+  if (Array.isArray(Medicamento_Indicacion) && Medicamento_Indicacion.length > 0) {
+    for (const medicamento of Medicamento_Indicacion) {
+      const Medicamento = medicamento.medicamento;
+      const Indicacion = medicamento.indicacion;
 
       const NewMedicamento = `INSERT INTO Medicamento
           (Medicamento, Indicacion)
           VALUES (?, ?);`;
-
       try {
         const [medicamentoResult] = await connection.execute(NewMedicamento, [
           Medicamento,
           Indicacion,
         ]);
+
 
         idMedicamento.push(medicamentoResult.insertId);
       } catch (error) {
@@ -65,7 +58,7 @@ export async function NuevaReceta(
       "El array Medicamentos está vacío, no se realizaron inserciones."
     );
   }
-
+  // Y finalmente los enlazamos en la tabla de enlace
   if (Array.isArray(idMedicamento) && idMedicamento.length > 0) {
     let contador = 1;
     for (const medicamentoId of idMedicamento) {
@@ -125,17 +118,6 @@ export async function UpdateReceta_Añadir(Elemento) {
     ]);
     const idMedicamento = result.insertId; // Aquí obtienes el ID del medicamento insertado
 
-    // Consultamos cual fue el ultimo numero de orden insertado en la receta 
-    const LastValueOrden =  `
-    SELECT Orden
-    FROM Medicamento_Receta 
-    WHERE idReceta_Pacientes = ?
-    ORDER BY Orden DESC
-    LIMIT 1`;
-    const [UltimoValor] = await connection.execute(LastValueOrden,[Elemento.idReceta]);
-    // Y lo almacenamos en una variable
-    const ValorOrden = UltimoValor[0].Orden+1;
-
     // Finalmente simpelemte insertamos todo lo anterior en la tabla  de enlace
     const Asociar_Receta = `
       INSERT INTO Medicamento_Receta
@@ -144,10 +126,10 @@ export async function UpdateReceta_Añadir(Elemento) {
     await connection.execute(Asociar_Receta, [
       idMedicamento,
       Elemento.idReceta,
-      ValorOrden,
+      Elemento.Orden,
     ]);
-
     connection.end();
+
   } catch (error) {
     console.error(
       "Ha ocurrido un error añadiendo el medicamento la receta del paciente: ",

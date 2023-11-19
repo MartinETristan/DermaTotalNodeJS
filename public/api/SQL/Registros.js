@@ -77,6 +77,14 @@ export async function InfoRegistros() {
     const Consultorios = ` SELECT * FROM Consultorio`;
     const [Cons_U] = await connection.execute(Consultorios);
 
+    // Pedimos los padeciminetos
+    const Padecimientos = `SELECT * FROM Padecimientos`;
+    const [Padec] = await connection.execute(Padecimientos);
+
+    // Pedimos las Areas
+    const Areas = `SELECT * FROM Areas`;
+    const [Area] = await connection.execute(Areas);
+
     connection.end();
     const InfoparaRegistros = {
       Doctores: docs,
@@ -87,6 +95,8 @@ export async function InfoRegistros() {
       EstadoCitas: EstC,
       StatusUsuario: Stat_U,
       Consultorios: Cons_U,
+      Padecimientos: Padec,
+      Areas: Area,
     };
     return InfoparaRegistros;
   } catch (error) {
@@ -167,6 +177,68 @@ export async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
     }
   }
 }
+
+//==================================================================================================
+// Diagnostico
+//==================================================================================================
+
+export async function NuevoPadecimiento(idArea,Padecimiento){
+  try{
+    const connection = await mysql.createConnection(db);
+    const query = `INSERT INTO Padecimientos (idArea,Padecimiento) VALUES (?,?)`;
+    const [result] = await connection.execute(query,[idArea,Padecimiento]);
+    connection.end();
+    return result.insertId;
+  }catch(error){
+    console.error("Ha ocurrido un error creando el padecimiento: ",error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+export async function Buscar_Padecimiento(Padecimiento){
+  try{
+    const connection = await mysql.createConnection(db);
+    const query = `SELECT * FROM Padecimientos WHERE Padecimiento LIKE ?`;
+    const [result] = await connection.execute(query, [`%${Padecimiento}%`]);
+    
+    connection.end();
+    return result;
+  }catch(error){
+    console.error("Ha ocurrido un error buscando el padecimiento: ",error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+export async function Añadir_Padecimiento(idPadecimiento,idSesion){
+  try {
+    const connection = await mysql.createConnection(db);
+    const query = `INSERT INTO Padecimientos_Sesion
+    (idPadecimiento, idSesion)
+    VALUES(?, ?);`;
+    await connection.execute(query,[idPadecimiento,idSesion]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error añadiendo el padecimiento: ",error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+export async function Quitar_Padecimiento(idPadecimiento,idSesion){
+  try {
+    const connection = await mysql.createConnection(db);
+    const query = `DELETE FROM Padecimientos_Sesion
+    WHERE idPadecimiento = ? AND idSesion = ?;`;
+    await connection.execute(query,[idPadecimiento,idSesion]);
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error quitando el padecimiento: ",error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
+
+
 
 //==================================================================================================
 // Updates estados Pacientes / Citas

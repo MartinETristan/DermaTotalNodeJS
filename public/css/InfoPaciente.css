@@ -2,12 +2,61 @@
     margin: 0 auto;
 }
 
-.NombrePaciente {
+.TextoHeaderPaciente {
     margin-left: 25px;
     height: auto;
     width: auto;
-    max-width: 500px;
+}
+#TituloOpciones{
+    font-size: 38px;
+}
 
+#MensajeOpciones{
+    font-size: 24px;
+}
+
+.Cont_TextNombre {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    gap: 20px;
+}
+
+.iconbtn--edit.Nombre {
+    color: black;
+    background-color: white;
+}
+
+.botonCancelarNombre,
+.botonGuardarNombre {
+    margin-left: 10px;
+}
+
+.Cont_InputsNombre>* {
+    margin-top: 5px;
+}
+
+#InputNombre,
+#ApellidoP,
+#ApellidoM {
+    color: orange;
+    border: 2px solid rgb(255, 218, 150);
+    background-color: white;
+    border-radius: 5px;
+    font-size: 24px;
+    padding: 5px 10px;
+}
+
+#InputNombre::placeholder,
+#ApellidoP::placeholder,
+#ApellidoM::placeholder {
+    color: orange;
+    opacity: 0.5;
+    /* Firefox */
+}
+
+.Cont_InputsNombre {
+    display: none;
 }
 
 .contfotousuario {
@@ -177,19 +226,21 @@ h1 {
     border-radius: 5px;
     border: none;
 }
-.botonEditarAlergias{
-justify-content: center;
-align-items: center;
-padding: 3px 8px 3px 8px;
-background-color: orange;
-color: white;
-font-size: 15px;
-border-radius: 5px;
-border: none;
+
+.botonEditarAlergias {
+    justify-content: center;
+    align-items: center;
+    padding: 3px 8px 3px 8px;
+    background-color: orange;
+    color: white;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
 }
 
 
-.botonCancelarAlergias{
+.botonCancelarAlergias,
+.botonCancelarNombre {
     font-size: 15px;
     background-color: red;
     color: #fff;
@@ -198,7 +249,8 @@ border: none;
     border: red;
 }
 
-.botonGuardarAlergias{
+.botonGuardarAlergias,
+.botonGuardarNombre {
     font-size: 15px;
     background-color: rgb(29, 196, 29);
     color: #fff;
@@ -215,7 +267,8 @@ border: none;
 
 #inputAlergias::placeholder {
     color: #004368;
-    opacity: 0.75; /* Firefox */
+    opacity: 0.75;
+    /* Firefox */
 }
 
 .iconbtn--cancel {
@@ -432,9 +485,11 @@ border: none;
     padding: 5px 10px;
     background: rgb(250, 20, 20);
     color: #fff;
+    font-size: 16px;
 }
 
 .page__controlbtn--split {
+    font-size: 16px;
     transition: background-color 0.5s, border-color 0.5s, color 0.5s;
     display: block;
     margin: 0;
@@ -517,9 +572,9 @@ border: none;
     resize: vertical;
     margin-top: 10px;
     padding: 10px;
-    width: 95%;
+    width: 96.5%;
     min-height: 50px;
-    max-height: 190px;
+    max-height: 160px;
     border: 1px solid #e9f2f7;
     border-radius: 5px;
 }
@@ -575,11 +630,17 @@ border: none;
     display: block;
 }
 
-
-
-#botonNuevaReceta,
-#agregarCampo,
 .AñadirMedicamento {
+    margin-left: 10px;
+    font-size: 15px;
+    background-color: #73c235;
+    color: #fff;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: #73c235;
+}
+
+#botonNuevaReceta {
     font-size: 15px;
     background-color: #73c235;
     color: #fff;
@@ -695,7 +756,7 @@ a[href^="mailto:"]:focus {
 }
 
 .infogroup.ficha>.info,
-.Diagnosticos>.region__content>.infogroup>.info {
+.Seguimientos>.region__content>.infogroup>.info {
     display: flex;
     justify-content: stretch;
     width: 100%;
@@ -711,7 +772,7 @@ a[href^="mailto:"]:focus {
 
 
 .infogroup.ficha>.info>*,
-.Diagnosticos>.region__content>.infogroup>.info>* {
+.Seguimientos>.region__content>.infogroup>.info>* {
     flex: 1;
     margin: 2px;
 }
@@ -727,6 +788,9 @@ a[href^="mailto:"]:focus {
 .Alerg {
     margin: 0;
     color: red;
+    font-weight: bold;
+    font-size: 24px;
+    text-decoration: underline;
 }
 
 .Eda {
@@ -769,7 +833,7 @@ dd {
 
 
 /* AREA DE DIAGNOSTICOS */
-.Diagnosticos>h2 {
+.Seguimientos>h2 {
     padding-top: 5px;
     color: white;
     padding-bottom: 0;
@@ -777,34 +841,34 @@ dd {
     font-size: 28px;
 }
 
-.Diagnosticos>*>*>*>*>*>*>.info__item__title {
+.Seguimientos>*>*>*>*>*>*>.info__item__title {
     color: #004368;
     /* color: red; */
     font-size: 24px;
 }
 
-.Diagnosticos .info__item {
+.Seguimientos .info__item {
     height: 320px;
 }
 
-.Diagnosticos .info__item__content {
+.Seguimientos .info__item__content {
     font-size: 18px;
 }
 
-.Diagnosticos {
+.Seguimientos {
     border-radius: 5px;
     background: linear-gradient(-180deg, #5dc9ffc4, #1485c24c);
     margin-top: 20px;
     padding: 10px;
 }
 
-.Diagnosticos .region__content {
+.Seguimientos .region__content {
     margin-top: 5px;
 }
 
 .Contenedor__Diagnosticos {
     padding-right: 15px;
-    height: 200px;
+    height: 180px;
     overflow-y: auto;
     border-radius: 5px;
 }
@@ -814,6 +878,208 @@ dd {
     height: 270px;
     overflow-y: auto;
     border-radius: 5px;
+}
+
+.DiagnosticoTitulo {
+    padding: 0;
+    /* margin-top:px; */
+}
+
+.DoctorDiagnostico {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.Cont_Diagnostico {
+    margin-top: 5px;
+    padding: 5px;
+    background-color: rgb(240, 240, 240);
+    border-radius: 5px;
+}
+
+.DoctorDiagnostico>span {
+    color: #249DD9;
+}
+
+.Diagnostico_Receta {
+    font-size: 20px;
+    padding-bottom: 5px;
+}
+
+.info__item__tags {
+    width: 50%;
+    max-width: 335.5px;
+}
+
+#Etiquetas_Actuales,#Etiquetas {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: auto;
+    gap: 5px;
+    width: 100%;
+    /* max-width: 335.5px; */
+    height: auto;
+    border-radius: 5px;
+    overflow-x: scroll;
+    padding-bottom: 15px;
+}
+
+.Etiqueta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    background-color: #249DD9;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    gap: 5px;
+}
+
+.Etiqueta p {
+    margin: 0; 
+    white-space: nowrap; /* Evita el salto de línea */
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.Area0{
+    background-color: #595959;
+}
+
+.Area1 {
+    background-color: #249DD9;
+}
+
+.Area2 {
+    background-color: #e40000;
+}
+
+.Area3 {
+    background-color: #9c00b7;
+}
+
+.Area4 {
+    background-color: #a8a8a8;
+}
+
+
+
+.Etiqueta p {
+    margin: 0;
+}
+
+.Eliminar-Etiqueta {
+    cursor: pointer;
+    background-color: hsl(0, 100%, 50%);
+    padding: 2px 6px 2px 6px;
+    font-size: 12px;
+    border-radius: 2px;
+}
+
+.Crear_padecimiento {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    border-radius: 5px;
+    width: 100%;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.Crear_padecimiento>input {
+    width: 40%;
+    padding: 10px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+}
+
+.GuardarPadecimiento {
+    background-color: #249DD9;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: #249DD9;
+    cursor: pointer;
+}
+
+.CancelarPadecimiento {
+    background-color: #ff0000;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: #ff0000;
+    cursor: pointer;
+
+}
+
+.Crear_padecimiento>select {
+    width: 20%;
+    padding: 10px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+
+}
+
+
+.AceptarOpciones {
+    font-size: 14px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 0;
+    color: #fff;
+    background: rgba(5, 173, 5, 0.500);
+    box-shadow: 0 0px 10px rgba(5, 173, 5, 0.0);
+    transition: .5s;
+  }
+  .AceptarOpciones:hover {
+    background: rgb(5, 173, 5);
+    box-shadow: 0 0px 10px rgba(5, 173, 5, 0.5);
+  }
+  
+  .CancelarOpciones {
+    font-size: 14px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 0;
+    color: #fff;
+    background: rgba(255, 0, 0, 0.500);
+    box-shadow: 0 0px 10px rgba(186, 0, 0, 0.0);
+    transition: .2s;
+  }
+  
+  .CancelarOpciones:hover {
+    background: red;
+    box-shadow: 0 0px 10px rgba(186, 0, 0, 0.5);
+  }
+  
+
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: translateX(0);
+        color: black;
+        border-color: rgba(255, 0, 0, 0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        color: red;
+        border-color: red;
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-2.5px);
+    }
+}
+
+.wiggle {
+    animation: wiggle 0.3s ease-in-out;
 }
 
 
@@ -960,12 +1226,61 @@ form>h3 {
     margin-bottom: 10px;
 }
 
-.Cont_Seguimiento > p {
-    word-wrap: break-word; 
+.Cont_Seguimiento>p {
+    word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
+.footerSeguimiento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 
+}
+
+.Cont_Diagnosticos {
+    width: 80%;
+}
+
+.inputDiagnostic {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+
+}
+
+.resultados-autocompletado {
+    position: absolute;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px #0000004d;
+    overflow: hidden;
+}
+
+.resultados-autocompletado>.diagnosticos_Resultado {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.resultados-autocompletado>.diagnosticos_Resultado:hover {
+    background-color: #249DD9;
+    color: white;
+}
+
+.diagnosticos_CrearBoton {
+    background-color: #cacaca;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    text-decoration: double;
+}
+
+.diagnosticos_CrearBoton:hover {
+    background-color: rgba(255, 166, 0, 0.75);
+    color: white;
+}
 
 .selector {
     width: 100%;
@@ -986,6 +1301,7 @@ form>h3 {
     width: 100%;
     height: auto;
 }
+
 .InfoOpciones>.infogroup>button {
     margin-top: 30px;
     padding: 10px;

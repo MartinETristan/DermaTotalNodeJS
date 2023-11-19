@@ -5,6 +5,8 @@
 import * as API_TimeMachine from "./api_timemachine.js";
 // Dashboard
 import * as API_Dashboard from "./SQL/Dashboard.js";
+// Citas
+import * as API_Citas from "./SQL/Citas.js";
 
 export default function (io) {
 
@@ -102,7 +104,7 @@ io.on("connection", (socket) => {
   
     socket.on("Update_Checkout", (data) => {
       console.log(data);
-      API_Dashboard.Update_Checkout(data.idSesion, data.CheckOut);
+      API_Citas.Update_Checkout(data.idSesion, data.CheckOut);
       io.to("Doctor" + socket.request.session.idDoctor).emit("Update_CheckOut");
       io.to("Recepcion").emit("CheckOut");
     });

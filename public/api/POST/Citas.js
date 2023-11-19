@@ -57,4 +57,22 @@ router.post("/AgendaDoctor", async (peticion, respuesta) => {
   }
 });
 
+// Actualizar el Seguimineto de la sesion de la cita
+router.post ("/UpdateSeguimiento", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+    if (peticion.session.EsDoctor) {
+      await API_Citas.UpdateSeguimiento(
+        peticion.body.idSesion,
+        peticion.body.Seguimiento,
+      );
+      respuesta.end(JSON.stringify("Seguimiento actualizado exitosamente"));
+    } else {
+      respuesta.end(JSON.stringify("No tiene permisos para realizar esta accion"));
+    }
+  }
+});
+
+
+
+
 export default router;

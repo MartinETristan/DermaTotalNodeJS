@@ -265,19 +265,16 @@ export async function DashDoc_CitasFinalizadas(idDoctor, Fecha) {
   }
 }
 
-
-
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Dashboard Recepcion
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 //==================================================================================================
-// Función para obtener la informacion del Dashboard de recpecion (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
+// Dashboard Recepcion | Pacientes Hoy
 //==================================================================================================
-export async function DashRecepcion(Sucursal, Fecha) {
+export async function DashRecepcion_PacientesHoy(Sucursal, Fecha) {
   let CitasHoy = [];
-  let PacientesPedidos = [];
-  let PacientesCheckout = [];
   try {
-    //==================================================================================================
-    // Citas del dia
     const connection = await mysql.createConnection(db);
     const consultaHoy = `SELECT c.idCitas, p.idPaciente, c.idDoctor, a.idAsociado, CONCAT(uDoc.Nombres," ",uDoc.ApellidoP) AS Doctor,
       CONCAT(uAso.Nombres," ",uAso.ApellidoP) AS Asociado,
@@ -316,8 +313,8 @@ export async function DashRecepcion(Sucursal, Fecha) {
         };
       });
     }
-
     connection.end();
+    return CitasHoy;
   } catch (error) {
     console.error(
       "Ha ocurrido un error en la consulta de citas del día:",
@@ -325,10 +322,14 @@ export async function DashRecepcion(Sucursal, Fecha) {
     );
     return "Ha ocurrido un error.";
   }
+}
 
+//==================================================================================================
+// Dashboard Recepcion | Pacientes Pedidos
+//==================================================================================================
+export async function DashRecepcion_PacientesPedidos(Sucursal) {
+  let PacientesPedidos = [];
   try {
-    //==================================================================================================
-    // Pacientes Pedidos
     const connection = await mysql.createConnection(db);
     const Pedidos = `SELECT pp.idCitas,pp.idDoctor,pp.idConsultorio, Udoc.Nombres AS NombreD, Upac.Nombres AS NombreP,
       CONCAT(Udoc.ApellidoP," ",Udoc.ApellidoM) AS ApellidoD,	CONCAT(Upac.ApellidoP," ",Upac.ApellidoM) AS ApellidoP,
@@ -371,14 +372,19 @@ export async function DashRecepcion(Sucursal, Fecha) {
       });
     }
     connection.end();
+    return PacientesPedidos;
   } catch (error) {
     console.error("Ha ocurrido un error en los pacientes pedidos:", error);
     return "Ha ocurrido un error.";
   }
+}
 
+//==================================================================================================
+// Dashboard Recepcion | Citas Finalizadas
+//==================================================================================================
+export async function DashRecepcion_CitasFinalizadas(Sucursal, Fecha) {
+  let PacientesCheckout = [];
   try {
-    //==================================================================================================
-    // Citas Finalizadas
     const connection = await mysql.createConnection(db);
     const CitasFin = `SELECT u.Nombres, CONCAT(u.ApellidoP," ",u.ApellidoM) AS Apellidos, DATE_FORMAT(c.HoraCita, '%H:%i') AS HoraCita, 
       s.CheckOut,u.RutaFoto, s.idPaciente, p2.Procedimiento
@@ -410,19 +416,20 @@ export async function DashRecepcion(Sucursal, Fecha) {
       });
     }
     connection.end();
+    return PacientesCheckout;
   } catch (error) {
     console.error("Ha ocurrido un error en los pacientes Finalizados:", error);
     return "Ha ocurrido un error.";
   }
-
-  const InfoDashRecep = {
-    CitasHoy: CitasHoy,
-    PacientesPedidos: PacientesPedidos,
-    PacientesCheckout: PacientesCheckout,
-  };
-  return InfoDashRecep;
 }
 
+
+
+
+
+//==================================================================================================
+// Función para obtener la informacion del Dashboard de recpecion (Pacientes en espera, Citas del dia, Otros consultorios y Citas Finalizadas)
+//==================================================================================================
 export async function Hoy_Espera(idCita, HoraLlegada) {
   try {
     const connection = await mysql.createConnection(db);
@@ -544,6 +551,7 @@ export async function AsignarP_Pedido(
   }
 }
 
+// Aqui se da el checkout a recepcion y se avanza un status en la cita
 export async function Consulta_Checkout(idCita, idSesion, HoraFin, CheckOut) {
   try {
     const connection = await mysql.createConnection(db);
@@ -578,20 +586,4 @@ export async function Consulta_Checkout(idCita, idSesion, HoraFin, CheckOut) {
   }
 }
 
-export async function Update_Checkout(idSesion, CheckOut) {
-  try {
-    const connection = await mysql.createConnection(db);
-    const consulta = `UPDATE Sesion
-  SET CheckOut = ?
-  WHERE idSesion = ?`;
-    connection.execute(consulta, [CheckOut, idSesion]);
-    connection.end();
-  } catch (error) {
-    console.error(
-      "Ha ocurrido un error en la actualizacion del Checkout:",
-      error
-    );
-    return "Ha ocurrido un error.";
-  }
-}
 

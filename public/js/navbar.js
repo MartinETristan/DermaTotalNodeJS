@@ -16,12 +16,15 @@ $(window).bind("scroll", function () {
     $(".nav-bar").addClass("fixed");
     $(".nav-1").addClass("toleft");
     $(".icono").addClass("icoinvert");
+    $("body").css("padding-top", navHeight-8 + "px"); // Agrega un padding al body
   } else {
     $(".nav-bar").removeClass("fixed");
     $(".nav-1").removeClass("toleft");
     $(".icono").removeClass("icoinvert");
+    $("body").css("padding-top", "0"); // Restablece el padding del body
   }
 });
+
 
 function getUserRole() {
   return new Promise((resolve, reject) => {
@@ -376,9 +379,12 @@ window.addEventListener("beforeunload", function (event) {
   socket.disconnect();
 });
 
-if (window.location.href.indexOf("/Dashboard") === -1) {
+// Verificar si estamos en la página /Dashboard o en alguna página que comience con /InfoPaciente/ seguido de un número
+if (window.location.href.indexOf("/Dashboard") === -1 && !window.location.href.match(/\/InfoPaciente\/\d+$/)) {
+  // Si no estamos en ninguna de esas páginas, desconectar el socket
   socket.disconnect();
 }
+
 
 
 // ==================================================================================================

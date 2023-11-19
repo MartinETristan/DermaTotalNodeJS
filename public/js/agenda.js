@@ -73,8 +73,7 @@ $(document).ready(function () {
     stickyHeaderDates: true,
     // Indicador de hora
     nowIndicator: true,
-    // Si se puede arrastrar los eventos
-    editable: true,
+
     // Si se puede seleccionar los eventos
     selectable: true,
     // Formato de la hora
@@ -92,32 +91,51 @@ $(document).ready(function () {
         method: "POST",
         dataType: "json",
         success: function (data) {
-          // Array con los colores a mostrar con base a su status
           const colores = {
             1: "#249DD9",
             2: "#f9b11f",
             3: "green",
             4: "#ACACAC",
           };
+    
           var eventos = data.map(function (evento) {
-            var startTime = moment.utc(evento.HoraCita).local().format("HH:mm"); // Convertir y ajustar la hora de inicio
-            var endTime = moment.utc(evento.FinCita).local().format("HH:mm"); // Convertir y ajustar la hora de finalización
-
-            return {
-              id: evento.idCitas,
-              title: evento.Nombres,
-              start: evento.HoraCita,
-              end: evento.FinCita,
-              backgroundColor: colores[evento.idStatusPaciente],
-              borderColor: colores[evento.idStatusPaciente],
-              extendedProps: {
-                Procedimiento: evento.Procedimiento,
-                idPaciente: evento.idPaciente,
-              },
-              // Agrega otras propiedades según tus necesidades
-              _content: `<h3>${evento.Nombres}</h3><div class="HoraConsulta">${startTime}/${endTime}</div>`,
-            };
+            var startTime = moment.utc(evento.HoraCita).local().format("HH:mm");
+            var endTime = moment.utc(evento.FinCita).local().format("HH:mm");
+    
+            // Filtrar eventos que cumplan la condición de edición (idStatusPaciente igual a 1)
+            if (evento.idStatusPaciente === 1) {
+              return {
+                id: evento.idCitas,
+                title: evento.Nombres,
+                start: evento.HoraCita,
+                end: evento.FinCita,
+                backgroundColor: colores[evento.idStatusPaciente],
+                borderColor: colores[evento.idStatusPaciente],
+                extendedProps: {
+                  Procedimiento: evento.Procedimiento,
+                  idPaciente: evento.idPaciente,
+                },
+                _content: `<h3>${evento.Nombres}</h3><div class="HoraConsulta">${startTime}/${endTime}</div>`,
+                editable: true, // Habilitar edición solo para eventos con idStatusPaciente igual a 1
+              };
+            } else {
+              return {
+                id: evento.idCitas,
+                title: evento.Nombres,
+                start: evento.HoraCita,
+                end: evento.FinCita,
+                backgroundColor: colores[evento.idStatusPaciente],
+                borderColor: colores[evento.idStatusPaciente],
+                extendedProps: {
+                  Procedimiento: evento.Procedimiento,
+                  idPaciente: evento.idPaciente,
+                },
+                _content: `<h3>${evento.Nombres}</h3><div class="HoraConsulta">${startTime}/${endTime}</div>`,
+                editable: false, // Deshabilitar edición para otros eventos
+              };
+            }
           });
+    
           successCallback(eventos);
         },
         error: function (error) {
@@ -126,6 +144,7 @@ $(document).ready(function () {
         },
       });
     },
+    
 
     // Crea los eventos con base a la informacion de la base de datos
     eventContent: function (arg) {

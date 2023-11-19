@@ -63,7 +63,7 @@
       <% //Contenido de la Izquierda%>
       <div class="Izquierda">
         <h2 class="Titulo">
-          Registro de Entrada (<b class="NumeroPacientesEspera"></b>): <button class="bi-arrow-repeat" id="ActualizarEspera"></button>
+          Registro de Entrada (<b class="NumeroPacientesEspera"></b>): <button class="bi-arrow-repeat" id="Doc_ActualizarEspera"></button>
         </h2>
         <% //Citas en Turno%>
         <div class="Entrada">
@@ -75,7 +75,7 @@
         <% // Otros Consultorios%>
         <div class="OC">
           <h2 class="Titulo">
-            Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>): <button class="bi-arrow-repeat" id="ActualizarOC"></button>
+            Otros Consultorios (<b class="NumeroOtrosConsultorios"></b>): <button class="bi-arrow-repeat" id="Doc_ActualizarOC"></button>
           </h2>
           <div class="Otros">
             <div class="ContenidoOtrosConsultorios">
@@ -89,7 +89,7 @@
       <div class="Derecha">
         <% // Citas Confirmadas para hoy%>
         <h2 class="Titulo">
-          Citas para hoy (<b class="NumeroPacientesCitasHoy"></b>): <button class="bi-arrow-repeat" id="ActualizarCitasHoy"></button>
+          Citas para hoy (<b class="NumeroPacientesCitasHoy"></b>): <button class="bi-arrow-repeat" id="Doc_ActualizarCitasHoy"></button>
         </h2>
         <div class="CCPH">
           <div class="Hoy">
@@ -102,7 +102,7 @@
         <% // Citas Finalizadas%>
         <div class="CF">
           <h2 class="Titulo">
-            Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>): <button class="bi-arrow-repeat" id="ActualizarCF"></button>
+            Citas Finalizadas (<b class="NumeroCitasFinalizadas"></b>): <button class="bi-arrow-repeat" id="Doc_ActualizarCF"></button>
           </h2>
           <div class="Finalizadas">
             <div class="ContenidoCitasFinalizadas">
@@ -131,15 +131,15 @@
     <!-- <a href="#" id="NuevoPaciente">NuevoPaciente</a> -->
     <div class="ContenidoRecepcion">
       <div class="PacientesdeHoy">
-        <h2>Pacientes de hoy:</h2>
+        <h2>Pacientes de hoy: <button class="bi-arrow-repeat" id="Recep_Actualizar_P_Hoy"></button></h2>
         <div class="CitasHoy"></div>
       </div>
       <div class="PacientesPedidos">
-        <h2>Pacientes Pedidos:</h2>
+        <h2>Pacientes Pedidos: <button class="bi-arrow-repeat" id="Recep_Actualizar_P_Pedidos"></button></h2>
         <div class="Pedidos"></div>
       </div>
       <div class="PacientesCheckout">
-        <h2>Pacientes Finalizados:</h2>
+        <h2>Pacientes Finalizados: <button class="bi-arrow-repeat" id="Recep_Actualizar_P_Checkout"></button></h2>
         <div class="PacientesFinalizados"></div>
         <div class="PaginacionPF"></div>
       </div>
@@ -162,11 +162,11 @@
     <!-- <a href="#" id="NuevoPaciente">NuevoPaciente</a> -->
     <div class="ContenidoRecepcion">
       <div class="PacientesdeHoy">
-        <h2>Pacientes de hoy:</h2>
+        <h2>Pacientes de hoy: <button class="bi-arrow-repeat" id="Recep_Actualizar_P_Hoy"></button></h2>
         <div class="CitasHoy"></div>
       </div>
       <div class="PacientesCheckout">
-        <h2>Pacientes Finalizados:</h2>
+        <h2>Pacientes Finalizados: <button class="bi-arrow-repeat" id="Recep_Actualizar_P_Checkout"></button></h2>
         <div class="PacientesFinalizados"></div>
         <div class="PaginacionPF"></div>
       </div>

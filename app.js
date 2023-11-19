@@ -16,7 +16,6 @@ import * as API_TimeMachine from "./public/api/api_timemachine.js";
 //==================================================================================================
 // Configuracion del Sitio Web
 //==================================================================================================
-
 // Ejecucion de dotenv
 config();
 const app = express();
@@ -256,5 +255,6 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
 
 // Y un Middleware para Cualquier otro sitio no encontrado (página 404)
 app.use((req, res) => {
+
   res.render("404.ejs");
 });

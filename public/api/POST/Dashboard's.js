@@ -232,14 +232,87 @@ router.post("/DashboardDoc/CitasFinalizadas", async (peticion, respuesta) => {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 router.post("/DashboardRecepcion", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
-    const PacientesEspera = await API_Dashboard.DashRecepcion(
+
+    const CitasHoy = await API_Dashboard.DashRecepcion_PacientesHoy(
       peticion.session.Sucursal,
       API_TimeMachine.FechaHora().FormatoDia
     );
-    respuesta.end(JSON.stringify(PacientesEspera));
+    const PacientesPedidos = await API_Dashboard.DashRecepcion_PacientesPedidos(
+      peticion.session.Sucursal,
+      API_TimeMachine.FechaHora().FormatoDia
+    );
+
+    const PacientesCheckout = await API_Dashboard.DashRecepcion_CitasFinalizadas(
+      peticion.session.Sucursal,
+      API_TimeMachine.FechaHora().FormatoDia
+    );
+
+    const InfoDashboard = {
+    CitasHoy: CitasHoy,
+    PacientesPedidos: PacientesPedidos,
+    PacientesCheckout: PacientesCheckout,
+    };
+
+    respuesta.end(JSON.stringify(InfoDashboard));
   } else {
     respuesta.redirect("/");
   }
 });
+
+//==================================================================================================
+// Dashboard Recepcion | Citas Hoy
+//==================================================================================================
+
+router.post("/DashboardRecepcion/CitasHoy", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+
+    const CitasHoy = await API_Dashboard.DashRecepcion_PacientesHoy(
+      peticion.session.Sucursal,
+      API_TimeMachine.FechaHora().FormatoDia
+    );
+
+    respuesta.end(JSON.stringify(CitasHoy));
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+//==================================================================================================
+// Dashboard Recepcion | Pacientes Pedidos
+//==================================================================================================
+
+router.post("/DashboardRecepcion/P_Pedidos", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+    const PacientesPedidos = await API_Dashboard.DashRecepcion_PacientesPedidos(
+      peticion.session.Sucursal,
+      API_TimeMachine.FechaHora().FormatoDia
+    );
+
+    respuesta.end(JSON.stringify(PacientesPedidos));
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+//==================================================================================================
+// Dashboard Recepcion | Pacientes Checkout
+//==================================================================================================
+
+router.post("/DashboardRecepcion/P_Checkout", async (peticion, respuesta) => {
+  if (peticion.session.idusuario) {
+
+    const PacientesCheckout = await API_Dashboard.DashRecepcion_CitasFinalizadas(
+      peticion.session.Sucursal,
+      API_TimeMachine.FechaHora().FormatoDia
+    );
+    respuesta.end(JSON.stringify(PacientesCheckout));
+  } else {
+    respuesta.redirect("/");
+  }
+});
+
+
+
+
 
 export default router;

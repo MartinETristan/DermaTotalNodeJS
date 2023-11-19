@@ -9,14 +9,16 @@
     <link rel="stylesheet" href="/css/InfoPaciente.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
     <link rel="icon" href="/img/favicon.ico" />
-    <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js"></script>
-    <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
     <script src="/js/infoPaciente.js"></script>
-    <script src="/js/infoPaciente/General.js"></script>
+    <script src="/js/infoPaciente/General/Ficha_Antecedentes.js"></script>
+    <script src="/js/infoPaciente/General/Seguimiento.js"></script>
+    <script src="/js/infoPaciente/General/UltimaReceta.js"></script>
+    <script src="/js/infoPaciente/General/NuevaReceta.js"></script>
     <script src="/js/infoPaciente/Historial.js"></script>
     <script src="/js/infoPaciente/Recetas.js"></script>
   </head>
@@ -67,11 +69,24 @@
             <img class="fotousuario"alt="Foto Paciente">
           </div>
           <div>
-            <div class="NombrePaciente">
-             <h1 class="Nombre">Cargando Nombre...<br><h1 class="Apellido">Cargando Apellidos...</h1></h1>
-             <input type="text" name="Nombre" id="Nombre" placeholder="Nombre" style="display: none;">
-             <input type="text" name="ApellidoP" id="ApellidoP" placeholder="Apellido Paterno" style="display: none;">
-             <input type="text" name="ApellidoM" id="ApellidoM" placeholder="Apellido Materno" style="display: none;">
+            <div class="TextoHeaderPaciente">
+              <div class="NombrePaciente">
+                <div class="Cont_TextNombre">
+                  <div class="TextNombre">
+                    <h1 class="Nombre">Cargando Nombre...</h1>
+                    <h1 class="Apellido">Cargando Apellidos...</h1>
+                  </div>
+                  <button class="iconbtn--edit Nombre" id="EditarNombre"></button> 
+                </div>
+                <div class="Cont_InputsNombre">
+                  <!-- style="display: none;" -->
+                  <input type="text" name="Nombre" id="InputNombre" placeholder="Nombre*"><br>
+                  <input type="text" name="ApellidoP" id="ApellidoP" placeholder="Apellido Paterno">
+                  <input type="text" name="ApellidoM" id="ApellidoM" placeholder="Apellido Materno">
+                  <button class="botonCancelarNombre" id="botonCancelarNombre">Cancelar</button>
+                  <button class="botonGuardarNombre" id="botonGuardarNombre">Guardar</button>
+                </div>
+              </div>
              <h3 class="Eda">Edad: <span class="Edad">Cargando edad...</span> años</h3>
              <div class="contenedorAlergias">
                <h3 class="Alerg" id="textAlergias">ALERGIAS: <span class="Alergias">No hay alergias</span></h3>

@@ -59,12 +59,27 @@ router.post("/ActualizarAntecedentesPaciente", async (req, res) => {
 
 // Actualizamos la informacion personal
 router.post("/ActualizarInfoPersonal", async (req, res) => {
-  API_Registros.ActualizarDatosGenerales(
-    req.session.idInfoUsuario,
-    req.body.Propiedad,
-    req.body.Valor,
-    req.body.TipoUser
-  );
+  // En caso de que se vaya a cambiar el nombre del paciente,
+  // se ejecuta un ciclo para actualizar el nombre y apellido
+  // ya que se encuientra en columbnas diferentes
+  if (req.body.CambiosNombre) {
+    req.body.CambiosNombre.forEach((element) => {
+      API_Registros.ActualizarDatosGenerales(
+        req.session.idInfoUsuario,
+        element.Propiedad,
+        element.Valor,
+        element.TipoUser
+      );
+    });
+    //En caso de que se actualice cualquier otro valor, se ejecuta la funcion normal
+  } else {
+    API_Registros.ActualizarDatosGenerales(
+      req.session.idInfoUsuario,
+      req.body.Propiedad,
+      req.body.Valor,
+      req.body.TipoUser
+    );
+  }
   return res
     .status(200)
     .json({ mensaje: "Informacion Personal actualizada exitosamente" });
@@ -265,5 +280,46 @@ async function CarpetaPersonal(Protocolo, id) {
     throw new Error("El protocolo no es valido.");
   }
 }
+
+router.post("/NuevoPadecimiento", async (req, res) => {
+  const idPadecimiento = await API_Registros.NuevoPadecimiento(
+    req.body.idArea,
+    req.body.Padecimiento
+  );
+  return res.status(200).json({ idPadecimiento: idPadecimiento });
+});
+
+router.post("/Buscar_Padecimiento", async (req, res) => {
+  const resBusqueda = await API_Registros.Buscar_Padecimiento(
+    req.body.Padecimiento
+  );
+  res.end(JSON.stringify(resBusqueda));
+});
+
+router.post("/GuardarDiagnosticos", async (req, res) => {
+  // Para cada una de las instrucciones, ejecutar la funcion correspondiente
+  req.body.cambios.forEach((element) => {
+    switch (element.action) {
+      // En caso de añadir un padecimiento
+      case "Añadir":
+        API_Registros.Añadir_Padecimiento(
+          element.idPadecimiento,
+          element.idSesion
+        );
+        break;  
+      // En caso de eliminar un padecimiento
+      case "Eliminar":
+        API_Registros.Quitar_Padecimiento(
+          element.idPadecimiento,
+          element.idSesion
+        );
+        break;
+      // En caso de no tener una entrada valida
+      default:
+        console.log("No se ha encontrado la accion");
+        break;
+    }
+  });
+});
 
 export default router;

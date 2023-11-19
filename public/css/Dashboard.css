@@ -490,7 +490,6 @@ img {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* color: #b0b0b0; */
   --bg-size: 400%;
   --color-one: #249DD9;
   --color-two: #b0b0b0;
@@ -498,9 +497,9 @@ img {
       var(--color-two),
       var(--color-one)) 0 0 / var(--bg-size) 100%;
   color: transparent;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
+  background-clip: text;
   animation: move-bg 8s infinite linear;
 }
 

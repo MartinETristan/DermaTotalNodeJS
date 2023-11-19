@@ -577,7 +577,7 @@ function Actualizar_CF(){
 //==================================================================================================
 
 $(document).ready(function () {
-  $("#ActualizarEspera").click(function () {
+  $("#Doc_ActualizarEspera").click(function () {
     Actualizar_Espera();
     // Añade la clase para iniciar la animación y el manejador del evento para cuando termine
     $(".Entrada").addClass("entrando").on("animationend", function() {
@@ -588,7 +588,7 @@ $(document).ready(function () {
     });
   });
   
-  $("#ActualizarCitasHoy").click(function () {
+  $("#Doc_ActualizarCitasHoy").click(function () {
     Actualizar_CitasHoy();
     $(".CCPH").addClass("entrando").on("animationend", function() {
       $(this).removeClass("entrando");  
@@ -596,14 +596,14 @@ $(document).ready(function () {
     });
   });
 
-  $("#ActualizarOC").click(function () {
+  $("#Doc_ActualizarOC").click(function () {
     Actualizar_OC();
     $(".Otros").addClass("entrando").on("animationend", function() {
       $(this).removeClass("entrando");  
       $(this).off("animationend");
     });
   });
-  $("#ActualizarCF").click(function () {
+  $("#Doc_ActualizarCF").click(function () {
     Actualizar_CF();
     $(".Finalizadas").addClass("entrando").on("animationend", function() {
       $(this).removeClass("entrando");  

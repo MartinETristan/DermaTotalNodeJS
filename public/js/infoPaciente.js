@@ -59,8 +59,6 @@ async function obtenerDatos() {
 
     // Crear el Header con los datos obtenidos
     HeaderInfoPaciente(dataPaciente);
-
-    return console.log("Datos obtenidos correctamente");
   } catch (error) {
     console.error(error);
     throw error; // Lanza el error para que pueda ser manejado por quien llame a la función
@@ -72,24 +70,92 @@ function HeaderInfoPaciente(data) {
   // Llenamos los campos de la vista con los datos obtenidos
   //Nombre
   const Nombre = document.querySelector(".Nombre");
+  const InputNombre = document.getElementById("InputNombre");
+  InputNombre.value = data.BasicInfo[0].Nombres || "";
   Nombre.textContent = data.BasicInfo[0].Nombres;
+
   //Apellido
   const Apellido = document.querySelector(".Apellido");
+  const InputApellidoP = document.getElementById("ApellidoP");
+  const InputApellidoM = document.getElementById("ApellidoM");
   Apellido.textContent = data.BasicInfo[0].Apellidos;
+
+  // Separamos el apellido en dos partes (por que viene concatenado de la BD)
+  const partes = data.BasicInfo[0].Apellidos.split(" ");
+  InputApellidoP.value = partes[0] || "";
+  InputApellidoM.value = partes[1] || "";
+
+  // Agregamos los eventos para editar el nombre
+  agregarEventListener("EditarNombre", function () {
+    const cont_InputNombre = document.querySelector(".Cont_InputsNombre");
+    const cont_TextNombre = document.querySelector(".Cont_TextNombre");
+    cont_InputNombre.style.display = "block";
+    cont_TextNombre.style.display = "none";
+  });
+  // Para cancelar la edicion
+  agregarEventListener("botonCancelarNombre", function () {
+    const cont_InputNombre = document.querySelector(".Cont_InputsNombre");
+    const cont_TextNombre = document.querySelector(".Cont_TextNombre");
+    cont_TextNombre.style.display = "flex";
+    cont_InputNombre.style.display = "none";
+  });
+
+  // Y para guardar los cambios
+  agregarEventListener("botonGuardarNombre", function () {
+    if (InputNombre.value == null || InputNombre.value == "") {
+      alert("No se puede dejar el nombre vacio");
+      return;
+    }
+
+    // Convertimos el ApellidoP y ApellidoM para quitarle los espacios
+    const InputApellidoP_Clean = InputApellidoP.value.replace(/\s/g, "");
+    const InputApellidoM_Clean = InputApellidoM.value.replace(/\s/g, "");
+
+    fetch("/ActualizarInfoPersonal", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        CambiosNombre: [
+          { Propiedad: "Nombres", Valor: InputNombre.value, TipoUser: 7 },
+          { Propiedad: "ApellidoP", Valor: InputApellidoP_Clean, TipoUser: 7 },
+          { Propiedad: "ApellidoM", Valor: InputApellidoM_Clean, TipoUser: 7 },
+        ],
+      }),
+    });
+
+    // Actualizamos el nombre con los datos del input
+    const textoNombre = document.querySelector(".Nombre");
+    textoNombre.textContent = InputNombre.value;
+    const textoApellido = document.querySelector(".Apellido");
+    // Concatenamos los apellidos
+    const concatApellidos = InputApellidoP.value + " " + InputApellidoM.value;
+    // Y los actualziamos en el texto
+    textoApellido.textContent = concatApellidos;
+
+    const cont_InputNombre = document.querySelector(".Cont_InputsNombre");
+    const cont_TextNombre = document.querySelector(".Cont_TextNombre");
+    cont_TextNombre.style.display = "flex";
+    cont_InputNombre.style.display = "none";
+  });
+
   // Edad
   const Edad = document.querySelector(".Edad");
   Edad.textContent = data.BasicInfo[0].Edad;
 
   //Y alergias
   const Alergias = document.querySelector(".Alergias");
+  // Alergias.textContent = "Ninguna";
+  const Alerg = document.querySelector(".Alerg");
   if (
-    data.Antecedentes[0].Alergias == "No hay Alergias" ||
+    data.Antecedentes[0].Alergias == "ALERGIAS: Negadas" ||
     data.Antecedentes[0].Alergias == null
   ) {
-    // Alergias.textContent = "Ninguna";
-    const Alerg = document.querySelector(".Alerg");
-    Alerg.setAttribute("style", "color: #004368;");
-    Alerg.textContent = "No hay Alergias";
+    Alerg.textContent = "ALERGIAS: Negadas";
+    Alerg.style.fontSize = "18px";
+    Alerg.style.color = " #004368";
+    Alerg.style.textDecoration = " none";
   } else {
     Alergias.textContent = data.Antecedentes[0].Alergias.toUpperCase();
   }
@@ -103,10 +169,10 @@ function HeaderInfoPaciente(data) {
   // Y seleccionamos el Input para editar las alergias
   const InputAlergias = document.getElementById("inputAlergias");
   InputAlergias.value =
-    data.Antecedentes[0].Alergias != "No hay Alergias"
+    data.Antecedentes[0].Alergias != "ALERGIAS: Negadas"
       ? data.Antecedentes[0].Alergias
       : "";
-  const Alerg = document.querySelector(".Alerg");
+  // const Alerg = document.querySelector(".Alerg");
   // Añadimos el boton al contenedor
   contenedorAlergias.appendChild(botonEditAlerg);
 
@@ -163,8 +229,102 @@ function HeaderInfoPaciente(data) {
   };
   Avatar.src = nuevaURL;
 
+  // Activa el Boton para Terminar la Consulta en caso de que haya una consulta activa
+  if (data.SesionesActivas.length > 0) {
+    const BotonTerminar = document.getElementById("TerminarConsulta");
+    BotonTerminar.style.display = "block";
+
+    agregarEventListener("TerminarConsulta", function () {
+      // Mostrar el contenedor de las opciones
+      const contenedor = document.getElementById("Cont_Opciones");
+      contenedor.style.visibility = "visible";
+      contenedor.style.opacity = "1";
+      const TituloOpciones = document.getElementById("TituloOpciones");
+      TituloOpciones.textContent = "Terminar Consulta";
+      const MensajeOpciones = document.getElementById("MensajeOpciones");
+      MensajeOpciones.textContent = `Este es el checkout de ${datosAlmacenados.BasicInfo[0].Nombres} por la ${datosAlmacenados.SesionesActivas[0].Procedimiento} (de requerirse, por favor indica cargos adicionales).`;
+
+      const Opciones = document.getElementById("Opciones");
+      // Limpiamos el contenido anterior
+      const InfoOpciones = document.querySelector(".InfoOpciones");
+      InfoOpciones.innerHTML = "";
+
+
+      var Checkout = document.createElement("input");
+      Checkout.setAttribute("id", "valorCheckout");
+      Checkout.required = true;
+      InfoOpciones.appendChild(Checkout);
+
+      if (datosAlmacenados.SesionesActivas[0].Nota) {
+        var Nota = document.createElement("p");
+        Nota.classList.add("NotaOpciones");
+        Nota.textContent = `Nota: ${datosAlmacenados.SesionesActivas[0].Nota}`;
+        InfoOpciones.appendChild(Nota);
+      }
+
+      // Si ya existen los botones, eliminarlos
+      const contenedorBotonesExistente =
+        document.querySelector(".BotonesOpciones");
+      if (contenedorBotonesExistente) {
+        Opciones.removeChild(contenedorBotonesExistente);
+      }
+
+      // Creación de los botones de aceptar y cancelar
+      const contenedorBotones = document.createElement("div");
+      contenedorBotones.classList.add("BotonesOpciones");
+
+      // Crear el botón de Cancelar
+      const botonCancelar = document.createElement("button");
+      botonCancelar.classList.add("CancelarOpciones");
+      botonCancelar.textContent = "Cancelar";
+
+      // Crear el botón de Aceptar
+      const botonAceptar = document.createElement("button");
+      botonAceptar.classList.add("AceptarOpciones");
+      botonAceptar.textContent = "Aceptar";
+
+      // Agregar los botones al contenedor
+      contenedorBotones.appendChild(botonCancelar);
+      contenedorBotones.appendChild(botonAceptar);
+
+      // Acciones de los botones de aceptar y cancelar
+      botonCancelar.addEventListener("click", function (event) {
+        contenedor.style.visibility = "hidden";
+        contenedor.style.opacity = "0";
+        event.stopPropagation();
+      });
+
+      // Aqui van las acciones para cuado se de en aceptar
+      botonAceptar.addEventListener("click", function (event) {
+        // Verificamos que el campo de checkout no esté vacío
+        if (!Checkout.checkValidity()) {
+          Checkout.reportValidity();
+          return;
+        }else{
+          console.log("Checkout.value", Checkout.value);
+          socket.emit("CambioEstadoPaciente", {
+            idCita: datosAlmacenados.SesionesActivas[0].idCita,
+            idStatus: 3,
+            idSesion: datosAlmacenados.SesionesActivas[0].idSesion,
+            Doctor: datosAlmacenados.SesionesActivas[0].idDoctor,
+            Asociado: datosAlmacenados.SesionesActivas[0].idAsociado,
+            Checkout: Checkout.value,
+          });
+          // Y limpiamos la vista
+          contenedor.style.visibility = "hidden";
+          contenedor.style.opacity = "0";
+          // Y recargamos la pagina
+          location.reload();
+        }
+      });
+      Opciones.appendChild(contenedorBotones);
+
+      console.log("Terminar Consulta", data.SesionesActivas[0]);
+    });
+  }
+
   // ========================================================================================================
-  // Escuchar el boton para reinciiar la constraseña
+  // Escuchar el boton para reiniciar la constraseña
   // ========================================================================================================
   agregarEventListener("InfoDTPaciente", function () {
     // Mostrar el contenedor de las opciones
@@ -270,6 +430,12 @@ function HeaderInfoPaciente(data) {
       });
     } else {
       console.log("No hay status");
+    }
+
+    //En caso de que existan botones alternos, los ocultamos
+    const BotonesAlternos = document.querySelector(".BotonesOpciones");
+    if(BotonesAlternos){
+      BotonesAlternos.style.display = "none";
     }
 
     // ========================================================================================================
@@ -424,143 +590,18 @@ function getCombinedInputData() {
   return combinedData;
 }
 
-var arrayInput = [];
-
-// Comparar los datos
-function itemsAreEqual(item1, item2) {
-  return (
-    item1.Medicamento === item2.Medicamento &&
-    item1.Indicacion === item2.Indicacion
-  );
-}
-
-// ========================================================================================================
-// Funcion para compara el Array original con el Array dado por los cambios
-// ========================================================================================================
-function compareData(original, form) {
-  let changes = [];
-  let hasNotaChange = false;
-
-  let contador = 1;
-  form.forEach((item) => {
-    const originalItem = original.find(
-      (o) =>
-        o.idMedicamento === item.idMedicamento &&
-        o.idMedicamento_Receta === item.idMedicamento_Receta &&
-        o.idReceta === item.idReceta
-    );
-
-    if (!originalItem) {
-      if (item.Medicamento === "" && item.Indicacion === "") {
-        return;
-      }
-      item.idReceta = original[0].idReceta;
-      item.idMedicamento_Receta = original[0].idMedicamento_Receta;
-      changes.push({ action: "Añadir", item });
-    } else if (!itemsAreEqual(originalItem, item)) {
-      changes.push({ action: "Editar", item });
-    } else if (originalItem.Nota !== item.Nota) {
-      hasNotaChange = true;
-    }
-
-    if (item.Orden != contador && contador <= original.length) {
-      let cambios = [];
-      cambios.push(item);
-      cambios.push({ NuevoOrden: contador });
-
-      changes.push({ action: "Reordendar", cambios });
-    }
-    contador++;
-  });
-
-  original.forEach((item) => {
-    if (
-      !form.some(
-        (f) =>
-          f.idMedicamento === item.idMedicamento &&
-          f.idMedicamento_Receta === item.idMedicamento_Receta &&
-          f.idReceta === item.idReceta
-      )
-    ) {
-      changes.push({ action: "Quitar", item });
-    }
-  });
-
-  if (hasNotaChange) {
-    const notaChangeItem = form[0];
-    changes.push({
-      action: "EditNota",
-      item: { idReceta: notaChangeItem.idReceta, Nota: notaChangeItem.Nota },
-    });
-  }
-
-  // Funcion para resetear la interfaz
-  function resetUI() {
-    const formEditReceta = document.querySelector("#Receta_actual form");
-    const botones = document.querySelector(".Botones");
-    const botoncancelar = document.getElementById("CancelarEdit");
-    const botonEditar = document.getElementById("EditarUltimaReceta");
-    const botonGuardar = document.getElementById("GuardarCambios");
-    const botonPrint = document.getElementById("Print");
-    const botonNuevaReceta = document.getElementById("botonNuevaReceta");
-    const Nota = document.querySelector(".Nota");
-
-    if (Nota) {
-      Nota.style.display = "block";
-    }
-
-    botones.style.display = "flex";
-    botoncancelar.style.display = "none";
-    botonEditar.style.display = "flex";
-    botonGuardar.style.display = "none";
-    botonPrint.style.display = "flex";
-    botonNuevaReceta.style.display = "block";
-    formEditReceta.style.display = "none";
-
-    // Mostramos todos los elementos generados con 'crearElementoMedicamento'
-    const elementosReceta = document.querySelectorAll(".elemento-receta");
-    elementosReceta.forEach((elemento) => {
-      elemento.style.display = "block";
-    });
-  }
-
-  // Si hay cambios, pasamos el array de cambios
-  // console.log(changes);
-  if (changes.length > 0) {
-    let respuesta = confirm(
-      "¿Estas seguro de guardar los cambios? Estos cambios pueden alterar el orden, medicamentos o indicaciones para el paciente."
-    );
-
-    if (respuesta) {
-      fetch("/CambiosReceta", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Cambios: changes,
-        }),
-      });
-      location.reload();
-    } else {
-      resetUI();
-      return null;
-    }
-  } else {
-    resetUI();
-    return null;
-  }
-}
-
 // Función para agregar campos de Medicamentos e Indicaciones
-function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
-  const camposMedicamentos = document.getElementById(`${zona}`);
+function agregarCampos({
+  zona,
+  NombreInputMedicamento,
+  NombreInputIndicacion,
+}) {
   // Creamos un contenedor para los campos de Medicamento e Indicación
   const contenedor = document.createElement("div");
   contenedor.classList.add("New");
   const medicamentoInput = document.createElement("input");
   medicamentoInput.type = "text";
-  medicamentoInput.name = `${NombreInputMedicamento}`;
+  medicamentoInput.name = NombreInputMedicamento;
   medicamentoInput.placeholder = "Medicamento";
   medicamentoInput.required = true;
   medicamentoInput.classList.add("medicamentoreceta");
@@ -577,185 +618,29 @@ function agregarCampos(zona, NombreInputMedicamento, NombreInputIndicacion) {
   });
   contenedor.appendChild(botonQuitar);
 
+  // Boton para crear el par de Medicamento e Indicación
+  const botonAñadir = document.createElement("button");
+  botonAñadir.type = "button";
+  botonAñadir.textContent = "Añadir";
+  botonAñadir.classList.add("AñadirMedicamento");
+  botonAñadir.addEventListener("click", () => {
+    agregarCampos({
+      zona: botonAñadir.parentNode,
+      NombreInputMedicamento: "Medicamentos",
+      NombreInputIndicacion: "Indicaciones",
+    });
+  });
+  contenedor.appendChild(botonAñadir);
+
   const indicacionInput = document.createElement("input");
   indicacionInput.type = "text";
-  indicacionInput.name = `${NombreInputIndicacion}`;
+  indicacionInput.name = NombreInputIndicacion;
   indicacionInput.placeholder = "Indicación";
   indicacionInput.classList.add("indicacionreceta");
   indicacionInput.required = true;
   contenedor.appendChild(indicacionInput);
 
-  camposMedicamentos.appendChild(contenedor);
-
-  if (zona === "camposMedicamentos") {
-    // Agregar el par de Medicamento e Indicación al array correspondiente
-    medicamentoInput.addEventListener("blur", () => {
-      agregarMedicamentoIndicacion(
-        medicamentoInput.value,
-        indicacionInput.value
-      );
-    });
-  }
-}
-
-// ========================================================================================================
-// Funcion para crear conteido de Diagnosticos
-// ========================================================================================================
-
-function crearElemento_Diagnostico(clase) {
-  const elemento = document.createElement("div");
-  elemento.classList.add(clase);
-  return elemento;
-}
-
-function crearElementoHeader_Diagnostico(Fecha, Etiquetas = []) {
-  const elemento = document.createElement("header");
-  elemento.classList.add("info__item__header");
-
-  const titulo = document.createElement("h3");
-  titulo.classList.add("info__item__title");
-  titulo.textContent = Fecha;
-  elemento.appendChild(titulo);
-
-  if (Etiquetas.length > 0) {
-    const etiquetasDiv = document.createElement("div");
-    etiquetasDiv.classList.add("info__item__tags");
-    Etiquetas.forEach((etiqueta) => {
-      const span = document.createElement("span");
-      span.classList.add("info__item__tag");
-      span.textContent = etiqueta;
-      etiquetasDiv.appendChild(span);
-    });
-    elemento.appendChild(etiquetasDiv);
-  }
-
-  return elemento;
-}
-
-function crearInfoItem_Diagnostico(contenido) {
-  const item = crearElemento_Diagnostico("info__item");
-  const itemContent = crearElemento_Diagnostico("info__item__content");
-
-  //Eliminamos el ultimo por que ya se muestra en otra vista
-  if (Array.isArray(contenido)) {
-    item.classList.add("Historial_Seguimientos");
-    //Creamos el elemento de paginación
-    const paginacion = document.createElement("div");
-    paginacion.classList.add("paginacion");
-    itemContent.appendChild(paginacion);
-
-    const totalPaginas = contenido.length;
-
-    // Función para mostrar el contenido de la página actual
-    function mostrarContenido(paginaActual) {
-      // Limpiar el contenido anterior
-      itemContent.innerHTML = "";
-      const fecha = formatearFecha(contenido[paginaActual - 1].Fecha);
-      const elemento = contenido[paginaActual - 1];
-      const header = crearElementoHeader_Diagnostico(
-        "SEGUIMIENTO " + fecha.dia + "/" + fecha.mes + "/" + fecha.año + ":"
-      );
-      itemContent.appendChild(header);
-      const contenedor = document.createElement("div");
-      contenedor.classList.add("Contenedor__Diagnosticos");
-      const p = document.createElement("p");
-      p.textContent = elemento.Diagnostico;
-      contenedor.appendChild(p);
-      itemContent.appendChild(contenedor);
-
-      // Si la paginación ya está inicializada, simplemente la añadimos de nuevo al final de itemContent.
-      if (paginacion) {
-        itemContent.appendChild(paginacion);
-      }
-    }
-
-    // Iniciar mostrando la primera página
-    mostrarContenido(1);
-
-    // Crear contenedor de paginación si aún no existe
-    if (!paginacion) {
-      paginacion = document.createElement("div");
-    }
-
-    // Añadirlo al final de itemContent
-    itemContent.appendChild(paginacion);
-
-    // Inicializar twbsPagination
-    $(paginacion).twbsPagination({
-      totalPages: totalPaginas,
-      visiblePages: 5,
-      first: "Mas Reciente",
-      next: ">",
-      prev: "<",
-      last: "Mas Antigua",
-      onPageClick: function (event, page) {
-        mostrarContenido(page);
-      },
-    });
-  } else if (typeof contenido === "string") {
-    item.classList.add("SeguimientoHoy");
-    const header = crearElementoHeader_Diagnostico("SEGUIMINETO HOY:");
-
-    itemContent.appendChild(header);
-
-    const input = document.createElement("textarea");
-    input.classList.add("info__item__textarea");
-    input.placeholder = "Escribe el seguimiento aquí...";
-    input.required = true;
-    input.addEventListener("input", function () {
-      // Restablecer la altura para calcular correctamente el scrollHeight
-      this.style.height = "auto";
-      // Establecer la altura en función del contenido, pero no superará la max-height definida en CSS
-      this.style.height = this.scrollHeight + "px";
-    });
-    itemContent.appendChild(input);
-
-    const cont_text = document.createElement("div");
-    cont_text.classList.add("Cont_Seguimiento");
-    const textinput = document.createElement("p");
-    textinput.style.display = "none";
-    textinput.style.visibility = "0";
-    cont_text.appendChild(textinput);
-    itemContent.appendChild(cont_text);
-
-
-    const botonGuardar = document.createElement("button");
-    botonGuardar.type = "button";
-    botonGuardar.textContent = "Guardar";
-    botonGuardar.style.float = "right";
-    botonGuardar.style.marginRight = "10px";
-    botonGuardar.classList.add("iconbtn--save");
-    botonGuardar.addEventListener("click", () => {
-      const diagnostico = input.value;
-        if (diagnostico) {
-          // console.log(diagnostico);
-          textinput.textContent = input.value;
-          input.style.display = "none";
-          textinput.style.display = "block";
-          botonEditar.style.display = "inline-block";
-          botonGuardar.style.display = "none";
-        }
-    });
-
-    const botonEditar = document.createElement("button");
-    botonEditar.type = "button";
-    botonEditar.style.display = "none";
-    botonEditar.textContent = "Editar";
-    botonEditar.style.float = "right";
-    botonEditar.style.marginRight = "10px";
-    botonEditar.classList.add("iconbtn--editar");
-    botonEditar.addEventListener("click", () => {
-      input.style.display = "block";
-      textinput.style.display = "none";
-      botonEditar.style.display = "none";
-      botonGuardar.style.display = "block";
-    });
-    itemContent.appendChild(botonEditar);
-    itemContent.appendChild(botonGuardar);
-  }
-
-  item.appendChild(itemContent);
-  return item;
+  zona.insertAdjacentElement("afterend", contenedor);
 }
 
 // ========================================================================================================
@@ -824,10 +709,14 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
       if (!valor) {
         const Alerg = document.querySelector(".Alerg");
         Alerg.style.color = "#004368";
-        Alerg.textContent = "No hay Alergias";
+        Alerg.textContent = "ALERGIAS: Negadas";
+        Alerg.style.textDecoration = "none";
+        Alerg.style.fontSize = "18px";
       } else {
         textElement.textContent = `ALERGIAS: ${valor.toUpperCase()}`;
         textElement.style.color = "red";
+        textElement.style.fontSize = "24px";
+        textElement.style.textDecoration = "underline";
       }
       break;
 
@@ -847,7 +736,7 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
       textElement.textContent = fechaReordenada;
       break;
     default:
-      textElement.textContent = valor;
+      textElement.textContent = valor || `No hay ${NombredelCampo} registrado.`;
       break;
   }
   textElement.style.display = "block";
@@ -967,9 +856,10 @@ $(document).ready(async function () {
     $("#Historial").remove();
     $("#Recetas").remove();
     $(".infogroup.antecedentes").remove();
-    $(".Diagnosticos").remove();
+    $(".Seguimientos").remove();
     $("#editarAlergias").remove();
-    $("#RA").remove();
+    $(".Botones").remove();
+    $("#TerminarConsulta").remove();
     $("#NR").remove();
     $(".infogroup.ficha").css({
       "margin-right": "auto",

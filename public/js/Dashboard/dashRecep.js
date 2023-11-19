@@ -23,7 +23,9 @@ function PacientesHoy(datos) {
 
       // El título se puede obtener de cualquier cita del mismo doctor
       const tituloDoctor = document.createElement("h3");
-      tituloDoctor.textContent = `${Doctores[Doctor][0].Doctor||"Otras Consultas"}:`;
+      tituloDoctor.textContent = `${
+        Doctores[Doctor][0].Doctor || "Otras Consultas"
+      }:`;
       divDoctor.appendChild(tituloDoctor);
 
       const divContDoctor = document.createElement("div");
@@ -128,92 +130,92 @@ function PacientesHoy(datos) {
 function PacientesPedidos(datos) {
   console.log("Datos de Pacientes Pedidos");
   console.log(datos);
-  
-  const PacientesPedidosDiv = document.querySelector(".Pedidos");
-  if(PacientesPedidosDiv){
 
+  const PacientesPedidosDiv = document.querySelector(".Pedidos");
+  if (PacientesPedidosDiv) {
     PacientesPedidosDiv.innerHTML = "";
     if (datos.length != 0) {
-    datos.forEach((Paciente) => {
-      const ElementoPaciente = document.createElement("div");
-      ElementoPaciente.classList.add("Paciente", "Asignar");
-      ElementoPaciente.id = Paciente.idPaciente;
-  
-      const InfoPedido = document.createElement("div");
-      InfoPedido.classList.add("InfoPedido");
-  
-      const rutaRelativaPaciente = Paciente.RutaFotoP
-        ? getPacientePath(Paciente.RutaFotoP, "/public")
-        : "/img/UserIco.webp";
-  
-      const rutaRelativaDoctor = Paciente.RutaFotoD
-        ? getPacientePath(Paciente.RutaFotoD, "/public")
-        : "/img/UserIco.webp";
-  
-      // Sección de información del paciente
-      const PacientePedido = document.createElement("div");
-      PacientePedido.classList.add("PacientePedido");
-      PacientePedido.appendChild(
-        createHeader(
-          rutaRelativaPaciente,
-          Paciente.NombreP,
-          Paciente.ApellidoP
-        )
-      );
-      createInfoSection(
-        [{ TituloInfo: "Cita", SourceInfo: Paciente.HoraCita }],
-        PacientePedido
-      );
-      InfoPedido.appendChild(PacientePedido);
-  
-      // Sección de información del doctor
-      const DrPedido = document.createElement("div");
-      DrPedido.classList.add("DrPedido");
-      DrPedido.appendChild(
-        createHeader(rutaRelativaDoctor, Paciente.NombreD, Paciente.ApellidoD)
-      );
-      createInfoSection(
-        [{ TituloInfo: "Consultorio", SourceInfo: Paciente.Cosultorio }],
-        DrPedido
-      );
-      InfoPedido.appendChild(DrPedido);
-  
-      // Botones de acción
-      const ContenedorBotones = document.createElement("div");
-      ContenedorBotones.classList.add("BotonesDeAccion");
-      const Boton = document.createElement("button");
-      Boton.classList.add("BotonPedir");
-      Boton.textContent = "Asignar";
-      Boton.addEventListener("click", function (event) {
-        console.log("Informacion del Paciente Clickado:");
-        console.log(Paciente);
-        DatosPaciente = {
-          Protocolo: "Asignar",
-          idStatusPaciente: 2,
-          idSucursal: Paciente.idSucursal,
-          idPaciente: Paciente.idPaciente,
-          idProcedimiento: Paciente.idProcedimiento,
-          idDoctor: Paciente.idDoctor,
-          idCita: Paciente.idCitas,
-          idConsultorio: Paciente.idConsultorio,
-          NombreD: Paciente.NombreD,
-          NombreP: Paciente.NombreP,
-          ApellidoP: Paciente.ApellidoP,
-          ApellidoD: Paciente.ApellidoD,
-          HoraCita: Paciente.HoraCita,
-          Consultorio: Paciente.Cosultorio,
-          RutaFotoP: rutaRelativaPaciente,
-          RutaFotoD: rutaRelativaDoctor,
-          Procedimiento: Paciente.Procedimiento,
-        };
-        Accion_Paciente(DatosPaciente);
-        event.stopPropagation();
+      datos.forEach((Paciente) => {
+        const ElementoPaciente = document.createElement("div");
+        ElementoPaciente.classList.add("Paciente", "Asignar");
+        ElementoPaciente.id = Paciente.idPaciente;
+
+        const InfoPedido = document.createElement("div");
+        InfoPedido.classList.add("InfoPedido");
+
+        const rutaRelativaPaciente = Paciente.RutaFotoP
+          ? getPacientePath(Paciente.RutaFotoP, "/public")
+          : "/img/UserIco.webp";
+
+        const rutaRelativaDoctor = Paciente.RutaFotoD
+          ? getPacientePath(Paciente.RutaFotoD, "/public")
+          : "/img/UserIco.webp";
+
+        // Sección de información del paciente
+        const PacientePedido = document.createElement("div");
+        PacientePedido.classList.add("PacientePedido");
+        PacientePedido.appendChild(
+          createHeader(
+            rutaRelativaPaciente,
+            Paciente.NombreP,
+            Paciente.ApellidoP
+          )
+        );
+        createInfoSection(
+          [{ TituloInfo: "Cita", SourceInfo: Paciente.HoraCita }],
+          PacientePedido
+        );
+        InfoPedido.appendChild(PacientePedido);
+
+        // Sección de información del doctor
+        const DrPedido = document.createElement("div");
+        DrPedido.classList.add("DrPedido");
+        DrPedido.appendChild(
+          createHeader(rutaRelativaDoctor, Paciente.NombreD, Paciente.ApellidoD)
+        );
+        createInfoSection(
+          [{ TituloInfo: "Consultorio", SourceInfo: Paciente.Cosultorio }],
+          DrPedido
+        );
+        InfoPedido.appendChild(DrPedido);
+
+        // Botones de acción
+        const ContenedorBotones = document.createElement("div");
+        ContenedorBotones.classList.add("BotonesDeAccion");
+        const Boton = document.createElement("button");
+        Boton.classList.add("BotonPedir");
+        Boton.textContent = "Asignar";
+        Boton.addEventListener("click", function (event) {
+          console.log("Informacion del Paciente Clickado:");
+          console.log(Paciente);
+          DatosPaciente = {
+            Protocolo: "Asignar",
+            idStatusPaciente: 2,
+            idSucursal: Paciente.idSucursal,
+            idPaciente: Paciente.idPaciente,
+            idProcedimiento: Paciente.idProcedimiento,
+            idDoctor: Paciente.idDoctor,
+            idCita: Paciente.idCitas,
+            idConsultorio: Paciente.idConsultorio,
+            NombreD: Paciente.NombreD,
+            NombreP: Paciente.NombreP,
+            ApellidoP: Paciente.ApellidoP,
+            ApellidoD: Paciente.ApellidoD,
+            HoraCita: Paciente.HoraCita,
+            Consultorio: Paciente.Cosultorio,
+            RutaFotoP: rutaRelativaPaciente,
+            RutaFotoD: rutaRelativaDoctor,
+            Procedimiento: Paciente.Procedimiento,
+          };
+          Accion_Paciente(DatosPaciente);
+          event.stopPropagation();
+        });
+        ContenedorBotones.appendChild(Boton);
+        ElementoPaciente.appendChild(InfoPedido);
+        ElementoPaciente.appendChild(ContenedorBotones);
+        PacientesPedidosDiv.appendChild(ElementoPaciente);
       });
-      ContenedorBotones.appendChild(Boton);
-      ElementoPaciente.appendChild(InfoPedido);
-      ElementoPaciente.appendChild(ContenedorBotones);
-      PacientesPedidosDiv.appendChild(ElementoPaciente);
-    });} else {
+    } else {
       const NoCitas = document.createElement("h2");
       NoCitas.textContent = "No hay pacientes pedidos.";
       PacientesPedidosDiv.appendChild(NoCitas);
@@ -310,8 +312,6 @@ function PacientesFinalizados(datos) {
   }
 }
 
-
-
 //==================================================================================================
 // Peticion de la informacion del dashboard de recepcion
 //==================================================================================================
@@ -329,54 +329,107 @@ $.ajax({
   },
 });
 
+//==================================================================================================
+// Funciones para actualizar de manera individual las tablas del Dashboard
+//==================================================================================================
+
+function ActualizarCitasHoy() {
+  $.ajax({
+    url: "/DashboardRecepcion/CitasHoy",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      PacientesHoy(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+function ActualizarPedidos() {
+  $.ajax({
+    url: "/DashboardRecepcion/P_Pedidos",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      PacientesPedidos(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+function ActualizarFinalizados() {
+  $.ajax({
+    url: "/DashboardRecepcion/P_Checkout",
+    method: "POST",
+    dataType: "json",
+    success: function (respuesta) {
+      PacientesFinalizados(respuesta);
+    },
+    error: function (error) {
+      console.error(error);
+    },
+  });
+}
+
+//==================================================================================================
+// Funciones para actualizar de manera individual las tablas del Dashboard
+//==================================================================================================
+$(document).ready(function () {
+  $("#Recep_Actualizar_P_Hoy").click(function () {
+    ActualizarCitasHoy();
+    // Añade la clase para iniciar la animación y el manejador del evento para cuando termine
+    $(".CitasHoy").addClass("entrando").on("animationend", function() {
+      // Quita la clase si ya no se necesita más la animación
+      $(this).removeClass("entrando");  
+      // Elimina el manejador del evento para que no se acumulen si el botón se pulsa múltiples veces
+      $(this).off("animationend");
+    });
+  });
+  
+  $("#Recep_Actualizar_P_Pedidos").click(function () {
+    ActualizarPedidos();
+    $(".Pedidos").addClass("entrando").on("animationend", function() {
+      $(this).removeClass("entrando");  
+      $(this).off("animationend");
+    });
+  });
+
+  $("#Recep_Actualizar_P_Checkout").click(function () {
+    ActualizarFinalizados();
+    $(".PacientesFinalizados").addClass("entrando").on("animationend", function() {
+      $(this).removeClass("entrando");  
+      $(this).off("animationend");
+    });
+  });
+
+
+});
+
+
+
+
 
 //==================================================================================================
 // Socket's para actualizar el Dashboard
 //==================================================================================================
 //Citas de Hoy
 socket.on("CheckIn", function (data) {
-  $.ajax({
-    url: "/DashboardRecepcion",
-    method: "POST",
-    dataType: "json",
-    success: function (respuesta) {
-      PacientesHoy(respuesta.CitasHoy);
-    },
-    error: function (error) {
-      console.error(error);
-    },
-  });
+  ActualizarCitasHoy();
 });
 
 //Pacientes Pedidos
 socket.on("P_Pedidos", function (data) {
-  $.ajax({
-    url: "/DashboardRecepcion",
-    method: "POST",
-    dataType: "json",
-    success: function (respuesta) {
-      PacientesPedidos(respuesta.PacientesPedidos);
-    },
-    error: function (error) {
-      console.error(error);
-    },
-  });
+  ActualizarPedidos();
   NuevoAudio(2);
 });
 
 //Checkout
 socket.on("CheckOut", function (data) {
-  $.ajax({
-    url: "/DashboardRecepcion",
-    method: "POST",
-    dataType: "json",
-    success: function (respuesta) {
-      PacientesFinalizados(respuesta.PacientesCheckout);
-    },
-    error: function (error) {
-      console.error(error);
-    },
-  });
+  ActualizarFinalizados();
   NuevoAudio(3);
 });
 
@@ -384,4 +437,3 @@ socket.on("CheckOut", function (data) {
 socket.on("Sonido", function (data) {
   NuevoAudio(2);
 });
-
