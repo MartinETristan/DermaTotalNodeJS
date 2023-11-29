@@ -391,24 +391,35 @@ if (window.location.href.indexOf("/Dashboard") === -1 && !window.location.href.m
 // Funciones de inactividad
 // ==================================================================================================
 let inactivityTimer;
+let lastUpdateTime = 0; // Almacenará el momento de la última actualización
 
 function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
+  lastUpdateTime = new Date().getTime(); // Actualizar el momento de la última actualización
+
   inactivityTimer = setTimeout(function () {
-    // Se ejecutará esta función si no hay actividad en 10 minutos
-    location.reload();
-  }, 15 * 60 * 1000); // 10 minutos en milisegundos
+    // Obtener el tiempo actual en milisegundos
+    let now = new Date().getTime();
+
+    // Verificar si han pasado al menos 10 minutos desde la última actualización
+    if (now - lastUpdateTime > 10 * 60 * 1000) {
+      location.reload();
+    }
+  }, 10 * 60 * 1000); // 10 minutos en milisegundos
 }
 
-// Cuando ocurra actividad (por ejemplo, un clic en algún lugar de la página)
-document.addEventListener("click", function () {
-  resetInactivityTimer(); // Reiniciar el contador de inactividad
-});
+function handleVisibilityChange() {
+  if (document.visibilityState === 'visible') {
+    resetInactivityTimer();
+  } else {
+    clearTimeout(inactivityTimer);
+  }
+}
 
-// Cuando ocurre un evento de scroll en la página
-window.addEventListener("scroll", function () {
-  resetInactivityTimer(); // Reiniciar el contador de inactividad
-});
+// Eventos para reiniciar el contador de inactividad
+document.addEventListener("visibilitychange", handleVisibilityChange);
+document.addEventListener("click", resetInactivityTimer);
+window.addEventListener("scroll", resetInactivityTimer);
 
 // Iniciar el contador de inactividad al cargar la página
 resetInactivityTimer();

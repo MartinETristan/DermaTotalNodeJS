@@ -188,6 +188,6 @@ function cargarNuevaReceta(){
     location.reload();
   });
   
-
+  cargarNuevaCita();
 }
 

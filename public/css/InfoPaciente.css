@@ -7,11 +7,12 @@
     height: auto;
     width: auto;
 }
-#TituloOpciones{
+
+#TituloOpciones {
     font-size: 38px;
 }
 
-#MensajeOpciones{
+#MensajeOpciones {
     font-size: 24px;
 }
 
@@ -649,7 +650,7 @@ h1 {
     border: #73c235;
 }
 
-#cancelarReceta {
+#cancelarReceta,#cancelarCita {
     color: red;
     border: 0;
     background-color: #fff;
@@ -911,7 +912,8 @@ dd {
     max-width: 335.5px;
 }
 
-#Etiquetas_Actuales,#Etiquetas {
+#Etiquetas_Actuales,
+#Etiquetas {
     display: flex;
     flex-wrap: nowrap;
     overflow: auto;
@@ -937,13 +939,14 @@ dd {
 }
 
 .Etiqueta p {
-    margin: 0; 
-    white-space: nowrap; /* Evita el salto de línea */
-    overflow: hidden; 
-    text-overflow: ellipsis; 
+    margin: 0;
+    white-space: nowrap;
+    /* Evita el salto de línea */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.Area0{
+.Area0 {
     background-color: #595959;
 }
 
@@ -1021,6 +1024,34 @@ dd {
 
 }
 
+/* 
+.event {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 150px;
+    bottom: 3px;
+    left: calc(50% - 1.5px);
+    content: " ";
+    display: block;
+    background: #3d8eb9;
+}
+
+.event.busy {
+    background: #f64747;
+}
+.event.medium {
+    background: orange;
+}
+.event.available {
+    background: green;
+}
+ */
+
+
+
+
+
 
 .AceptarOpciones {
     font-size: 14px;
@@ -1031,13 +1062,14 @@ dd {
     background: rgba(5, 173, 5, 0.500);
     box-shadow: 0 0px 10px rgba(5, 173, 5, 0.0);
     transition: .5s;
-  }
-  .AceptarOpciones:hover {
+}
+
+.AceptarOpciones:hover {
     background: rgb(5, 173, 5);
     box-shadow: 0 0px 10px rgba(5, 173, 5, 0.5);
-  }
-  
-  .CancelarOpciones {
+}
+
+.CancelarOpciones {
     font-size: 14px;
     padding: 15px;
     border-radius: 10px;
@@ -1046,13 +1078,13 @@ dd {
     background: rgba(255, 0, 0, 0.500);
     box-shadow: 0 0px 10px rgba(186, 0, 0, 0.0);
     transition: .2s;
-  }
-  
-  .CancelarOpciones:hover {
+}
+
+.CancelarOpciones:hover {
     background: red;
     box-shadow: 0 0px 10px rgba(186, 0, 0, 0.5);
-  }
-  
+}
+
 
 
 @keyframes wiggle {
@@ -1067,6 +1099,7 @@ dd {
     25% {
         transform: translateX(-5px);
     }
+
     50% {
         color: red;
         border-color: red;
@@ -1353,6 +1386,176 @@ form>h3 {
     background-color: #249DD9;
     border-color: #249DD9;
 }
+
+#NuevaCita {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 150px;
+}
+
+#botonNuevaCita{
+    font-size: 15px;
+    background-color: red;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: red;
+}
+
+.calendaroNuevaCita {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.ControlesNuevaCita {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    text-align: left;
+    gap: 5px;
+    color: #004368;
+    padding: 0px 20px 20px 20px;
+    border: 2px solid #004368;
+    border-radius: 5px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.ControlesNuevaCita>*>h2 {
+    margin: 0;
+    padding-bottom: 0;
+}
+
+.SeleccionarDoctor,
+.SeleccionarProcedimiento,
+.SeleccionarSucursal {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.duracion {
+    color: red;
+}
+
+#Duracion {
+    /* color: red; */
+    padding: 5px 10px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+}
+
+.Cont_BotonGuardarCita {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#GuardarCita {
+    font-size: 20px;
+    background-color: red;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: #249DD9;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.flatpickr {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+/* Estilos de SweetAlet */
+/* SubTitulo */
+.swal-text {
+    background-color: #FEFAE3;
+    padding: 17px;
+    border: 1px solid #F0E1A1;
+    display: block;
+    margin: 22px;
+    text-align: center;
+    font-size: large;
+    color: #61534e;
+}
+
+/* Alerta */
+.swal-modal {
+    width: 50%;
+}
+
+.ListaCitas {
+    display: flex;
+    flex-direction: column;
+    height: 440px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.InfoCitas {
+    width: 100%;
+    padding-right: 40px;
+}
+
+
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 5px;
+    padding: 0;
+    width: 100%;
+}
+
+.lista__item {
+    /* Usa flexbox para alinear los elementos */
+    display: flex;
+    /* Alinea los elementos al inicio horizontalmente */
+    justify-content: flex-start;
+    /* Alinea los elementos en el centro verticalmente */
+    align-items: center;
+    /* Espacio entre elementos */
+    gap: 20px;
+    /* Relleno del contenedor */
+    padding: 10px;
+    /* Radio de la frontera */
+    border-radius: 5px;
+    /* Color de fondo */
+    background-color: #e9f2f7;
+}
+
+.lista__item>p {
+    /* Asigna la capacidad de expansión a los elementos */
+    flex: 1;
+    /* Centra el texto dentro de cada div */
+    text-align: center;
+}
+
+.inputNuevaCitaNota {
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    font-size: 16px;
+    resize: vertical;
+    margin-top: 10px;
+    padding: 10px;
+    width: 91%;
+    min-height: 50px;
+    max-height: 160px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+}
+
+#fechaNuevaCita {
+    padding: 10px;
+    border: 1px solid #e9f2f7;
+    border-radius: 5px;
+    width: 80%;
+}
+
 
 .footer {
     display: flex;

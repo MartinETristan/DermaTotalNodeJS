@@ -193,11 +193,18 @@ async function CrearPaciente(req, res) {
     // Crear la carpeta del paciente
     const Ruta = await CarpetaPersonal(req.body.Protocolo, idUsuario);
 
-    // Mover la imagen a la carpeta del paciente
-    await fs.rename(
-      path.join(pathToPublic, "/private/src/temp", req.file.filename),
-      path.join(Ruta, req.file.filename)
-    );
+    // Si no se ha seleccionado una imagen, termina y mandar un mensaje de ok
+    if (!req.file) {
+      return res
+        .status(200)
+        .json({ mensaje: "No se ha seleccionado una imagen" });
+    }else{
+      // Mover la imagen a la carpeta del paciente
+      await fs.rename(
+        path.join(pathToPublic, "/private/src/temp", req.file.filename),
+        path.join(Ruta, req.file.filename)
+      );
+    }
 
     // Si el protocolo es "Perfil", crear la miniatura de la imagen y moverla a la carpeta del paciente
     if (req.body.Protocolo === "Perfil") {

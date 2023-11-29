@@ -254,8 +254,6 @@ export async function InfoPaciente(idPaciente) {
     return "Ha ocurrido un error.";
   }
 
-
-
   // =================================================
   // Tags de los diagnosticos del paciente
 
@@ -269,10 +267,9 @@ export async function InfoPaciente(idPaciente) {
     WHERE s.idPaciente = ?
     ORDER BY s.idSesion DESC, idPadecimiento ASC`;
 
-    const [rowTags, fieldsAntecedentes] = await connection.execute(
-      queryTags,
-      [idPaciente]
-    );
+    const [rowTags, fieldsAntecedentes] = await connection.execute(queryTags, [
+      idPaciente,
+    ]);
     connection.end();
     if (rowTags.length > 0) {
       Tags = rowTags.map((elemento) => {
@@ -284,8 +281,7 @@ export async function InfoPaciente(idPaciente) {
         };
       });
     }
-    
-  }catch (error) {
+  } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo las Tag's del paciente: ",
       error

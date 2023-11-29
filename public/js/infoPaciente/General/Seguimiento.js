@@ -128,8 +128,8 @@ function crearInfoItem_Seguimiento(tipo, contenido) {
     item.classList.add("SeguimientoHoy");
     const header = crearElementoHeader_Seguimiento(
       FormatoFechaActual == FormatoFechaSesion
-        ? `SEGUIMINETO HOY:`
-        : `SEGUIMINETO (${FormatoFechaSesion}):`,
+        ? `SEGUIMIENTO HOY:`
+        : `SEGUIMIENTO (${FormatoFechaSesion}):`,
       "Etiquetas_Actuales",
       datosAlmacenados.Tags.filter(
         (tag) => tag.idSesion == contenido[0].idSesion

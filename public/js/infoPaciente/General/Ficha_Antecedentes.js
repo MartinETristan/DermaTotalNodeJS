@@ -3,6 +3,8 @@
 // ========================================================================================================
 function cargarGeneral() {
   console.log(datosAlmacenados);
+  console.log(InfoSesion);
+  console.log(InfoSelects);
   const General = document.querySelector("#infocontenido");
   var htmlString = `
       <div class="region__content" id="region__content">
@@ -186,6 +188,80 @@ function cargarGeneral() {
                   <button type="submit" id="GuardarReceta">Guardar Receta</button>
                 </header>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <section class="region" id="NC">
+      <div class="infogroup">
+        <div class="info__item">
+          <div class="info__item__content">
+            <header class="info__item__header">
+              <h2>Nueva Cita:</h2>
+              <button type="button" id="cancelarCita" style="display:none;">Cancelar</button>
+              <button type="button" id="botonNuevaCita">Nueva Cita</button>
+            </header>
+            <div class="NuevaCita" id="NuevaCita" style="display:none;">
+              <div class="ControlesNuevaCita">
+                <div class="flatpickr">
+                  <h2>Fecha de la cita:</h2>
+                  <div class="calendaroNuevaCita">
+                    <input name="fechaNuevaCita" id="fechaNuevaCita" type="text" placeholder="Elegir fecha..." data-input> 
+                    <a class="input-button" title="clear" data-clear>
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                  </div>
+                  <div class="duracion">
+                  <span>Duracion:</span>
+                  <select name="Duracion" id="Duracion">
+                    <option value="10">10 minutos</option>
+                    <option value="15">15 minutos</option>
+                    <option value="20">20 minutos</option>
+                    <option value="30" selected>30 minutos</option>
+                    <option value="45">45 minutos</option>
+                    <option value="60">1 hora</option>
+                  </select>
+                  </div>
+                </div>
+                <div class="SeleccionarDoctor">
+                <h2>Medico:</h2>
+                  <select name="idDoctor" id="citaDoctor">
+                    <option value="" disabled selected>Elige a un especialista...</option>
+                  </select>
+                </div>
+
+                <div class="SeleccionarProcedimiento">
+                <h2>Procedimiento:</h2>
+                  <select name="idProcedimiento" id="procedimientoCita" >
+                    <option value="" disabled selected>Elige un procedimiento...</option>
+                  </select>
+                </div>
+                <div class="SeleccionarSucursal">
+                <h2>Sucursal:</h2>
+                  <select name="idSucursal" id="sucursalCita">
+                    <option value="" disabled selected>Elige una sucursal...</option>
+                  </select>
+                </div>
+                <div class="nuevaCitaNota">
+                  <h2>Nota (Opcional):</h2>
+                  <textarea id="NotaNuevaCita" placeholder="Nota" class="inputNuevaCitaNota"></textarea>
+                </div>
+                <div class="Cont_BotonGuardarCita">
+                  <button type="submit" id="GuardarCita">Agendar Cita</button>
+                </div>
+              </div>
+              <div class="InfoCitas">
+                <div class="TextoListaCitas">
+                  <h2>Citas agendadas:</h2>
+                </div>
+                <div class="ListaCitas">
+                <p>Elige un dia en la fecha de cita para ver las citas agendadas para ese dia.</p>
+                </div>
+                <div id="PaginacionListaCitas">
+                </div>
+              </div>
             </div>
           </div>
         </div>

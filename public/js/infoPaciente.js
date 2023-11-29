@@ -533,6 +533,22 @@ function formatearFecha(fechaOriginal) {
   };
 }
 
+// Funcion para dar formato a la hora
+function formatearHora(hora) {
+  const fecha = new Date(hora);
+  let horas = fecha.getHours();
+  let minutos = fecha.getMinutes();
+  const ampm = horas >= 12 ? 'pm' : 'am';
+
+  horas = horas % 12;
+  horas = horas ? horas : 12; // La hora '0' debe ser '12'
+  minutos = minutos < 10 ? '0'+minutos : minutos;
+
+  const horaFormateada = horas + ':' + minutos + ampm;
+  return horaFormateada;
+}
+
+
 // Funcion para reinciar la contraseña:
 function reiniciarContraseña() {
   // Restablecer la contraseña a el nombre de usuario

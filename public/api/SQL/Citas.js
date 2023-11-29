@@ -1,17 +1,42 @@
 import { mysql, db } from "../conf_api.js";
 
-// Muestra las citas que tiene el doctor en el dia de hoy
-export async function CitasDoctor(idDoctor) {
+// Muestra las citas que tiene el doctor 15 dias antes de la fecha actual
+// y todas las citas que tiene el doctor despues de la fecha actual
+export async function CitasMedico(idDoctor, idAsociado) {
   try {
     const connection = await mysql.createConnection(db);
-    const CalendarioCitas = `SELECT c.idCitas,c.idPaciente,c.idStatusPaciente, u.Nombres, p.Procedimiento ,c.HoraCita ,c.FinCita FROM Citas c 
+    let fechaActual = new Date();
+    fechaActual.setDate(fechaActual.getDate() - 15);
+    let fechaLimite = fechaActual.toISOString().split("T")[0];
+
+    // Define la consulta base
+    let CalendarioCitasBase = `SELECT c.idCitas, c.idPaciente, c.idStatusPaciente, u.Nombres, p.Procedimiento, c.HoraCita, c.FinCita 
+      FROM Citas c 
       INNER JOIN Procedimiento p ON c.idProcedimiento = p.idProcedimiento 
-      INNER JOIN Paciente pa ON c.idPaciente  = pa.idPaciente 
-      INNER JOIN  Usuarios u ON pa.idUsuario  = u.idUsuario 
-      WHERE  idDoctor = ?`;
-    const [rowsCitas, fieldsHoy] = await connection.execute(CalendarioCitas, [
-      idDoctor,
-    ]);
+      INNER JOIN Paciente pa ON c.idPaciente = pa.idPaciente 
+      INNER JOIN Usuarios u ON pa.idUsuario = u.idUsuario `;
+
+    // Añadir la condición adecuada según si idDoctor o idAsociado está presente
+    let CalendarioCitas;
+    let params;
+    if (idDoctor != "" && idAsociado == "") {
+      CalendarioCitas =
+        CalendarioCitasBase + `WHERE c.idDoctor = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
+      params = [idDoctor, fechaLimite];
+    } else if (idAsociado != "" && idDoctor == "") {
+      CalendarioCitas =
+        CalendarioCitasBase + `WHERE c.idAsociado = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
+      params = [idAsociado, fechaLimite];
+    } else {
+      // Manejar el caso en que ambos son null, si es necesario
+      return "Error: No se especificó un doctor o asociado";
+    }
+
+    const [rowsCitas, fieldsHoy] = await connection.execute(
+      CalendarioCitas,
+      params
+    );
+
     connection.end();
     return rowsCitas;
   } catch (error) {
@@ -19,6 +44,39 @@ export async function CitasDoctor(idDoctor) {
       "Ha ocurrido un error obteniendo las citas del doctor: ",
       error
     );
+    return "Ha ocurrido un error.";
+  }
+}
+
+export async function NuevaCita(
+  idSucursal,
+  idProcedimiento,
+  idDoctor,
+  idAsociado,
+  idPaciente,
+  HoraCita,
+  FinCita,
+  NotasCita
+) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const consulta = `INSERT INTO Citas
+    (idSucursal, idProcedimiento, idDoctor, idAsociado, idPaciente, HoraCita, FinCita, Nota)
+    VALUES(?,?,?,?,?,?,?,?);`;
+    const idCita = await connection.execute(consulta, [
+      idSucursal,
+      idProcedimiento,
+      idDoctor != "" ? idDoctor: null,
+      idAsociado != "" ? idAsociado: null,
+      idPaciente,
+      HoraCita,
+      FinCita,
+      NotasCita != "" ? NotasCita: null,
+    ]);
+    connection.end();
+    return idCita[0].insertId;
+  } catch (error) {
+    console.error("Ha ocurrido un error creando la cita: ", error);
     return "Ha ocurrido un error.";
   }
 }
@@ -56,22 +114,19 @@ export async function Update_Checkout(idSesion, CheckOut) {
 }
 
 // Actualiza el seguimiento de la sesion de la cita
-export async function UpdateSeguimiento(idSesion, Seguimiento){
-try {
-  const connection = await mysql.createConnection(db);
-  const consulta = `UPDATE Sesion
+export async function UpdateSeguimiento(idSesion, Seguimiento) {
+  try {
+    const connection = await mysql.createConnection(db);
+    const consulta = `UPDATE Sesion
   SET Seguimiento = ?
   WHERE idSesion = ?`;
-  connection.execute(consulta, [Seguimiento, idSesion]);
-  connection.end();
-}catch (error) {
-  console.error(
-    "Ha ocurrido un error en la actualizacion del seguimiento:",
-    error
-  );
-  return "Ha ocurrido un error.";
+    connection.execute(consulta, [Seguimiento, idSesion]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error en la actualizacion del seguimiento:",
+      error
+    );
+    return "Ha ocurrido un error.";
+  }
 }
-
-}
-
-

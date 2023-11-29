@@ -62,7 +62,9 @@ export async function InfoRegistros() {
     const [suc] = await connection.execute(Sucursales);
 
     //Pedimos los procedimientos Dispobibles
-    const Procedimiento = `SELECT idProcedimiento,Procedimiento FROM Procedimiento p`;
+    const Procedimiento = `SELECT p.idProcedimiento,p.idAreas,p.Procedimiento, a.Area 
+    FROM Procedimiento p 
+    LEFT JOIN Areas a ON p.idAreas = a.idAreas `;
     const [Proced] = await connection.execute(Procedimiento);
 
     //Pedimos los Estados de citas
@@ -355,3 +357,26 @@ export async function ActualizarStatus(TipodeUsuario, id, Status) {
   }
 }
 
+export async function RegitroCreacionCita(R_EsDoctor, R_ID, idCita) {
+  try {
+    const connection = await mysql.createConnection(db);
+
+    const query = `INSERT INTO Creacion_Citas (idDoctor, idRecepcionista, idCitas, Fecha) VALUES (?, ?, ?, NOW());`;
+
+    let idDoctor = null;
+    let idRecepcionista = null;
+
+    // Verificación más explícita
+    if (R_EsDoctor === true || R_EsDoctor === 'true') {
+      idDoctor = R_ID;
+    } else {
+      idRecepcionista = R_ID;
+    }
+
+    await connection.execute(query, [idDoctor, idRecepcionista, idCita]);
+    
+    connection.end();
+  } catch (error) {
+    console.error("Ha ocurrido un error realizando el registro de la creacion de la cita: ", error);
+  }
+}
