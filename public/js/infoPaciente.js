@@ -180,24 +180,30 @@ function HeaderInfoPaciente(data) {
   agregarEventListener("editarAlergias", function () {
     editarDato("Alergias");
   });
+
+  // Creamos el contenedor de los botones de guardar y cancelar
+  const contAlergias = document.createElement("div");
+  contAlergias.id = "contAlergias";
+  contAlergias.style.display = "none";
+
   //Creamos el boton de cancelar
   const botonCancelarAlerg = document.createElement("button");
   botonCancelarAlerg.type = "button";
   botonCancelarAlerg.textContent = "Cancelar";
   botonCancelarAlerg.classList.add("botonCancelarAlergias");
-  botonCancelarAlerg.style.display = "none";
   botonCancelarAlerg.id = "cancelarAlergias";
-  contenedorAlergias.appendChild(botonCancelarAlerg);
+  contAlergias.appendChild(botonCancelarAlerg);
 
   //Creamos el boton de guardado
   const botonGuardarAlerg = document.createElement("button");
   botonGuardarAlerg.type = "button";
   botonGuardarAlerg.textContent = "Guardar";
   botonGuardarAlerg.classList.add("botonGuardarAlergias");
-  botonGuardarAlerg.style.display = "none";
   botonGuardarAlerg.id = "confirmarAlergias";
   // Añadimos el boton al contenedor`
-  contenedorAlergias.appendChild(botonGuardarAlerg);
+  contAlergias.appendChild(botonGuardarAlerg);
+
+  contenedorAlergias.appendChild(contAlergias);
 
   // Agregamos el evento para guardar las alergias
   agregarEventListener("confirmarAlergias", function () {
@@ -310,11 +316,8 @@ function HeaderInfoPaciente(data) {
             Asociado: datosAlmacenados.SesionesActivas[0].idAsociado,
             Checkout: Checkout.value,
           });
-          // Y limpiamos la vista
-          contenedor.style.visibility = "hidden";
-          contenedor.style.opacity = "0";
-          // Y recargamos la pagina
-          location.reload();
+          //Y mandamos al Dashboard
+          window.location.href = "/Dashboard";
         }
       });
       Opciones.appendChild(contenedorBotones);
@@ -347,8 +350,10 @@ function HeaderInfoPaciente(data) {
                <header class="info__item__header">
                  <h3 class="info__item__title">Status:</h3>
                  <button class="iconbtn--edit" id="editarStatus"></button>
-                 <button class="iconbtn--cancelar" id="cancelarStatus" style="display:none;"></button>
-                 <button class="iconbtn--confirm" id="confirmarStatus" style="display:none;">Confirmar</button>
+                 <div style="display:none;" id="contStatus">
+                  <button class="iconbtn--cancelar" id="cancelarStatus"></button>
+                  <button class="iconbtn--confirm" id="confirmarStatus">Confirmar</button>
+                 </div>
                </header>
                <p id="textStatus">${
                  data.DatosDT[0].Status || "Cargando Status..."
@@ -705,8 +710,7 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
   // Mostramos la vista de antes para salir del modo de edicion
   document.getElementById(`editar${NombredelCampo}`).style.display =
     "inline-block";
-  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`cont${NombredelCampo}`).style.display = "none";
   document.getElementById(`input${NombredelCampo}`).style.display = "none";
   // Almacenamos el texto en una variable
   const textElement = document.getElementById(`text${NombredelCampo}`);
@@ -729,10 +733,17 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
         Alerg.style.textDecoration = "none";
         Alerg.style.fontSize = "18px";
       } else {
-        textElement.textContent = `ALERGIAS: ${valor.toUpperCase()}`;
         textElement.style.color = "red";
         textElement.style.fontSize = "24px";
-        textElement.style.textDecoration = "underline";
+        textElement.textContent = "ALERGIAS: ";
+        
+        // Crear el elemento que contendrá la parte subrayada del texto
+        var underlineText = document.createElement("span");
+        underlineText.textContent = valor.toUpperCase();
+        underlineText.style.textDecoration = "underline";
+        
+        // Añadir el elemento subrayado al elemento principal
+        textElement.appendChild(underlineText);
       }
       break;
 
@@ -780,8 +791,7 @@ function cancelarEdicion(NombredelCampo) {
   // Restablecer la interfaz
   document.getElementById(`editar${NombredelCampo}`).style.display =
     "inline-block";
-  document.getElementById(`cancelar${NombredelCampo}`).style.display = "none";
-  document.getElementById(`confirmar${NombredelCampo}`).style.display = "none";
+  document.getElementById(`cont${NombredelCampo}`).style.display = "none";
   document.getElementById(`input${NombredelCampo}`).style.display = "none";
   document.getElementById(`text${NombredelCampo}`).style.display = "block";
 }
@@ -792,15 +802,16 @@ function cancelarEdicion(NombredelCampo) {
 function editarDato(NombredelCampo) {
   const botoneditar = document.getElementById(`editar${NombredelCampo}`);
   const botoncancelar = document.getElementById(`cancelar${NombredelCampo}`);
+  const contenedor = document.getElementById(`cont${NombredelCampo}`);
   const input = document.getElementById(`input${NombredelCampo}`);
   const texto = document.getElementById(`text${NombredelCampo}`);
-  const confirmar = document.getElementById(`confirmar${NombredelCampo}`);
+
 
   botoneditar.style.display = "none";
   input.style.display = "flex";
   input.style.width = "95%";
-  botoncancelar.style.display = "inline-block";
-  confirmar.style.display = "inline-block";
+  contenedor.style.display = "flex";
+  contenedor.style.gap = "25px";
   texto.style.display = "none";
 
   if (NombredelCampo == "Tel1" || NombredelCampo == "Tel2") {

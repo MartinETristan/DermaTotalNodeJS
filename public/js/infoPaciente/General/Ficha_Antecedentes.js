@@ -16,8 +16,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Sexo:</h3>
                 <button class="iconbtn--edit" id="editarSexo"></button>
-                <button class="iconbtn--cancelar" id="cancelarSexo" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarSexo" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contSexo">
+                  <button class="iconbtn--cancelar" id="cancelarSexo" ></button>
+                  <button class="iconbtn--confirm" id="confirmarSexo" >Confirmar</button>
+                </div>
               </header>
               <p id="textSexo">${datosAlmacenados.BasicInfo[0].Sexo}</p>
               <select name="inputSexo" id="inputSexo" style="display:none;" >
@@ -29,8 +31,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Fecha de Nac:</h3>
                 <button class="iconbtn--edit" id="editarFechaDeNac"></button>
-                <button class="iconbtn--cancelar" id="cancelarFechaDeNac" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarFechaDeNac" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contFechaDeNac">
+                  <button class="iconbtn--cancelar" id="cancelarFechaDeNac" ></button>
+                  <button class="iconbtn--confirm" id="confirmarFechaDeNac" >Confirmar</button>
+                </div>
               </header>
               <p id="textFechaDeNac">${
                 datosAlmacenados.BasicInfo[0].FechadeNac || "--/--/----"
@@ -46,8 +50,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Tel:</h3>
                 <button class="iconbtn--edit" id="editarTel1"></button>
-                <button class="iconbtn--cancelar" id="cancelarTel1" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarTel1" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contTel1">
+                  <button class="iconbtn--cancelar" id="cancelarTel1" ></button>
+                  <button class="iconbtn--confirm" id="confirmarTel1" >Confirmar</button>
+                </div>
               </header>
               <a id="textTel1" href="#">${
                 datosAlmacenados.BasicInfo[0].Tel1 ||
@@ -63,8 +69,10 @@ function cargarGeneral() {
               <header class="info__item__header">
               <h3 class="info__item__title">Tel. Secundario:</h3>
               <button class="iconbtn--edit" id="editarTel2"></button>
-              <button class="iconbtn--cancelar" id="cancelarTel2" style="display:none;"></button>
-              <button class="iconbtn--confirm" id="confirmarTel2" style="display:none;">Confirmar</button>
+              <div style="display:none;" id="contTel2">
+                <button class="iconbtn--cancelar" id="cancelarTel2" ></button>
+                <button class="iconbtn--confirm" id="confirmarTel2" >Confirmar</button>
+              </div>
               </header>
               <a id="textTel2" href="#">${
                 datosAlmacenados.BasicInfo[0].Tel2 ||
@@ -83,8 +91,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Correo:</h3>
                 <button class="iconbtn--edit" id="editarCorreo"></button>
-                <button class="iconbtn--cancelar" id="cancelarCorreo" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarCorreo" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contCorreo">
+                  <button class="iconbtn--cancelar" id="cancelarCorreo" ></button>
+                  <button class="iconbtn--confirm" id="confirmarCorreo" >Confirmar</button>
+                </div>
               </header>
               <a id="textCorreo" href="#">${
                 datosAlmacenados.BasicInfo[0].Correo ||
@@ -106,8 +116,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Personales/Patologicos:</h3>
                 <button class="iconbtn--edit" id="editarA_PP"></button>
-                <button class="iconbtn--cancelar" id="cancelarA_PP" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarA_PP" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contA_PP">
+                  <button class="iconbtn--cancelar" id="cancelarA_PP" ></button>
+                  <button class="iconbtn--confirm" id="confirmarA_PP" >Confirmar</button>
+                </div>
               </header>
               <p id="textA_PP"></p>
               <input type="text" name="inputA_PP" id="inputA_PP" style="display:none;"/>
@@ -118,8 +130,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">No Patologicos:</h3>
                 <button class="iconbtn--edit" id="editarA_NP"></button>
-                <button class="iconbtn--cancelar" id="cancelarA_NP" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarA_NP" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contA_NP">
+                  <button class="iconbtn--cancelar" id="cancelarA_NP" ></button>
+                  <button class="iconbtn--confirm" id="confirmarA_NP" >Confirmar</button>
+                </div>
               </header>
               <p id="textA_NP"></p>
               <input type="text" name="inputA_NP" id="inputA_NP" style="display:none;" />
@@ -130,8 +144,10 @@ function cargarGeneral() {
               <header class="info__item__header">
                 <h3 class="info__item__title">Heredo/Familiares:</h3>
                 <button class="iconbtn--edit" id="editarA_HF"></button>
-                <button class="iconbtn--cancelar" id="cancelarA_HF" style="display:none;"></button>
-                <button class="iconbtn--confirm" id="confirmarA_HF" style="display:none;">Confirmar</button>
+                <div style="display:none;" id="contA_HF">
+                  <button class="iconbtn--cancelar" id="cancelarA_HF"></button>
+                  <button class="iconbtn--confirm" id="confirmarA_HF">Confirmar</button>
+                </div>
               </header>
               <p id="textA_HF"></p>
               <input type="text" name="inputA_HF" id="inputA_HF" style="display:none;" />
@@ -143,7 +159,7 @@ function cargarGeneral() {
     
     <div class="Seguimientos">
     <h2>NOTAS DE SEGUIMIENTO:</h2>
-      <div class="region__content"></div>
+    <div class="region__content"></div>
     </div>
   
     <section class="region" id="RA">

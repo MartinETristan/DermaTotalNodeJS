@@ -333,6 +333,17 @@ function Accion_Paciente(datos) {
         // Y limpiamos la vista
         contenedor.style.visibility = "hidden";
         contenedor.style.opacity = "0";
+        // Cambiamos el color del paciente en la lista de espera a verde (ya fue pedido o en consulta)
+        // esto lo hacemos con el id del paciente y realizando la busqueda en un area determinada
+        // para evitar problemas con pacientes que tengan el mismo id
+        const cont_p_espera = document.querySelector(".PacientesEnEspera");
+        const idPacienteString = String(datos.idPaciente); // Convertir a cadena
+        const idEscapado = idPacienteString.replace(/^(\d)/, '\\3$1 '); // Escapar si comienza con un número
+        const elemento = cont_p_espera.querySelector("#" + idEscapado);
+
+        elemento.classList.remove("ATiempo", "Tarde");
+        elemento.classList.add("EnConsulta");
+        
         break;
       case "Finalizar":
         // Asi se obtiene el valor del checkout

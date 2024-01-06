@@ -39,12 +39,12 @@
     display: block;
     --bg-size: 400%;
     --color-one: hsla(34, 100%, 75%, 0.0);
-    --color-two: #fce4bdb9;
+    --color-two: #e9ffedf2;
     background: linear-gradient(90deg, var(--color-one),
         var(--color-two),
         var(--color-one)) 0 0 / var(--bg-size) 100%;
-    color: orange;
     animation: move-bg 8s infinite linear;
+    color: green;
 }
 
 
@@ -130,9 +130,6 @@
     display: flex;
     justify-content: center; /* centra el botón horizontalmente */
 }
-
-
-
 
 
 .footer {

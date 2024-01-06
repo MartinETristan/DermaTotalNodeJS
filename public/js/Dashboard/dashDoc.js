@@ -42,7 +42,6 @@ function PacientesEnEspera(datos) {
           ElementoPaciente.classList.remove("ATiempo", "Tarde");
           ElementoPaciente.classList.add("EnConsulta");
         }
-        ElementoPaciente.id = Paciente.idPaciente;
 
         const rutaRelativa = Paciente.RutaFoto
           ? getPacientePath(Paciente.RutaFoto, "/public")
@@ -98,6 +97,7 @@ function PacientesEnEspera(datos) {
             console.log(Paciente);
             DatosPaciente = {
               Protocolo: "Pedir",
+              idPaciente: Paciente.idPaciente,
               idStatusPaciente: Paciente.idStatusPaciente,
               idCita: Paciente.idCita,
               idSucursal: Paciente.idSucursal,
@@ -113,15 +113,11 @@ function PacientesEnEspera(datos) {
           }
         });
 
-        ElementoPaciente.addEventListener("click", function (event) {
-          const pacienteElement = event.target.closest(".Paciente");
-          if (
-            pacienteElement &&
-            pacienteElement.classList.contains("Paciente")
-          ) {
-            const idPaciente = pacienteElement.id;
-            window.location.href = "/InfoPaciente/" + idPaciente;
-          }
+        ElementoPaciente.dataset.idPaciente = Paciente.idPaciente;
+  
+        // Asignar un manejador de clic al ElementoPaciente
+        ElementoPaciente.addEventListener("click", function () {
+          window.location.href = "/InfoPaciente/" + this.dataset.idPaciente;
         });
 
         PacientesEspera.appendChild(ElementoPaciente);
@@ -171,7 +167,6 @@ function CitasHoy(datos) {
       elementos.forEach((Paciente) => {
         var ElementoPaciente = document.createElement("div");
         ElementoPaciente.classList.add("Paciente");
-        ElementoPaciente.id = Paciente.idPaciente;
 
         const rutaRelativa = Paciente.RutaFoto
           ? getPacientePath(Paciente.RutaFoto, "/public")
@@ -189,18 +184,18 @@ function CitasHoy(datos) {
           { TituloInfo: "Procedimiento", SourceInfo: Paciente.Procedimiento },
         ];
 
+        ElementoPaciente.dataset.idPaciente = Paciente.idPaciente;
+  
+        // Asignar un manejador de clic al ElementoPaciente
+        ElementoPaciente.addEventListener("click", function () {
+          window.location.href = "/InfoPaciente/" + this.dataset.idPaciente;
+        });
+
         createInfoSection(InfoLlegadaPaciente, ElementoPaciente);
         CitasHoy.appendChild(ElementoPaciente);
       });
     }
 
-    CitasHoy.addEventListener("click", function (event) {
-      var pacienteElement = event.target.closest(".Paciente");
-      if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
-        var idPaciente = pacienteElement.id;
-        window.location.href = "/InfoPaciente/" + idPaciente;
-      }
-    });
 
     // Mostramos la primera pagina
     mostrarElementos(datos.slice(0, elementosPorPagina));
@@ -252,7 +247,6 @@ function OtrosConsultorios(datos) {
           "Paciente",
           Paciente.idStatusPaciente === 2 ? "Pedir" : "Ver"
         );
-        ElementoPaciente.id = Paciente.idPaciente;
 
         const rutaRelativa = Paciente.RutaFoto
           ? getPacientePath(Paciente.RutaFoto, "/public")
@@ -305,17 +299,17 @@ function OtrosConsultorios(datos) {
           ElementoPaciente.appendChild(ContenedorBotones);
         }
 
+        ElementoPaciente.dataset.idPaciente = Paciente.idPaciente;
+  
+        // Asignar un manejador de clic al ElementoPaciente
+        ElementoPaciente.addEventListener("click", function () {
+          window.location.href = "/InfoPaciente/" + this.dataset.idPaciente;
+        });
+
+
         ContenidoOtrosConsultorios.appendChild(ElementoPaciente);
       });
     }
-
-    ContenidoOtrosConsultorios.addEventListener("click", function (event) {
-      const pacienteElement = event.target.closest(".Paciente");
-      if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
-        const idPaciente = pacienteElement.id;
-        window.location.href = "/InfoPaciente/" + idPaciente;
-      }
-    });
 
     mostrarElementos(datos.slice(0, elementosPorPagina));
   } else {
@@ -362,7 +356,6 @@ function CitasFinalizadas(datos) {
       elementos.forEach((Paciente) => {
         const ElementoPaciente = document.createElement("div");
         ElementoPaciente.classList.add("Paciente", "CitasFin");
-        ElementoPaciente.id = Paciente.idPaciente;
 
         const rutaRelativa = Paciente.RutaFoto
           ? getPacientePath(Paciente.RutaFoto, "/public")
@@ -407,19 +400,19 @@ function CitasFinalizadas(datos) {
           event.stopPropagation();
         });
 
+        ElementoPaciente.dataset.idPaciente = Paciente.idPaciente;
+  
+        // Asignar un manejador de clic al ElementoPaciente
+        ElementoPaciente.addEventListener("click", function () {
+          window.location.href = "/InfoPaciente/" + this.dataset.idPaciente;
+        });
+
         ContenedorBotones.appendChild(Boton);
         ElementoPaciente.appendChild(ContenedorBotones);
         ContenidoCitasFinalizadas.appendChild(ElementoPaciente);
       });
     }
 
-    ContenidoCitasFinalizadas.addEventListener("click", function (event) {
-      const pacienteElement = event.target.closest(".Paciente");
-      if (pacienteElement && pacienteElement.classList.contains("Paciente")) {
-        const idPaciente = pacienteElement.id;
-        window.location.href = "/InfoPaciente/" + idPaciente;
-      }
-    });
 
     mostrarElementos(datos.slice(0, elementosPorPagina));
   } else {

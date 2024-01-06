@@ -467,6 +467,7 @@ h1 {
     margin: 0;
     padding: 0;
     margin-left: auto;
+    align-items: center;
 }
 
 .page__controls>li {
@@ -478,15 +479,15 @@ h1 {
     display: block;
     margin: 0;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
     text-decoration: none;
     cursor: pointer;
     background: transparent;
     color: inherit;
-    padding: 5px 10px;
+    padding: 10px 15px;
     background: rgb(250, 20, 20);
     color: #fff;
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .page__controlbtn--split {
@@ -545,15 +546,23 @@ h1 {
 .info__item {
     background: #fff;
     border-radius: 3px;
+    margin-bottom: 5px;
 }
 
 .info__item+.info__item {
     border-top: 1px solid #e9f2f7;
 }
 
-.info__item__content {
+.info__item__content{
     padding: 10px;
 }
+
+.antecedentes >*>*>.info__item__content{
+    max-width: 700px;
+    word-wrap: break-word;
+}
+
+
 
 .info__item__content p {
     margin: 5px 0 0;
@@ -573,19 +582,17 @@ h1 {
     resize: vertical;
     margin-top: 10px;
     padding: 10px;
-    width: 96.5%;
+    width: 98%;
     min-height: 50px;
     max-height: 160px;
-    border: 1px solid #e9f2f7;
-    border-radius: 5px;
+    border: 2px solid #84c0ff94;
+    border-radius: 8px;
 }
 
 .info__item__title {
     margin: 0;
     font-weight: bold;
-    /* font-weight: 800; */
-    font-size: large;
-    color: #333;
+    font-size: 24px;
 }
 
 .info__item__map {
@@ -791,8 +798,13 @@ a[href^="mailto:"]:focus {
     color: red;
     font-weight: bold;
     font-size: 24px;
+    /* text-decoration: underline; */
+}
+
+.Alergias{
     text-decoration: underline;
 }
+
 
 .Eda {
     margin-bottom: 0;
@@ -844,12 +856,12 @@ dd {
 
 .Seguimientos>*>*>*>*>*>*>.info__item__title {
     color: #004368;
-    /* color: red; */
     font-size: 24px;
 }
 
 .Seguimientos .info__item {
-    height: 320px;
+    min-height: 200px;
+    margin: 2px;
 }
 
 .Seguimientos .info__item__content {
@@ -857,8 +869,8 @@ dd {
 }
 
 .Seguimientos {
-    border-radius: 5px;
-    background: linear-gradient(-180deg, #5dc9ffc4, #1485c24c);
+    border-radius: 15px;
+    background: #959ea9;
     margin-top: 20px;
     padding: 10px;
 }
@@ -869,7 +881,7 @@ dd {
 
 .Contenedor__Diagnosticos {
     padding-right: 15px;
-    height: 180px;
+    height: 100px;
     overflow-y: auto;
     border-radius: 5px;
 }
@@ -908,7 +920,7 @@ dd {
 }
 
 .info__item__tags {
-    width: 50%;
+    /* width: 50%; */
     max-width: 335.5px;
 }
 
@@ -923,7 +935,7 @@ dd {
     height: auto;
     border-radius: 5px;
     overflow-x: scroll;
-    padding-bottom: 15px;
+    /* padding-bottom: 15px; */
 }
 
 .Etiqueta {
@@ -949,23 +961,6 @@ dd {
 .Area0 {
     background-color: #595959;
 }
-
-.Area1 {
-    background-color: #249DD9;
-}
-
-.Area2 {
-    background-color: #e40000;
-}
-
-.Area3 {
-    background-color: #9c00b7;
-}
-
-.Area4 {
-    background-color: #a8a8a8;
-}
-
 
 
 .Etiqueta p {
@@ -1180,7 +1175,7 @@ form>h3 {
 
 /* Otros estilos si es necesario */
 #Opciones {
-    width: 50%;
+    width: 35%;
     padding: 20px;
     background: #f3f8ff;
     border: 2px solid #249dd98b;
@@ -1249,6 +1244,27 @@ form>h3 {
     margin-left: 45px;
 
 }
+.Historial_Seguimientos,.SeguimientoHoy{
+    border-radius: 8px;
+}
+
+
+@keyframes move-bg {
+    to {
+      background-position: var(--bg-size) 0;
+    }
+  }
+
+.SeguimientoHoy{
+    --bg-size: 400%;
+    --color-one: #dcf3ff;
+    --color-two: #f3fcff;
+    background: linear-gradient(90deg, var(--color-one),
+        var(--color-two),
+        var(--color-one)) 0 0 / var(--bg-size) 100%;
+    color: rgb(52 84 137);
+    animation: move-bg 8s infinite linear;
+}
 
 
 .Cont_Seguimiento {
@@ -1279,9 +1295,8 @@ form>h3 {
 .inputDiagnostic {
     width: 100%;
     padding: 10px;
-    border: 1px solid #e9f2f7;
-    border-radius: 5px;
-
+    border: 2px solid #84daff94;
+    border-radius: 8px;
 }
 
 .resultados-autocompletado {
@@ -1295,6 +1310,8 @@ form>h3 {
 .resultados-autocompletado>.diagnosticos_Resultado {
     padding: 10px;
     cursor: pointer;
+    color: #004368;
+    font-weight: bold;
 }
 
 .resultados-autocompletado>.diagnosticos_Resultado:hover {

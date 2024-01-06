@@ -64,7 +64,8 @@ export async function InfoRegistros() {
     //Pedimos los procedimientos Dispobibles
     const Procedimiento = `SELECT p.idProcedimiento,p.idAreas,p.Procedimiento, a.Area 
     FROM Procedimiento p 
-    LEFT JOIN Areas a ON p.idAreas = a.idAreas `;
+    LEFT JOIN Areas a ON p.idAreas = a.idAreas
+    ORDER  BY p.idAreas ASC, p.idProcedimiento ASC`;
     const [Proced] = await connection.execute(Procedimiento);
 
     //Pedimos los Estados de citas

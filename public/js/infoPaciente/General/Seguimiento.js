@@ -29,16 +29,17 @@ function cargarSeguimiento() {
     crearInfo.appendChild(item);
   }
 
+  crearInfoGroup.appendChild(crearInfo);
+  
   // Si detecta Sesiones Activas, crea un input para poder insertarla
   if (numSesionesActivas >= 1) {
     const Input = crearInfoItem_Seguimiento(
       "SeguiminetoActual",
       datosAlmacenados.SesionesActivas
     );
-    crearInfo.appendChild(Input);
+    crearInfoGroup.appendChild(Input);
   }
 
-  crearInfoGroup.appendChild(crearInfo);
   contenidoDiag.appendChild(crearInfoGroup);
 
   // Y pasamos a la siguiente función
@@ -306,7 +307,6 @@ function crearInfoItem_Seguimiento(tipo, contenido) {
             // Crear un nuevo elemento para la etiqueta
             const etiqueta = document.createElement("div");
             etiqueta.classList.add("Etiqueta");
-            etiqueta.classList.add("Area" + diagnostico.idArea);
             const etiquetaText = document.createElement("p");
             etiquetaText.textContent = diagnostico.Padecimiento;
             etiqueta.appendChild(etiquetaText);

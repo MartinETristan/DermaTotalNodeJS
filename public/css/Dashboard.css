@@ -263,7 +263,8 @@ img {
 }
 
 .Paciente.CitasFin {
-  background: rgb(255, 246, 246);
+  background: rgb(255 213 213);
+  color: red;
 }
 
 .Paciente.Opciones >* {
