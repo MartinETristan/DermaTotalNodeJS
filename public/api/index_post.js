@@ -3,7 +3,7 @@
 // para poder exportarlos todos juntos y que puedan ser usados
 // =============================================================================
 import Auth from './POST/Auth&Cookies.js';
-import Dashboards from "./POST/Dashboard's.js";
+import Dashboards from "./POST/Dashboard.js";
 import Registros from "./POST/Registros.js";
 import Citas from "./POST/Citas.js";
 import Recetas from "./POST/Recetas.js";

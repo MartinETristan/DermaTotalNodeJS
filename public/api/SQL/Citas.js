@@ -3,6 +3,8 @@ import { mysql, db } from "../conf_api.js";
 // Muestra las citas que tiene el doctor 15 dias antes de la fecha actual
 // y todas las citas que tiene el doctor despues de la fecha actual
 export async function CitasMedico(idDoctor, idAsociado) {
+  let CitasMedico = [];
+
   try {
     const connection = await mysql.createConnection(db);
     let fechaActual = new Date();
@@ -10,22 +12,23 @@ export async function CitasMedico(idDoctor, idAsociado) {
     let fechaLimite = fechaActual.toISOString().split("T")[0];
 
     // Define la consulta base
-    let CalendarioCitasBase = `SELECT c.idCitas, c.idPaciente, c.idStatusPaciente, u.Nombres, p.Procedimiento, c.HoraCita, c.FinCita 
-      FROM Citas c 
-      INNER JOIN Procedimiento p ON c.idProcedimiento = p.idProcedimiento 
-      INNER JOIN Paciente pa ON c.idPaciente = pa.idPaciente 
-      INNER JOIN Usuarios u ON pa.idUsuario = u.idUsuario `;
+    let CalendarioCitasBase = `SELECT c.idCitas, c.idPaciente, c.idStatusPaciente, u.Nombres, c.HoraCita, c.FinCita 
+          FROM Citas c 
+          INNER JOIN Paciente pa ON c.idPaciente = pa.idPaciente 
+          INNER JOIN Usuarios u ON pa.idUsuario = u.idUsuario  `;
 
     // Añadir la condición adecuada según si idDoctor o idAsociado está presente
     let CalendarioCitas;
     let params;
     if (idDoctor != "" && idAsociado == "") {
       CalendarioCitas =
-        CalendarioCitasBase + `WHERE c.idDoctor = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
+        CalendarioCitasBase +
+        `WHERE c.idDoctor = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
       params = [idDoctor, fechaLimite];
     } else if (idAsociado != "" && idDoctor == "") {
       CalendarioCitas =
-        CalendarioCitasBase + `WHERE c.idAsociado = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
+        CalendarioCitasBase +
+        `WHERE c.idAsociado = ? AND c.HoraCita >= ? ORDER BY c.HoraCita ASC`;
       params = [idAsociado, fechaLimite];
     } else {
       // Manejar el caso en que ambos son null, si es necesario
@@ -36,9 +39,37 @@ export async function CitasMedico(idDoctor, idAsociado) {
       CalendarioCitas,
       params
     );
+    if (rowsCitas.length > 0) {
+      for (let cita of rowsCitas) {
+        const query_procedimientos = `SELECT p.Procedimiento
+          FROM Procedimiento_Citas pc
+          LEFT JOIN Procedimiento p ON pc.idProcedimiento  = p.idProcedimiento 
+          WHERE idCitas = ?             
+          `;
+        const [rowProcedimientos] = await connection.execute(
+          query_procedimientos,
+          [cita.idCitas]
+        );
+
+        // Agrega la información de los procedimientos a cada cita
+        cita.Procedimientos = rowProcedimientos.map(
+          (proc) => proc.Procedimiento
+        );
+
+        CitasMedico.push({
+          idCitas: cita.idCitas,
+          idPaciente: cita.idPaciente,
+          idStatusPaciente: cita.idStatusPaciente,
+          Nombres: cita.Nombres,
+          Procedimiento: cita.Procedimientos,
+          HoraCita: cita.HoraCita,
+          FinCita: cita.FinCita,
+        });
+      }
+    }
 
     connection.end();
-    return rowsCitas;
+    return CitasMedico;
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo las citas del doctor: ",
@@ -66,12 +97,12 @@ export async function NuevaCita(
     const idCita = await connection.execute(consulta, [
       idSucursal,
       idProcedimiento,
-      idDoctor != "" ? idDoctor: null,
-      idAsociado != "" ? idAsociado: null,
+      idDoctor != "" ? idDoctor : null,
+      idAsociado != "" ? idAsociado : null,
       idPaciente,
       HoraCita,
       FinCita,
-      NotasCita != "" ? NotasCita: null,
+      NotasCita != "" ? NotasCita : null,
     ]);
     connection.end();
     return idCita[0].insertId;

@@ -71,10 +71,10 @@ function crearInfoItem_Seguimiento(tipo, contenido) {
       const elemento = contenido[paginaActual - 1];
       const header = crearElementoHeader_Seguimiento(
         "SEGUIMIENTO " + fecha.dia + "/" + fecha.mes + "/" + fecha.año + ":",
-        "Etiquetas",
-        datosAlmacenados.Tags.filter(
-          (tag) => tag.idSesion == contenido[paginaActual - 1].idSesion
-        )
+        "Etiquetas",[]
+        // datosAlmacenados.Tags.filter(
+        //   (tag) => tag.idSesion == contenido[paginaActual - 1].idSesion
+        // )
       );
       itemContent.appendChild(header);
       const contenedor = document.createElement("div");
@@ -131,10 +131,10 @@ function crearInfoItem_Seguimiento(tipo, contenido) {
       FormatoFechaActual == FormatoFechaSesion
         ? `SEGUIMIENTO HOY:`
         : `SEGUIMIENTO (${FormatoFechaSesion}):`,
-      "Etiquetas_Actuales",
-      datosAlmacenados.Tags.filter(
-        (tag) => tag.idSesion == contenido[0].idSesion
-      )
+      "Etiquetas_Actuales",[]
+      // datosAlmacenados.Tags.filter(
+      //   (tag) => tag.idSesion == contenido[0].idSesion
+      // )
     );
 
     itemContent.appendChild(header);
@@ -240,9 +240,10 @@ function crearInfoItem_Seguimiento(tipo, contenido) {
     cont_diagnostics.appendChild(Busqueda_Diagnostic);
 
     //Autocompletado
-    const datosFiltrados = datosAlmacenados.Tags.filter(
-      (tag) => tag.idSesion == contenido[0].idSesion
-    );
+    const datosFiltrados = [];
+    // datosAlmacenados.Tags.filter(
+    //   (tag) => tag.idSesion == contenido[0].idSesion
+    // );
 
     // Usar el operador de propagación para añadir cada elemento filtrado individualmente al array
     arraydiagnosticos.push(...datosFiltrados);

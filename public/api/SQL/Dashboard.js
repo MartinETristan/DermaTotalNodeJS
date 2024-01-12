@@ -106,7 +106,7 @@ export async function DashDoc_CitasHoy(idDoctor, Fecha) {
     INNER JOIN Paciente p ON c.idPaciente = p.idPaciente 
     INNER JOIN Usuarios u ON p.idUsuario = u.idUsuario 
  
-    WHERE c.idDoctor = 1 AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = "2024-01-11" AND c.idEstadoCita = 1
+    WHERE c.idDoctor = ? AND c.idStatusPaciente = 1 AND DATE(c.HoraCita) = ? AND c.idEstadoCita = 1
     ORDER BY c.HoraCita ASC;
     `;
 

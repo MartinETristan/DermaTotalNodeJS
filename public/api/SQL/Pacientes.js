@@ -12,7 +12,7 @@ export async function InfoPaciente(idPaciente) {
   let HistorialFotografico = [];
   let Diagnosticos = [];
   let SesionesActivas = [];
-  let Tags = [];
+
   // =================================================
   // Informacion basica del paciente
   try {
@@ -184,13 +184,15 @@ export async function InfoPaciente(idPaciente) {
   // Diagnosticos del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const queryDiagnosticos = `SELECT idSesion,InicioDeSesion,Seguimiento, p.Procedimiento, u.Nombres AS Doctor
-      FROM Sesion s 
-      LEFT JOIN Procedimiento p ON s.idProcedimiento = p.idProcedimiento 
-      LEFT JOIN Doctor d ON s.idDoctor = d.idDoctor 
-      LEFT JOIN Usuarios u ON d.idUsuario = u.idUsuario 
-      WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL
-      ORDER BY s.idSesion DESC;`;
+    const queryDiagnosticos = `SELECT s.idSesion, p.idPadecimiento, p.Padecimiento, s.InicioDeSesion, u.Nombres AS Doctor, s2.Seguimiento
+    FROM Sesion s 
+    LEFT JOIN Doctor d ON s.idDoctor = d.idDoctor 
+    LEFT JOIN Usuarios u ON d.idUsuario = u.idUsuario 
+    LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
+    LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
+    LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
+    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL
+    ORDER BY s.idSesion DESC, p.idPadecimiento ASC;`;
 
     const [rowDiagnosticos, fieldsAntecedentes] = await connection.execute(
       queryDiagnosticos,
@@ -201,10 +203,11 @@ export async function InfoPaciente(idPaciente) {
       Diagnosticos = rowDiagnosticos.map((elemento) => {
         return {
           idSesion: elemento.idSesion,
+          idPadecimiento: elemento.idPadecimiento,
+          Padecimiento: elemento.Padecimiento,
           Fecha: elemento.InicioDeSesion,
-          Procedimiento: elemento.Procedimiento,
-          Diagnostico: elemento.Seguimiento,
           Doctor: elemento.Doctor,
+          Diagnostico: elemento.Seguimiento,
         };
       });
     }
@@ -220,11 +223,13 @@ export async function InfoPaciente(idPaciente) {
   // Sesiones Activas del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const querySesionesActivas = `SELECT idSesion, s.idCitas ,s.idDoctor, s.idAsociado, InicioDeSesion, p.Procedimiento, s.Seguimiento, c.Nota
+    const querySesionesActivas = ` SELECT S.idSesion, s.idCitas ,s.idDoctor, s.idAsociado, p.idPadecimiento, p.Padecimiento, InicioDeSesion, s2.Seguimiento, c.Nota
     FROM Sesion s 
-    LEFT JOIN Procedimiento p ON s.idProcedimiento = p.idProcedimiento 
     LEFT JOIN Citas c ON c.idCitas = s.idCitas
-    WHERE s.idPaciente = ? AND (s.Seguimiento IS NULL OR s.FinDeSesion IS NULL)
+    LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
+    LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
+    LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
+    WHERE s.idPaciente = ? AND (s2.Seguimiento IS NULL OR s.FinDeSesion IS NULL)
     ORDER BY s.idSesion ASC;`;
 
     const [rowSesiones_A, fieldsAntecedentes] = await connection.execute(
@@ -239,8 +244,9 @@ export async function InfoPaciente(idPaciente) {
           idCita: elemento.idCitas,
           idDoctor: elemento.idDoctor,
           idAsociado: elemento.idAsociado,
+          idPadecimiento: elemento.idPadecimiento,
+          Padecimiento: elemento.Padecimiento,
           InicioSesion: elemento.InicioDeSesion,
-          Procedimiento: elemento.Procedimiento,
           Seguimiento: elemento.Seguimiento,
           Nota: elemento.Nota,
         };
@@ -254,40 +260,6 @@ export async function InfoPaciente(idPaciente) {
     return "Ha ocurrido un error.";
   }
 
-  // =================================================
-  // Tags de los diagnosticos del paciente
-
-  try {
-    const connection = await mysql.createConnection(db);
-    const queryTags = `
-    SELECT p.idPadecimiento, p.idArea, s.idSesion, p.Padecimiento 
-    FROM Padecimientos p
-    LEFT JOIN Padecimientos_Sesion ps ON p.idPadecimiento = ps.idPadecimiento 
-    LEFT JOIN Sesion s ON ps.idSesion = s.idSesion
-    WHERE s.idPaciente = ?
-    ORDER BY s.idSesion DESC, idPadecimiento ASC`;
-
-    const [rowTags, fieldsAntecedentes] = await connection.execute(queryTags, [
-      idPaciente,
-    ]);
-    connection.end();
-    if (rowTags.length > 0) {
-      Tags = rowTags.map((elemento) => {
-        return {
-          idPadecimiento: elemento.idPadecimiento,
-          idArea: elemento.idArea,
-          idSesion: elemento.idSesion,
-          Padecimiento: elemento.Padecimiento,
-        };
-      });
-    }
-  } catch (error) {
-    console.error(
-      "Ha ocurrido un error obteniendo las Tag's del paciente: ",
-      error
-    );
-    return "Ha ocurrido un error.";
-  }
 
   const InfoPaciente = {
     BasicInfo: BasicInfo,
@@ -297,7 +269,6 @@ export async function InfoPaciente(idPaciente) {
     HistorialFotografico: HistorialFotografico,
     Seguimientos: Diagnosticos,
     SesionesActivas: SesionesActivas,
-    Tags: Tags,
   };
 
   return InfoPaciente;
