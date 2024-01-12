@@ -26,7 +26,7 @@ export async function VerificarUsuario(usuario, contrasena) {
         if (bcrypt.compareSync(contrasena, hashedPassword)) {
           // Registra el inicio de sesion
           const registro =
-            "INSERT INTO `Login/Out` (idUsuario,Login) VALUES (?, NOW())";
+            "INSERT INTO `Login_Out` (idUsuario,Login) VALUES (?, NOW())";
           await connection.execute(registro, [rows[0].idUsuario]);
           connection.end();
           const InfoSession = {
@@ -87,7 +87,7 @@ export async function logout(idUsuario) {
   try {
     const connection = await mysql.createConnection(db);
     const registro =
-      "UPDATE `Login/Out` SET Logout = NOW() WHERE Login  = (SELECT MAX(Login) FROM `Login/Out` WHERE Logout IS NULL);";
+      "UPDATE `Login_Out` SET Logout = NOW() WHERE Login  = (SELECT MAX(Login) FROM `Login_Out` WHERE Logout IS NULL);";
     await connection.execute(registro, [idUsuario]);
     connection.end();
   } catch (error) {

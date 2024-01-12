@@ -74,7 +74,7 @@ function createInfoSection(infoArr, parentDiv) {
 
 // Funcion para crear botones que cambian de color dependiendo del estado del paciente
 function CrearBotonDeAccion(Paciente) {
-  console.log(Paciente);
+  // console.log(Paciente);
   const Boton = document.createElement("button");
   
   let claseBoton;

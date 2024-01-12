@@ -158,7 +158,9 @@ function cargarGeneral() {
     </div>
     
     <div class="Seguimientos">
-    <h2>NOTAS DE SEGUIMIENTO:</h2>
+    <div id="contHeaderSeguimientos">
+      <h2>NOTAS DE SEGUIMIENTO:</h2>
+    </div>
     <div class="region__content"></div>
     </div>
   
