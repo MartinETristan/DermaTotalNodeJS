@@ -3,4 +3,4 @@
 /docker-compose.yml
 /public/private/src/img
 /public/img/RCTa
-/public/api/DB/Inserts_DermaTotal.sql
+/DB/Inserts_DermaTotal.sql

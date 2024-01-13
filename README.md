@@ -30,7 +30,7 @@ PUERTO_NODE_LOCAL = 3000 (Donde se conectará Express)
 MYSQLDB_PORT_LOCAL = 3306
 ```
 
-Al igual que modificar los Insert's en la ruta `public/api/DB` para que tus tablas tengan los datos que se ajusten mas a tu estrucutra
+Al igual que modificar los Insert's de tu base de datos (Puedes encontraerlos en la ruta `/DB/Inserts.sql`) para que tus tablas tengan los datos que se ajusten mas a tu estrucutra
 
 Si te gustaria añadir mas ramas POST a el proyecto, no olvides de añadirlas en el archivo `/public/api/api_index_post.js` para que detecte 
 las rutas POST
