@@ -1,4 +1,4 @@
-import { mysql, bcrypt, db } from "../conf_api.js";
+import { mysql, bcrypt, db } from "../api_conf.js";
 
 //==================================================================================================
 // Función para verificar el usuario y contraseña en varias tablas

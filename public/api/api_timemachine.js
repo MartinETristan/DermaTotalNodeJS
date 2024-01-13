@@ -1,5 +1,5 @@
 
-import { moment } from "./conf_api.js";
+import { moment } from "./api_conf.js";
 
  // Asi se hace una aproximacion de la zona horaria
 const AproximacionZona = moment.tz.guess();

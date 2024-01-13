@@ -59,7 +59,7 @@ io.engine.use(sessionMiddleware);
 // ==================================================================================================
 // Rutas Post
 // ==================================================================================================
-import rutasPost from "./public/api/index_post.js";
+import rutasPost from "./public/api/api_index_post.js";
 
 Object.values(rutasPost).forEach((route) => {
   app.use(route);
@@ -68,7 +68,7 @@ Object.values(rutasPost).forEach((route) => {
 //==================================================================================================
 // WebSockets
 //==================================================================================================
-import socketManager from "./public/api/WebSocket's.js";
+import socketManager from "./public/api/WebSockets.js";
 socketManager(io);
 
 // ==================================================================================================

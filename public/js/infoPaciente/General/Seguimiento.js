@@ -10,6 +10,8 @@ function cargarSeguimiento() {
   const crearInfoGroup = crearElemento_Seguimiento("infogroup");
   const crearInfo = crearElemento_Seguimiento("info");
 
+  console.log(datosAlmacenados.Seguimientos);
+
   const numSeguimientos = datosAlmacenados.Seguimientos.length;
   const numSesionesActivas = datosAlmacenados.SesionesActivas.length;
 
@@ -30,6 +32,9 @@ function cargarSeguimiento() {
   }
 
   crearInfoGroup.appendChild(crearInfo);
+  
+
+
   
   // Si detecta Sesiones Activas, crea un input para poder insertarla
   if (numSesionesActivas >= 1) {

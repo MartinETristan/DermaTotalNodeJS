@@ -1,4 +1,4 @@
-import { mysql, bcrypt, db } from "../conf_api.js";
+import { mysql, bcrypt, db } from "../api_conf.js";
 
 //==================================================================================================
 // Funcion para obtener la informacion de los pacientes

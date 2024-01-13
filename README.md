@@ -6,6 +6,35 @@ Este repositorio esta hecho para tener un mejor control de versiones web del Sis
 
 
 
+## Instalación
+
+ Si te gustaria hacer uso de este proyecto y/o estructura, asegurate de tener el sigueinte formato en tu archivo .env:
+```bash
+# Datos de la empresa/debug
+COPYRIGHT = "©Copyright (Puedes cambiarlo por cualquier otra cosa pero... este es el texto que se mostrará antes del nombre de la empresa)"
+NOMBRE_EMPRESA = "(NOMBRE DE LA EMPRESA)"
+VERSION = "1.0.0 (VERSION QUE SE MOSTRARÁ EN EL SISTEMA)"
+
+#Host local
+MYSQLDB_HOST = "El nombre de tu usuario conectado a la aqui (localhost)"
+MYSQLDB_USER = "La constraseña de tu usuario (root)"
+
+#Password local
+MYSQLDB_PASSWORD = Contraseña de tu BD
+MYSQLDB_NAME = Nombre de tu BD
+
+# Estos son los puertos locales del sitio 
+PUERTO_NODE_LOCAL = 3000 (Donde se conectará Express)
+
+# Estos son los puertos de SQL
+MYSQLDB_PORT_LOCAL = 3306
+```
+
+Al igual que modificar los Insert's en la ruta `public/api/DB` para que tus tablas tengan los datos que se ajusten mas a tu estrucutra
+
+Si te gustaria añadir mas ramas POST a el proyecto, no olvides de añadirlas en el archivo `/public/api/api_index_post.js` para que detecte 
+las rutas POST
+
 
 ## Características
 

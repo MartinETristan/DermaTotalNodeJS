@@ -1,4 +1,4 @@
-import { mysql, db } from "../conf_api.js";
+import { mysql, db } from "../api_conf.js";
 
 export async function InsertRutaFoto(idUsuario, RutaFoto) {
   try {

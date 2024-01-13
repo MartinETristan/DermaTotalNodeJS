@@ -1,4 +1,4 @@
-import { mysql, db } from "../conf_api.js";
+import { mysql, db } from "../api_conf.js";
 
 // Muestra las citas que tiene el doctor 15 dias antes de la fecha actual
 // y todas las citas que tiene el doctor despues de la fecha actual
