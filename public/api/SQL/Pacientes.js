@@ -184,15 +184,15 @@ export async function InfoPaciente(idPaciente) {
   // Diagnosticos del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const queryDiagnosticos = `SELECT s.idSesion, p.idPadecimiento, p.Padecimiento, s.InicioDeSesion, u.Nombres AS Doctor, s2.Seguimiento
+    const queryDiagnosticos = `SELECT s.idSesion, p.idPadecimiento,p.idArea, p.Padecimiento, s.InicioDeSesion, u.Nombres AS Doctor, s2.Seguimiento
     FROM Sesion s 
     LEFT JOIN Doctor d ON s.idDoctor = d.idDoctor 
     LEFT JOIN Usuarios u ON d.idUsuario = u.idUsuario 
     LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
     LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
     LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
-    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL
-    ORDER BY s.idSesion DESC, p.idPadecimiento ASC;`;
+    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL AND s2.Seguimiento IS NOT NULL
+    ORDER BY s.InicioDeSesion DESC, p.idArea ASC, p.idPadecimiento ASC;`;
 
     const [rowDiagnosticos, fieldsAntecedentes] = await connection.execute(
       queryDiagnosticos,
@@ -204,6 +204,7 @@ export async function InfoPaciente(idPaciente) {
         return {
           idSesion: elemento.idSesion,
           idPadecimiento: elemento.idPadecimiento,
+          idArea: elemento.idArea,
           Padecimiento: elemento.Padecimiento,
           Fecha: elemento.InicioDeSesion,
           Doctor: elemento.Doctor,

@@ -36,7 +36,7 @@ export async function DashDoc_PacientesEspera(idDoctor, Fecha) {
     WHERE s.idDoctor = ?  AND s.CheckOut IS NULL
 
     ORDER BY HoraLlegada ASC, HoraCita ASC;
-      `;
+    `;
 
     const [rowsEspera, fieldsEspera] = await connection.execute(
       consultaEspera,

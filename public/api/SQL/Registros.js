@@ -185,80 +185,69 @@ export async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
 // Diagnostico
 //==================================================================================================
 
-export async function NuevoPadecimiento(idArea,Padecimiento){
-  try{
+export async function NuevoPadecimiento(idArea, Padecimiento) {
+  try {
     const connection = await mysql.createConnection(db);
     const query = `INSERT INTO Padecimientos (idArea,Padecimiento) VALUES (?,?)`;
-    const [result] = await connection.execute(query,[idArea,Padecimiento]);
+    const [result] = await connection.execute(query, [idArea, Padecimiento]);
     connection.end();
     return result.insertId;
-  }catch(error){
-    console.error("Ha ocurrido un error creando el padecimiento: ",error);
+  } catch (error) {
+    console.error("Ha ocurrido un error creando el padecimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-export async function Buscar_Padecimiento(Padecimiento){
-  try{
+export async function Buscar_Padecimiento(Padecimiento) {
+  try {
     const connection = await mysql.createConnection(db);
     const query = `SELECT * FROM Padecimientos WHERE Padecimiento LIKE ?`;
     const [result] = await connection.execute(query, [`%${Padecimiento}%`]);
-    
+
     connection.end();
     return result;
-  }catch(error){
-    console.error("Ha ocurrido un error buscando el padecimiento: ",error);
+  } catch (error) {
+    console.error("Ha ocurrido un error buscando el padecimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-export async function Añadir_Padecimiento(idPadecimiento,idSesion){
+export async function Añadir_Padecimiento(idPadecimiento, idSesion) {
   try {
     const connection = await mysql.createConnection(db);
     const query = `INSERT INTO Padecimientos_Sesion
     (idPadecimiento, idSesion)
     VALUES(?, ?);`;
-    await connection.execute(query,[idPadecimiento,idSesion]);
+    await connection.execute(query, [idPadecimiento, idSesion]);
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error añadiendo el padecimiento: ",error);
+    console.error("Ha ocurrido un error añadiendo el padecimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-export async function Quitar_Padecimiento(idPadecimiento,idSesion){
+export async function Quitar_Padecimiento(idPadecimiento, idSesion) {
   try {
     const connection = await mysql.createConnection(db);
     const query = `DELETE FROM Padecimientos_Sesion
     WHERE idPadecimiento = ? AND idSesion = ?;`;
-    await connection.execute(query,[idPadecimiento,idSesion]);
+    await connection.execute(query, [idPadecimiento, idSesion]);
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error quitando el padecimiento: ",error);
+    console.error("Ha ocurrido un error quitando el padecimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-
-
-
-
 //==================================================================================================
-// Updates estados Pacientes / Citas
+// Updates estados Pacientes 
 //==================================================================================================
-export async function NuevaCita(
-  idSucursal,
-  idProcedimiento,
-  idDoctor,
-  idAsociado,
+
+export async function ActualizarAntecedentesPaciente(
   idPaciente,
-  idStatus,
-  FechaCita,
-  DuracionCita,
-  NotasCita
-) {}
-
-export async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valor) {
+  Propiedad,
+  Valor
+) {
   try {
     const connection = await mysql.createConnection(db);
     const Actualizacion = `UPDATE HistorialClinico SET ${Propiedad} = ? WHERE idPaciente = ?`;
@@ -272,89 +261,83 @@ export async function ActualizarAntecedentesPaciente(idPaciente, Propiedad, Valo
   }
 }
 
-export async function ActualizarDatosGenerales(id, Propiedad, Valor, TipodeUsuario) {
-  // Acrtualiza la informacion del usuario basados en el tipo de usuario
-  switch (TipodeUsuario) {
-    case 1:
-      break;
+export async function ActualizarDatosGenerales( id, Propiedad, Valor, TipodeUsuario) {
+  // Actualiza la informacion del usuario basados en el tipo de usuario
+  const tablas = [
+    "SuperAdmin",
+    "Admin",
+    "Doctor",
+    "Recepcionista",
+    "Asociado",
+    "Paciente",
+  ];
 
-    case 2:
-      break;
+  // Validación de TipodeUsuario
+  const tipoUsuarioIndex = parseInt(TipodeUsuario) - 2;
 
-    case 3:
-      break;
+  if (isNaN(tipoUsuarioIndex) || tipoUsuarioIndex < 0 || tipoUsuarioIndex >= tablas.length) {
+    console.error("Tipo de usuario inválido.");
+    return "Tipo de usuario inválido.";
+  }
 
-    case 4:
-      break;
-
-    case 5:
-      break;
-
-    case 6:
-      break;
-
-    case 7:
-      try {
-        const connection = await mysql.createConnection(db);
-        const Actualizacion = `UPDATE Usuarios as Usuario
-          SET ${Propiedad} = ?
-          WHERE Usuario.idUsuario IN(
-          SELECT Fuente.idUsuario 
-          FROM Paciente AS Fuente
-          WHERE Fuente.idPaciente = ?
-          )`;
-        await connection.execute(Actualizacion, [Valor, id]);
-        connection.end();
-      } catch (error) {
-        console.error(
-          "Ha ocurrido un error actualizando la informacion personal del paciente: ",
-          error
-        );
-      }
-      break;
-
-    default:
-      console.log("No se encontro el tipo de usuario");
-      break;
+  try {
+    const connection = await mysql.createConnection(db);
+    const Actualizacion = `UPDATE Usuarios as Usuario
+        SET ${Propiedad} = ?
+        WHERE Usuario.idUsuario IN(
+        SELECT Fuente.idUsuario 
+        FROM ${tablas[tipoUsuarioIndex]} AS Fuente
+        WHERE Fuente.id${tablas[tipoUsuarioIndex]} = ?
+        )`;
+    await connection.execute(Actualizacion, [Valor, id]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      `Ha ocurrido un error actualizando la informacion personal del paciente: (${Propiedad})`,
+      error
+    );
   }
 }
 
+//==================================================================================================
+// NOTA:
+// Se pueden modificar estas funciones para que retornen el Nombre de lo que estan modificando
+// (Activo, Inactivo, Cancelado, etc)
+// Al igual para las funciones de arriba (ActualizarAntecedentesPaciente, ActualizarDatosGenerales)
+// y unicamente faltaría adaptar el frontend para que muestre el nombre en lugar del id
+//==================================================================================================
 export async function ActualizarStatus(TipodeUsuario, id, Status) {
-  switch (TipodeUsuario) {
-    case 1:
-      break;
+  const tablas = [
+    "SuperAdmin",
+    "Admin",
+    "Doctor",
+    "Recepcionista",
+    "Asociado",
+    "Paciente",
+  ];
 
-    case 2:
-      break;
+  // Validación de TipodeUsuario
+  const tipoUsuarioIndex = parseInt(TipodeUsuario) - 2;
 
-    case 3:
-      break;
+  if (
+    isNaN(tipoUsuarioIndex) ||
+    tipoUsuarioIndex < 0 ||
+    tipoUsuarioIndex >= tablas.length
+  ) {
+    console.error("Tipo de usuario inválido.");
+    return "Tipo de usuario inválido.";
+  }
 
-    case 4:
-      break;
-
-    case 5:
-      break;
-
-    case 6:
-      break;
-
-    case 7:
-      try {
-        const connection = await mysql.createConnection(db);
-        const Actualizacion = `UPDATE Paciente SET idStatus = ? WHERE idPaciente = ?`;
-        await connection.execute(Actualizacion, [Status, id]);
-        connection.end();
-      } catch (error) {
-        console.error(
-          "Ha ocurrido un error actualizando el status del usuario: ",
-          error
-        );
-      }
-      break;
-    default:
-      console.log("No se encontro el tipo de usuario");
-      break;
+  try {
+    const connection = await mysql.createConnection(db);
+    const Actualizacion = `UPDATE ${tablas[tipoUsuarioIndex]} SET idStatus = ? WHERE idPaciente = ?`;
+    await connection.execute(Actualizacion, [Status, id]);
+    connection.end();
+  } catch (error) {
+    console.error(
+      "Ha ocurrido un error actualizando el status del usuario: ",
+      error
+    );
   }
 }
 
@@ -368,16 +351,19 @@ export async function RegitroCreacionCita(R_EsDoctor, R_ID, idCita) {
     let idRecepcionista = null;
 
     // Verificación más explícita
-    if (R_EsDoctor === true || R_EsDoctor === 'true') {
+    if (R_EsDoctor === true || R_EsDoctor === "true") {
       idDoctor = R_ID;
     } else {
       idRecepcionista = R_ID;
     }
 
     await connection.execute(query, [idDoctor, idRecepcionista, idCita]);
-    
+
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error realizando el registro de la creacion de la cita: ", error);
+    console.error(
+      "Ha ocurrido un error realizando el registro de la creacion de la cita: ",
+      error
+    );
   }
 }

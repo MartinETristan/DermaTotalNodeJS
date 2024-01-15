@@ -925,7 +925,9 @@ dd {
 }
 
 #Etiquetas_Actuales,
-#Etiquetas {
+#Etiquetas ,
+#contHeaderSeguimientos,
+#HeaderTags{
     display: flex;
     flex-wrap: nowrap;
     overflow: auto;
@@ -938,6 +940,15 @@ dd {
     /* padding-bottom: 15px; */
 }
 
+#contHeaderSeguimientos{
+    justify-content: space-between;
+}
+
+#contHeaderSeguimientos > h2{
+    color: white;
+    padding: 5px;
+}
+
 .Etiqueta {
     display: flex;
     justify-content: center;
@@ -948,6 +959,11 @@ dd {
     padding: 5px;
     border-radius: 5px;
     gap: 5px;
+    cursor: pointer;
+}
+
+.Etiqueta.Activa {
+    background-color: #004368;
 }
 
 .Etiqueta p {
@@ -957,11 +973,6 @@ dd {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-.Area0 {
-    background-color: #595959;
-}
-
 
 .Etiqueta p {
     margin: 0;
