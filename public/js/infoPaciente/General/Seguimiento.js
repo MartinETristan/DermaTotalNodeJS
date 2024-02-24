@@ -179,432 +179,402 @@ function crearInfoItem_SeguimientoActual(contenido) {
     "Etiquetas_Actuales"
   );
 
+  // Añadimos el Header al itemContent
   itemContent.appendChild(header);
 
+
+
+
+// Creamos el contenedor del TextArea y los elementos
+const cont_Seguimiento = document.createElement("div");
+cont_Seguimiento.id = "Cont_Seguimiento";
+cont_Seguimiento.style.display = "none";
+
+// Creamos el textarea para el seguimiento
   const input = document.createElement("textarea");
   input.classList.add("info__item__textarea");
   input.placeholder = "Escribe el seguimiento aquí...";
   input.value = contenido[0].Seguimiento || "";
   input.required = true;
+  input.id = "Seguimiento_Textarea";
+  
   input.addEventListener("input", function () {
     // Restablecer la altura para calcular correctamente el scrollHeight
     this.style.height = "auto";
     // Establecer la altura en función del contenido, pero no superará la max-height definida en CSS
     this.style.height = this.scrollHeight + "px";
   });
-  itemContent.appendChild(input);
+  cont_Seguimiento.appendChild(input);
 
+
+
+
+
+
+// Creamos el contenedor para los diagnosticos
   const cont_text = document.createElement("div");
-  cont_text.classList.add("Cont_Seguimiento");
+  cont_text.classList.add("Cont_TextSeguimiento");
+  cont_text.style.display = "none";
   const textinput = document.createElement("p");
   textinput.textContent = contenido[0].Seguimiento || "";
-  textinput.style.display = "none";
+  // textinput.style.display = "none";
   textinput.style.visibility = "0";
   cont_text.appendChild(textinput);
-  itemContent.appendChild(cont_text);
+  cont_Seguimiento.appendChild(cont_text);
 
-  // Creamos el footer para los botones y diagnosticos
-  const footerSeguimiento = document.createElement("div");
-  footerSeguimiento.classList.add("footerSeguimiento");
 
-  // Ahora creamos el contenedor para los diagnosticos
-  const cont_diagnostics = document.createElement("div");
-  cont_diagnostics.classList.add("Cont_Diagnosticos");
-  const Busqueda_Diagnostic = document.createElement("input");
-  Busqueda_Diagnostic.type = "text";
-  Busqueda_Diagnostic.id = "inputDiagnostic";
-  Busqueda_Diagnostic.placeholder = "Buscar Diagnosticos...";
-  Busqueda_Diagnostic.classList.add("inputDiagnostic");
+  const Cont_Botones = document.createElement("div");
+  Cont_Botones.classList.add("Cont_BotonesSeguimiento");
 
-  const Crear_padecimiento = document.createElement("div");
-  Crear_padecimiento.classList.add("Crear_padecimiento");
-
-  const input_NuevoPadecimiento = document.createElement("input");
-  input_NuevoPadecimiento.type = "text";
-  input_NuevoPadecimiento.id = "input_NuevoPadecimiento";
-  input_NuevoPadecimiento.placeholder = "Nuevo Padecimiento...";
-  input_NuevoPadecimiento.required = true;
-
-  const Areas = document.createElement("select");
-  Areas.id = "Areas";
-  Areas.classList.add("Areas");
-  for (let index = 0; index < InfoSelects.Areas.length; index++) {
-    const element = InfoSelects.Areas[index];
-    const option = document.createElement("option");
-    option.value = element.idAreas;
-    option.textContent = element.Area;
-    Areas.appendChild(option);
-  }
-
-  const BotonCrearPadecimiento = document.createElement("button");
-  BotonCrearPadecimiento.type = "button";
-  BotonCrearPadecimiento.textContent = "Guardar";
-  BotonCrearPadecimiento.classList.add("GuardarPadecimiento");
-  BotonCrearPadecimiento.addEventListener("click", () => {
-    const nuevoPadecimiento = input_NuevoPadecimiento.value;
-    const idArea = Areas.value;
-    if (input_NuevoPadecimiento.checkValidity()) {
-      fetch("/NuevoPadecimiento", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Padecimiento: nuevoPadecimiento,
-          idArea: idArea,
-        }),
-      });
-      Crear_padecimiento.style.display = "none";
-      Busqueda_Diagnostic.style.display = "block";
-      botonGuardar.style.display = "block";
-    } else {
-      input_NuevoPadecimiento.focus();
-    }
-  });
-
-  const BotonCancelarPadecimiento = document.createElement("button");
-  BotonCancelarPadecimiento.type = "button";
-  BotonCancelarPadecimiento.textContent = "Cancelar";
-  BotonCancelarPadecimiento.classList.add("CancelarPadecimiento");
-  BotonCancelarPadecimiento.addEventListener("click", () => {
-    Crear_padecimiento.style.display = "none";
-    Busqueda_Diagnostic.style.display = "block";
-    botonGuardar.style.display = "block";
-  });
-
-  Crear_padecimiento.style.display = "none";
-  Crear_padecimiento.appendChild(input_NuevoPadecimiento);
-  Crear_padecimiento.appendChild(Areas);
-  Crear_padecimiento.appendChild(BotonCancelarPadecimiento);
-  Crear_padecimiento.appendChild(BotonCrearPadecimiento);
-
-  cont_diagnostics.appendChild(Crear_padecimiento);
-  cont_diagnostics.appendChild(Busqueda_Diagnostic);
-
-  //Autocompletado
-  const datosFiltrados = [];
-
-  // Usar el operador de propagación para añadir cada elemento filtrado individualmente al array
-  arraydiagnosticos.push(...datosFiltrados);
-
-  // Función para actualizar los resultados del autocompletado
-  const actualizarAutocompletado = (input, resultados) => {
-    const valorInput = input.value.toLowerCase();
-    resultados.innerHTML = ""; // Limpia resultados anteriores
-
-    if (!valorInput) return;
-    // Tus datos de autocompletado
-    $.ajax({
-      url: "/Buscar_Padecimiento",
-      method: "POST",
-      dataType: "json",
-      data: { Padecimiento: valorInput },
-      success: function (data) {
-        // Ahora los diagnosticos están en 'data'
-        const filtrados = data.filter((item) =>
-          item.Padecimiento.toLowerCase().includes(valorInput)
-        );
-        // Aquí procesamos los resultados
-        procesarResultados(filtrados, input, resultados, valorInput);
-      },
-      error: function (error) {
-        console.log(error);
-      },
-    });
-  };
-
-  const procesarResultados = (filtrados, input, resultados, valorInput) => {
-    // En caso de que los resultados sean menos de 3, mostramos un botón para crear un nuevo diagnóstico
-    if (filtrados.length < 3) {
-      filtrados.forEach((diagnostico) => {
-        const divResultado = document.createElement("div");
-        divResultado.classList.add("diagnosticos_Resultado");
-        divResultado.textContent = diagnostico.Padecimiento;
-        divResultado.addEventListener("click", () => {
-          if (
-            arraydiagnosticos.some(
-              (e) => e.idPadecimiento === diagnostico.idPadecimiento
-            )
-          ) {
-            console.log("Ya existe");
-            Busqueda_Diagnostic.classList.add("wiggle");
-
-            // Opcional: quitar la clase después de que la animación haya terminado
-            setTimeout(() => {
-              Busqueda_Diagnostic.classList.remove("wiggle");
-            }, 500); // 500 ms es la duración de la animación
-            return;
-          }
-
-          arraydiagnosticos.push(diagnostico);
-
-          input.value = ""; // Limpiar el input
-          resultados.innerHTML = ""; // Limpiar los resultados anteriores
-
-          // Contenedor para las etiquetas seleccionadas
-          const cont_etiqueta = document.getElementById("Etiquetas_Actuales");
-
-          // Crear un nuevo elemento para la etiqueta
-          const etiqueta = document.createElement("div");
-          etiqueta.classList.add("Etiqueta");
-          const etiquetaText = document.createElement("p");
-          etiquetaText.textContent = diagnostico.Padecimiento;
-          etiqueta.appendChild(etiquetaText);
-
-          const etiquetaBoton = document.createElement("span");
-          etiquetaBoton.classList.add("Eliminar-Etiqueta");
-          etiquetaBoton.textContent = "X";
-          etiquetaBoton.addEventListener("click", () => {
-            const indice = arraydiagnosticos.findIndex(
-              (diag) => diag.idPadecimiento == diagnostico.idPadecimiento
-            );
-            // Verificar si se encontró el índice
-            if (indice != -1) {
-              arraydiagnosticos.splice(indice, 1); // Elimina 1 elemento en el índice encontrado
-            }
-
-            etiqueta.parentNode.removeChild(etiqueta);
-          });
-          etiqueta.appendChild(etiquetaBoton);
-
-          // Añadir la nueva etiqueta al contenedor
-          cont_etiqueta.appendChild(etiqueta);
-        });
-        resultados.appendChild(divResultado);
-      });
-      const hr = document.createElement("hr");
-      resultados.appendChild(hr);
-      hr.style.margin = "2px";
-      const crearDiagnostico = document.createElement("div");
-      crearDiagnostico.textContent = "Crear diagnóstico";
-      crearDiagnostico.classList.add("diagnosticos_CrearBoton");
-      crearDiagnostico.addEventListener("click", () => {
-        // Aqui es donde se realizará la creación del diagnóstico
-        // y ocultará las entradas anteriores dentro de ""
-        Crear_padecimiento.style.display = "flex";
-        Busqueda_Diagnostic.style.display = "none";
-        botonGuardar.style.display = "none";
-        input_NuevoPadecimiento.value = Busqueda_Diagnostic.value;
-      });
-      resultados.appendChild(crearDiagnostico);
-    } else {
-      filtrados.forEach((diagnostico) => {
-        const divResultado = document.createElement("div");
-        divResultado.classList.add("diagnosticos_Resultado");
-        divResultado.textContent = diagnostico.Padecimiento;
-        divResultado.addEventListener("click", () => {
-          if (
-            arraydiagnosticos.some(
-              (e) => e.idPadecimiento === diagnostico.idPadecimiento
-            )
-          ) {
-            console.log("Ya existe");
-            Busqueda_Diagnostic.classList.add("wiggle");
-
-            // Opcional: quitar la clase después de que la animación haya terminado
-            setTimeout(() => {
-              Busqueda_Diagnostic.classList.remove("wiggle");
-            }, 500); // 500 ms es la duración de la animación
-            return;
-          }
-
-          arraydiagnosticos.push(diagnostico);
-
-          input.value = ""; // Limpiar el input
-          resultados.innerHTML = ""; // Limpiar los resultados anteriores
-
-          // Contenedor para las etiquetas seleccionadas
-          const cont_etiqueta = document.getElementById("Etiquetas_Actuales");
-
-          // Crear un nuevo elemento para la etiqueta
-          const etiqueta = document.createElement("div");
-          etiqueta.classList.add("Etiqueta");
-          const etiquetaText = document.createElement("p");
-          etiquetaText.textContent = diagnostico.Padecimiento;
-          etiqueta.appendChild(etiquetaText);
-
-          const etiquetaBoton = document.createElement("span");
-          etiquetaBoton.classList.add("Eliminar-Etiqueta");
-          etiquetaBoton.textContent = "X";
-          etiquetaBoton.addEventListener("click", () => {
-            const indice = arraydiagnosticos.findIndex(
-              (diag) => diag.idPadecimiento == diagnostico.idPadecimiento
-            );
-            // Verificar si se encontró el índice
-            if (indice != -1) {
-              arraydiagnosticos.splice(indice, 1); // Elimina 1 elemento en el índice encontrado
-            }
-
-            etiqueta.parentNode.removeChild(etiqueta);
-          });
-          etiqueta.appendChild(etiquetaBoton);
-
-          // Añadir la nueva etiqueta al contenedor
-          cont_etiqueta.appendChild(etiqueta);
-        });
-        resultados.appendChild(divResultado);
-      });
-    }
-  };
-
-  // Crear contenedor para los resultados del autocompletado
-  const resultadosAutocompletado = document.createElement("div");
-  resultadosAutocompletado.classList.add("resultados-autocompletado");
-  cont_diagnostics.appendChild(resultadosAutocompletado);
-
-  // Añadir evento de entrada al input
-  Busqueda_Diagnostic.addEventListener("input", () =>
-    actualizarAutocompletado(Busqueda_Diagnostic, resultadosAutocompletado)
-  );
-
-  // Ocultar resultados cuando se hace clic fuera
-  document.addEventListener("click", (evento) => {
-    if (evento.target !== Busqueda_Diagnostic) {
-      resultadosAutocompletado.innerHTML = "";
-    }
-  });
-
-  // Ahora creamos el contenedor para los botones
-  const cont_botonesDiagnostic = document.createElement("div");
-  cont_botonesDiagnostic.classList.add("Cont_Botones");
-
-  const botonGuardar = document.createElement("button");
-  botonGuardar.type = "button";
-  botonGuardar.textContent = "Guardar";
-  botonGuardar.classList.add("iconbtn--save");
-  // Al hacer Click en el boton guardar
-  botonGuardar.addEventListener("click", () => {
-    const diagnostico = input.value;
-    if (!input.checkValidity()) {
-      input.reportValidity();
-      return;
-    } else {
-      // Guardamos el seguimiento
-      fetch("/UpdateSeguimiento", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          idSesion: contenido[0].idSesion,
-          Seguimiento: diagnostico,
-        }),
-      });
-      textinput.textContent = input.value;
-      input.style.display = "none";
-      textinput.style.display = "block";
-      botonEditar.style.display = "inline-block";
-      botonGuardar.style.display = "none";
-      const botonesEliminar = document.querySelectorAll(
-        "#Etiquetas_Actuales .Etiqueta .Eliminar-Etiqueta"
-      );
-      botonesEliminar.forEach((boton) => {
-        boton.style.display = "none"; // Esto oculta el botón
-      });
-      Busqueda_Diagnostic.style.display = "none";
-      // Guardamos los diagnosticos en caso de que existan
-      if (arraydiagnosticos.length > 0) {
-        // Pero antes los comparamos para saber que cambios se hacen
-        Comparar_Diagnosticos(
-          datosFiltrados,
-          arraydiagnosticos,
-          contenido[0].idSesion
-        );
-      }
-    }
-  });
 
   const botonEditar = document.createElement("button");
   botonEditar.type = "button";
-  botonEditar.style.display = "none";
   botonEditar.textContent = "Editar";
   botonEditar.classList.add("iconbtn--editar");
+  botonEditar.style.display = "none";
   botonEditar.addEventListener("click", () => {
-    input.style.display = "block";
-    textinput.style.display = "none";
+    // input.style.display = "block";
+    // textinput.style.display = "none";
+    // guardarSeguimiento.style.display = "block";
     botonEditar.style.display = "none";
-    botonGuardar.style.display = "block";
-    // Seleccionar todos los elementos 'Eliminar-Etiqueta' que son hijos de 'Etiqueta' dentro de 'Etiquetas_Actuales'
-    const botonesEliminar = document.querySelectorAll(
-      "#Etiquetas_Actuales .Etiqueta .Eliminar-Etiqueta"
-    );
-    botonesEliminar.forEach((boton) => {
-      boton.removeAttribute("style"); // Esto elimina el atributo 'style' del botón
-    });
-    Busqueda_Diagnostic.style.display = "block";
+    input.style.display = "block";
+    cont_text.style.display = "none";
+    NuevoDiagnostico.style.display = "none";
+    guardarSeguimiento.style.display = "block";
+    input.focus();
+  });
+  
+  Cont_Botones.appendChild(botonEditar);
+
+
+  const guardarSeguimiento = document.createElement("button");
+  guardarSeguimiento.type = "button";
+  guardarSeguimiento.textContent = "Guardar";
+  guardarSeguimiento.classList.add("iconbtn--save");
+  guardarSeguimiento.addEventListener("click", () => {
+    // console.log(input.value);
+    // console.log(textinput.textContent);
+    if (input.value == "" || input.value == textinput.textContent) {
+      input.classList.add("wiggle");
+      setTimeout(() => input.classList.remove("wiggle"), 500);
+      return;
+    }
+
+    textinput.textContent = input.value;
+    cont_text.style.display = "block";
+    input.style.display = "none";
+    guardarSeguimiento.style.display = "none";
+    botonEditar.style.display = "block";
+    NuevoDiagnostico.style.display = "block";
   });
 
-  if (contenido[0].Seguimiento != null) {
-    input.style.display = "none";
-    textinput.style.display = "block";
-    botonEditar.style.display = "inline-block";
-    botonGuardar.style.display = "none";
-    Busqueda_Diagnostic.style.display = "none";
-  }
+  Cont_Botones.appendChild(guardarSeguimiento);
 
-  cont_botonesDiagnostic.appendChild(botonEditar);
-  cont_botonesDiagnostic.appendChild(botonGuardar);
 
-  footerSeguimiento.appendChild(cont_diagnostics);
-  footerSeguimiento.appendChild(cont_botonesDiagnostic);
+  const NuevoDiagnostico = document.createElement("button");
+  NuevoDiagnostico.type = "button";
+  NuevoDiagnostico.textContent = "Nuevo Diagnostico";
+  NuevoDiagnostico.classList.add("iconbtn--save");
+  NuevoDiagnostico.style.display = "none";
+  NuevoDiagnostico.addEventListener("click", () => {
+    cont_Seguimiento.style.display = "none";
+    Busqueda_Diagnostic.style.display = "block";
+    botonGuardar.style.display = "block";
+  });
+
+
+
+  Cont_Botones.appendChild(NuevoDiagnostico);
+  cont_Seguimiento.appendChild(Cont_Botones);
+  itemContent.appendChild(cont_Seguimiento);
+
+
+
+
+
+    // Creamos el footer para los botones y diagnosticos
+    const footerSeguimiento = document.createElement("div");
+    footerSeguimiento.classList.add("footerSeguimiento");
+
+    // Ahora creamos el contenedor para los diagnosticos
+    const cont_diagnostics = document.createElement("div");
+    cont_diagnostics.classList.add("Cont_Diagnosticos");
+    const Busqueda_Diagnostic = document.createElement("input");
+    Busqueda_Diagnostic.type = "text";
+    Busqueda_Diagnostic.id = "inputDiagnostic";
+    Busqueda_Diagnostic.placeholder = "Buscar Diagnosticos...";
+    Busqueda_Diagnostic.classList.add("inputDiagnostic");
+    Busqueda_Diagnostic.required = true;
+
+    const Crear_padecimiento = document.createElement("div");
+    Crear_padecimiento.classList.add("Crear_padecimiento");
+
+    const input_NuevoPadecimiento = document.createElement("input");
+    input_NuevoPadecimiento.type = "text";
+    input_NuevoPadecimiento.id = "input_NuevoPadecimiento";
+    input_NuevoPadecimiento.placeholder = "Nuevo Padecimiento...";
+    input_NuevoPadecimiento.required = true;
+
+    const Areas = document.createElement("select");
+    Areas.id = "Areas";
+    Areas.classList.add("Areas");
+    for (let index = 0; index < InfoSelects.Areas.length; index++) {
+      const element = InfoSelects.Areas[index];
+      const option = document.createElement("option");
+      option.value = element.idAreas;
+      option.textContent = element.Area;
+      Areas.appendChild(option);
+    }
+
+    const BotonCrearPadecimiento = document.createElement("button");
+    BotonCrearPadecimiento.type = "button";
+    BotonCrearPadecimiento.textContent = "Guardar";
+    BotonCrearPadecimiento.classList.add("GuardarPadecimiento");
+
+
+    BotonCrearPadecimiento.addEventListener("click", () => {
+      const nuevoPadecimiento = input_NuevoPadecimiento.value;
+      const idArea = Areas.value;
+      if (input_NuevoPadecimiento.checkValidity()) {
+        fetch("/NuevoPadecimiento", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            Padecimiento: nuevoPadecimiento,
+            idArea: idArea,
+          }),
+        });
+        Crear_padecimiento.style.display = "none";
+        Busqueda_Diagnostic.style.display = "block";
+        botonGuardar.style.display = "block";
+      } else {
+        input_NuevoPadecimiento.focus();
+      }
+    });
+
+
+    const BotonCancelarPadecimiento = document.createElement("button");
+    BotonCancelarPadecimiento.type = "button";
+    BotonCancelarPadecimiento.textContent = "Cancelar";
+    BotonCancelarPadecimiento.classList.add("CancelarPadecimiento");
+    BotonCancelarPadecimiento.addEventListener("click", () => {
+      Crear_padecimiento.style.display = "none";
+      Busqueda_Diagnostic.style.display = "block";
+      botonGuardar.style.display = "block";
+    });
+
+    Crear_padecimiento.style.display = "none";
+    Crear_padecimiento.appendChild(input_NuevoPadecimiento);
+    Crear_padecimiento.appendChild(Areas);
+    Crear_padecimiento.appendChild(BotonCancelarPadecimiento);
+    Crear_padecimiento.appendChild(BotonCrearPadecimiento);
+
+    cont_diagnostics.appendChild(Crear_padecimiento);
+    cont_diagnostics.appendChild(Busqueda_Diagnostic);
+
+    //Autocompletado
+    const datosFiltrados = [];
+
+    // Usar el operador de propagación para añadir cada elemento filtrado individualmente al array
+    arraydiagnosticos.push(...datosFiltrados);
+
+    // Función para actualizar los resultados del autocompletado
+    const actualizarAutocompletado = (input, resultados) => {
+      const valorInput = input.value.toLowerCase();
+      resultados.innerHTML = ""; // Limpia resultados anteriores
+
+      if (!valorInput) return;
+      // Tus datos de autocompletado
+      $.ajax({
+        url: "/Buscar_Padecimiento",
+        method: "POST",
+        dataType: "json",
+        data: { Padecimiento: valorInput },
+        success: function (data) {
+          // Ahora los diagnosticos están en 'data'
+          const filtrados = data.filter((item) =>
+            item.Padecimiento.toLowerCase().includes(valorInput)
+          );
+          // Aquí procesamos los resultados
+          procesarResultados(filtrados, input, resultados, valorInput);
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    };
+
+
+    const crearElementoDiagnostico = (diagnostico, input, resultados, cont_etiqueta) => {
+      const divResultado = document.createElement("div");
+      divResultado.classList.add("diagnosticos_Resultado");
+      divResultado.textContent = diagnostico.Padecimiento;
+    
+      divResultado.addEventListener("click", () => {
+        if (arraydiagnosticos.some(e => e.idPadecimiento === diagnostico.idPadecimiento)) {
+          console.log("Ya existe");
+          Busqueda_Diagnostic.classList.add("wiggle");
+          setTimeout(() => Busqueda_Diagnostic.classList.remove("wiggle"), 500);
+          return;
+        }
+    
+        arraydiagnosticos.push(diagnostico);
+        input.value = "";
+        resultados.innerHTML = "";
+  
+
+        const etiqueta = document.createElement("div");
+        etiqueta.classList.add("Etiqueta");
+        const etiquetaText = document.createElement("p");
+        etiquetaText.textContent = diagnostico.Padecimiento;
+        etiqueta.appendChild(etiquetaText);
+    
+        const etiquetaBoton = document.createElement("span");
+        etiquetaBoton.classList.add("Eliminar-Etiqueta");
+        etiquetaBoton.textContent = "X";
+        etiquetaBoton.addEventListener("click", () => {
+          const indice = arraydiagnosticos.findIndex(diag => diag.idPadecimiento == diagnostico.idPadecimiento);
+          if (indice != -1) {
+            arraydiagnosticos.splice(indice, 1);
+          }
+          etiqueta.parentNode.removeChild(etiqueta);
+        });
+    
+        etiqueta.appendChild(etiquetaBoton);
+        cont_etiqueta.appendChild(etiqueta);
+
+
+
+
+
+        const textarea = document.getElementById("Cont_Seguimiento");
+
+        input.style.display = "none";
+        textarea.style.display = "block";
+
+      });
+    
+
+      return divResultado;
+    };
+    
+    const procesarResultados = (filtrados, input, resultados, valorInput) => {
+      filtrados.forEach(diagnostico => {
+        const divResultado = crearElementoDiagnostico(diagnostico, input, resultados, document.getElementById("Etiquetas_Actuales"));
+        resultados.appendChild(divResultado);
+      });
+    
+      if (filtrados.length < 3) {
+        const hr = document.createElement("hr");
+        resultados.appendChild(hr);
+        hr.style.margin = "2px";
+    
+        const crearDiagnostico = document.createElement("div");
+        crearDiagnostico.textContent = "Crear diagnóstico";
+        crearDiagnostico.classList.add("diagnosticos_CrearBoton");
+        crearDiagnostico.addEventListener("click", () => {
+          Crear_padecimiento.style.display = "flex";
+          Busqueda_Diagnostic.style.display = "none";
+          botonGuardar.style.display = "none";
+          input_NuevoPadecimiento.value = Busqueda_Diagnostic.value;
+        });
+        resultados.appendChild(crearDiagnostico);
+      }
+    };
+    
+
+
+    // Crear contenedor para los resultados del autocompletado
+    const resultadosAutocompletado = document.createElement("div");
+    resultadosAutocompletado.classList.add("resultados-autocompletado");
+    cont_diagnostics.appendChild(resultadosAutocompletado);
+
+    // Añadir evento de entrada al input
+    Busqueda_Diagnostic.addEventListener("input", () =>
+      actualizarAutocompletado(Busqueda_Diagnostic, resultadosAutocompletado)
+    );
+
+    // Ocultar resultados cuando se hace clic fuera
+    document.addEventListener("click", (evento) => {
+      if (evento.target !== Busqueda_Diagnostic) {
+        resultadosAutocompletado.innerHTML = "";
+      }
+    });
+
+    // Ahora creamos el contenedor para los botones
+    const cont_botonesDiagnostic = document.createElement("div");
+    cont_botonesDiagnostic.classList.add("Cont_Botones");
+
+    const botonGuardar = document.createElement("button");
+    botonGuardar.type = "button";
+    botonGuardar.textContent = "Guardar";
+    botonGuardar.classList.add("iconbtn--save");
+
+    footerSeguimiento.appendChild(cont_diagnostics);
+    footerSeguimiento.appendChild(cont_botonesDiagnostic);
+
+
 
   itemContent.appendChild(footerSeguimiento);
+
 
   item.appendChild(itemContent);
   return item;
 }
 
-function Comparar_Diagnosticos(Original, Nuevo, idSesion) {
-  let cambios = [];
+// function Comparar_Diagnosticos(Original, Nuevo, idSesion) {
+//   let cambios = [];
 
-  // Verificar qué elementos se eliminaron
-  Original.forEach((originalItem) => {
-    if (
-      !Nuevo.some(
-        (nuevoItem) => nuevoItem.idPadecimiento === originalItem.idPadecimiento
-      )
-    ) {
-      cambios.push({
-        action: "Eliminar",
-        idPadecimiento: originalItem.idPadecimiento,
-        idSesion: idSesion,
-      });
-    }
-  });
+//   // Verificar qué elementos se eliminaron
+//   Original.forEach((originalItem) => {
+//     if (
+//       !Nuevo.some(
+//         (nuevoItem) => nuevoItem.idPadecimiento === originalItem.idPadecimiento
+//       )
+//     ) {
+//       cambios.push({
+//         action: "Eliminar",
+//         idPadecimiento: originalItem.idPadecimiento,
+//         idSesion: idSesion,
+//       });
+//     }
+//   });
 
-  // Verificar qué elementos son nuevos
-  Nuevo.forEach((nuevoItem) => {
-    if (
-      !Original.some(
-        (originalItem) =>
-          originalItem.idPadecimiento === nuevoItem.idPadecimiento
-      )
-    ) {
-      cambios.push({
-        action: "Añadir",
-        idPadecimiento: nuevoItem.idPadecimiento,
-        idSesion: idSesion,
-      });
-    }
-  });
+//   // Verificar qué elementos son nuevos
+//   Nuevo.forEach((nuevoItem) => {
+//     if (
+//       !Original.some(
+//         (originalItem) =>
+//           originalItem.idPadecimiento === nuevoItem.idPadecimiento
+//       )
+//     ) {
+//       cambios.push({
+//         action: "Añadir",
+//         idPadecimiento: nuevoItem.idPadecimiento,
+//         idSesion: idSesion,
+//       });
+//     }
+//   });
 
-  // En caso de que encuentre cambios en los diagnosticos
-  if (cambios.length > 0) {
-    // va a realizar un fetch con los cambios a la base de datos
-    fetch("/GuardarDiagnosticos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        cambios: cambios,
-      }),
-    });
-    console.log(cambios);
-  } else {
-    return;
-  }
-}
+//   // En caso de que encuentre cambios en los diagnosticos
+//   if (cambios.length > 0) {
+//     // va a realizar un fetch con los cambios a la base de datos
+//     fetch("/GuardarDiagnosticos", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         cambios: cambios,
+//       }),
+//     });
+//     console.log(cambios);
+//   } else {
+//     return;
+//   }
+// }
 
 // ========================================================================================================
 // Funcion para crear conteido de Seguimientos
@@ -651,22 +621,6 @@ function crearElementoHeader_Seguimiento(Fecha, idDiv, Etiquetas) {
         etiqueta.classList.toggle("Activa");
       });
 
-      if (idDiv != "Etiquetas") {
-        const Eliminar = document.createElement("span");
-        Eliminar.textContent = "X";
-        Eliminar.classList.add("Eliminar-Etiqueta");
-        Eliminar.style.display = "none";
-        Eliminar.addEventListener("click", () => {
-          const indice = arraydiagnosticos.findIndex(
-            (diag) => diag.idPadecimiento === element.idPadecimiento
-          );
-          if (indice !== -1) {
-            arraydiagnosticos.splice(indice, 1);
-            etiqueta.parentNode.removeChild(etiqueta);
-          }
-        });
-        etiqueta.appendChild(Eliminar);
-      }
       cont_etiquetas.appendChild(etiqueta);
     });
   }
@@ -676,7 +630,6 @@ function crearElementoHeader_Seguimiento(Fecha, idDiv, Etiquetas) {
 
   return elemento;
 }
-
 
 // Esta funcion actualiza el contenido de los seguimientos con base al idPadecimiento dado
 function mostrarSeguimientosFiltrados(idPadecimiento) {

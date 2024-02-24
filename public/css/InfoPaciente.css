@@ -587,6 +587,7 @@ h1 {
     max-height: 160px;
     border: 2px solid #84c0ff94;
     border-radius: 8px;
+    margin-bottom: 10px;
 }
 
 .info__item__title {
@@ -860,7 +861,7 @@ dd {
 }
 
 .Seguimientos .info__item {
-    min-height: 200px;
+    /* min-height: 200px; */
     margin: 2px;
 }
 
@@ -954,7 +955,8 @@ dd {
     justify-content: center;
     align-items: center;
     flex-wrap: nowrap;
-    background-color: #249DD9;
+    /* background-color: #249DD9; */
+    background-color: #004368;
     color: white;
     padding: 5px;
     border-radius: 5px;
@@ -963,7 +965,8 @@ dd {
 }
 
 .Etiqueta.Activa {
-    background-color: #004368;
+    /* background-color: #004368; */
+    background-color: #249DD9;
 }
 
 .Etiqueta p {
@@ -1278,7 +1281,11 @@ form>h3 {
 }
 
 
-.Cont_Seguimiento {
+.Cont_TextSeguimiento {
+    margin-top: 10px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 225px;
@@ -1286,10 +1293,23 @@ form>h3 {
     margin-bottom: 10px;
 }
 
-.Cont_Seguimiento>p {
+.Cont_TextSeguimiento>p{
+    margin: 0;
+}
+
+.Cont_TextSeguimiento>p {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+
+.Cont_BotonesSeguimiento{
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+}
+
+
+
 
 .footerSeguimiento {
     display: flex;
