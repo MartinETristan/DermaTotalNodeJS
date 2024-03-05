@@ -303,30 +303,60 @@ router.post("/Buscar_Padecimiento", async (req, res) => {
   res.end(JSON.stringify(resBusqueda));
 });
 
-router.post("/GuardarDiagnosticos", async (req, res) => {
-  // Para cada una de las instrucciones, ejecutar la funcion correspondiente
-  req.body.cambios.forEach((element) => {
-    switch (element.action) {
-      // En caso de añadir un padecimiento
-      case "Añadir":
-        API_Registros.Añadir_Padecimiento(
-          element.idPadecimiento,
-          element.idSesion
-        );
-        break;  
-      // En caso de eliminar un padecimiento
-      case "Eliminar":
-        API_Registros.Quitar_Padecimiento(
-          element.idPadecimiento,
-          element.idSesion
-        );
-        break;
-      // En caso de no tener una entrada valida
-      default:
-        console.log("No se ha encontrado la accion");
-        break;
-    }
-  });
+// router.post("/GuardarDiagnosticos", async (req, res) => {
+//   // Para cada una de las instrucciones, ejecutar la funcion correspondiente
+//   req.body.cambios.forEach((element) => {
+//     switch (element.action) {
+//       // En caso de añadir un padecimiento
+//       case "Añadir":
+//         API_Registros.Añadir_Padecimiento(
+//           element.idPadecimiento,
+//           element.idSesion
+//         );
+//         break;  
+//       // En caso de eliminar un padecimiento
+//       case "Eliminar":
+//         API_Registros.Quitar_Padecimiento(
+//           element.idPadecimiento,
+//           element.idSesion
+//         );
+//         break;
+//       // En caso de no tener una entrada valida
+//       default:
+//         console.log("No se ha encontrado la accion");
+//         break;
+//     }
+//   });
+// });
+
+
+
+
+router.post("/Crear_Seguimiento", async (req, res) => {
+  const idSeguimiento = await API_Registros.Crear_Seguimiento(req.body.idSesion,req.body.Seguimiento, req.body.idPadecimiento);
+  return res.status(200).json({ idSeguimiento: idSeguimiento });
 });
+
+
+router.post("/Update_Seguimiento", async (req, res) => {
+  const update = await API_Registros.Update_Seguimiento(req.body.idSeguimiento,req.body.Seguimiento);
+  return res.json(update);
+});
+
+
+router.post("/Delete_Seguimiento", async (req, res) => {
+  const del_log = await API_Registros.Delete_Seguimiento(req.body.idSeguimiento);
+  return res.json(del_log);
+
+});
+
+
+
+
+
+
+
+
+
 
 export default router;

@@ -212,32 +212,113 @@ export async function Buscar_Padecimiento(Padecimiento) {
   }
 }
 
-export async function Añadir_Padecimiento(idPadecimiento, idSesion) {
+// export async function Añadir_Padecimiento(idPadecimiento, idSesion) {
+//   try {
+//     const connection = await mysql.createConnection(db);
+//     const query = `INSERT INTO Padecimientos_Sesion
+//     (idPadecimiento, idSesion)
+//     VALUES(?, ?);`;
+//     await connection.execute(query, [idPadecimiento, idSesion]);
+//     connection.end();
+//   } catch (error) {
+//     console.error("Ha ocurrido un error añadiendo el padecimiento: ", error);
+//     return "Ha ocurrido un error.";
+//   }
+// }
+
+// export async function Quitar_Padecimiento(idPadecimiento, idSesion) {
+//   try {
+//     const connection = await mysql.createConnection(db);
+//     const query = `DELETE FROM Padecimientos_Sesion
+//     WHERE idPadecimiento = ? AND idSesion = ?;`;
+//     await connection.execute(query, [idPadecimiento, idSesion]);
+//     connection.end();
+//   } catch (error) {
+//     console.error("Ha ocurrido un error quitando el padecimiento: ", error);
+//     return "Ha ocurrido un error.";
+//   }
+// }
+
+
+
+export async function Crear_Seguimiento(idSesion,Seguimiento, idPadecimiento) {
   try {
     const connection = await mysql.createConnection(db);
-    const query = `INSERT INTO Padecimientos_Sesion
-    (idPadecimiento, idSesion)
+
+    const query = `INSERT INTO Seguimientos
+    (idPadecimiento,Seguimiento)
     VALUES(?, ?);`;
-    await connection.execute(query, [idPadecimiento, idSesion]);
+
+    const [result] = await connection.execute(query, [idPadecimiento,Seguimiento]);
+    const idSeguimiento = result.insertId;
+
+    const query2 = `INSERT INTO Seguimientos_Sesion
+    (idSesion, idSeguimientos)
+    VALUES(?, ?);`;
+
+
+    await connection.execute(query2, [idSesion, idSeguimiento]);
+
     connection.end();
+
+    return idSeguimiento;
   } catch (error) {
-    console.error("Ha ocurrido un error añadiendo el padecimiento: ", error);
+    console.error("Ha ocurrido un error creando el seguimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-export async function Quitar_Padecimiento(idPadecimiento, idSesion) {
+
+
+export async function Update_Seguimiento(idSeguimiento,Seguimiento) {
   try {
     const connection = await mysql.createConnection(db);
-    const query = `DELETE FROM Padecimientos_Sesion
-    WHERE idPadecimiento = ? AND idSesion = ?;`;
-    await connection.execute(query, [idPadecimiento, idSesion]);
+
+    const query = `UPDATE Seguimientos
+    SET Seguimiento = ?
+    WHERE idSeguimientos = ?;`;
+
+    await connection.execute(query, [Seguimiento,idSeguimiento]);
     connection.end();
+    return "Se ha actualizado el seguimiento.";
   } catch (error) {
-    console.error("Ha ocurrido un error quitando el padecimiento: ", error);
+    console.error("Ha ocurrido un error creando el seguimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
+
+export async function Delete_Seguimiento(idSeguimiento) {
+  try {
+    const connection = await mysql.createConnection(db);
+
+    const query = `DELETE FROM Seguimientos
+    WHERE idSeguimientos = ?;`;
+
+    const query2 = `DELETE FROM Seguimientos_Sesion
+    WHERE idSeguimientos = ?;
+    `;
+
+    await connection.execute(query2, [idSeguimiento]);
+    await connection.execute(query, [idSeguimiento]);
+    connection.end();
+    return "Se ha eliminado el seguimiento.";
+  } catch (error) {
+    console.error("Ha ocurrido un error creando el seguimiento: ", error);
+    return "Ha ocurrido un error.";
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 //==================================================================================================
 // Updates estados Pacientes 

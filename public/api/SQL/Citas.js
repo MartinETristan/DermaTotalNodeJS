@@ -144,20 +144,3 @@ export async function Update_Checkout(idSesion, CheckOut) {
   }
 }
 
-// Actualiza el seguimiento de la sesion de la cita
-export async function UpdateSeguimiento(idSesion, Seguimiento) {
-  try {
-    const connection = await mysql.createConnection(db);
-    const consulta = `UPDATE Sesion
-  SET Seguimiento = ?
-  WHERE idSesion = ?`;
-    connection.execute(consulta, [Seguimiento, idSesion]);
-    connection.end();
-  } catch (error) {
-    console.error(
-      "Ha ocurrido un error en la actualizacion del seguimiento:",
-      error
-    );
-    return "Ha ocurrido un error.";
-  }
-}
