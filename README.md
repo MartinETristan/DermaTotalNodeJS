@@ -83,7 +83,7 @@ Este proyecto y sus derivados están siendo utilizados por:
 
 
 
-## Ayuda / Apollo ❗️
+## Ayuda / Apoyo ❗️
 De momento, a pesar de que el sistema funciona correctamente, existen ciertas areas que pueden mejorar en el sistema, listados a continuacion:
 
 | Archivo       | Problema                                                           |
