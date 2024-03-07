@@ -10,8 +10,6 @@ function cargarSeguimiento() {
   const crearInfoGroup = crearElemento_Seguimiento("infogroup");
   const crearInfo = crearElemento_Seguimiento("info");
 
-  console.log(datosAlmacenados.Seguimientos);
-
   const contHeaderSeguimientos = document.getElementById(
     "contHeaderSeguimientos"
   );
@@ -78,9 +76,41 @@ function cargarSeguimiento() {
       datosAlmacenados.SesionesActivas
     );
     crearInfoGroup.appendChild(Input);
+
   }
 
   contenidoDiag.appendChild(crearInfoGroup);
+
+  if(numSesionesActivas >= 1){
+    const contenedorEtiquetas = document.getElementById("Etiquetas_Actuales");
+    // Verificar si ya se generaron las etiquetas para evitar duplicados
+    if (contenedorEtiquetas.children.length === 0) {
+        for (let seguimiento of datosAlmacenados.SesionesActivas[0].Seguimientos) {
+            generarEtiqueta(seguimiento, contenedorEtiquetas);
+        }
+    }
+    arraydiagnosticos = [...datosAlmacenados.SesionesActivas[0].Seguimientos];
+    SeguiminetoActivo = datosAlmacenados.SesionesActivas[0].Seguimientos[datosAlmacenados.SesionesActivas[0].Seguimientos.length -1].idPadecimiento;
+    const Text = document.querySelector(".Cont_TextSeguimiento");
+    const TextArea = document.getElementById("Seguimiento_Textarea");
+    const botonEditar = document.querySelector(
+      ".Cont_BotonesSeguimiento button:nth-child(1"
+    );
+    const guardarSeguimiento = document.querySelector(
+      ".Cont_BotonesSeguimiento button:nth-child(2"
+    );
+    const NuevoDiagnostico = document.querySelector(
+      ".Cont_BotonesSeguimiento button:nth-child(3"
+    );
+
+    TextArea.value = arraydiagnosticos[arraydiagnosticos.length-1].Seguimiento;
+    Text.textContent = arraydiagnosticos[arraydiagnosticos.length-1].Seguimiento;
+    TextArea.style.display = "none";
+    Text.style.display = "block";
+    botonEditar.style.display = "block";
+    guardarSeguimiento.style.display = "none";
+    NuevoDiagnostico.style.display = "block";
+  }
 
   // Y pasamos a la siguiente función
   cargarUltimaReceta();
@@ -162,7 +192,7 @@ function crearInfoItem_SeguimientoActual(contenido) {
   const item = crearElemento_Seguimiento("info__item");
   const itemContent = crearElemento_Seguimiento("info__item__content");
 
-  console.log(contenido);
+
 
   const fecha_sesion = formatearFecha(contenido[0].InicioSesion);
   const fechaActual = new Date();
@@ -262,6 +292,10 @@ function crearInfoItem_SeguimientoActual(contenido) {
 
 
     if (arraydiagnosticos[index].Seguimiento != null) {
+
+      console.log(SeguiminetoActivo);
+      console.log(index);
+      console.log(arraydiagnosticos[index].idSeguimiento);
 
       // Actualizamos el seguimiento en la base de datos
       $.ajax({
@@ -453,197 +487,32 @@ function crearInfoItem_SeguimientoActual(contenido) {
     });
   };
 
-  const crearElementoDiagnostico = (
-    diagnostico,
-    input,
-    resultados,
-    cont_etiqueta
-  ) => {
+
+
+  const crearElementoDiagnostico = (diagnostico, input, resultados, cont_etiqueta) => {  
     const divResultado = document.createElement("div");
     divResultado.classList.add("diagnosticos_Resultado");
     divResultado.textContent = diagnostico.Padecimiento;
-
+  
+    // Asignamos el evento de clic para generar la etiqueta
     divResultado.addEventListener("click", () => {
-      if (
-        arraydiagnosticos.some(
-          (e) => e.idPadecimiento === diagnostico.idPadecimiento
-        )
-      ) {
+      // Verificamos si el diagnóstico ya existe en el array
+      if (!arraydiagnosticos.some(e => e.idPadecimiento === diagnostico.idPadecimiento)) {
+        // Procesamos y generamos la etiqueta
+        generarEtiqueta(diagnostico, cont_etiqueta);
+        // Limpieza y preparación del entorno de usuario
+        input.value = "";
+        resultados.innerHTML = "";
+      } else {
         console.log("Ya existe");
-        // Suponiendo que Busqueda_Diagnostic es una referencia al elemento de búsqueda
         Busqueda_Diagnostic.classList.add("wiggle");
         setTimeout(() => Busqueda_Diagnostic.classList.remove("wiggle"), 500);
-        return;
       }
-
-      // Le añadimos la propiedad de Seguimiento para llevar control sobre los Insert's
-      const postDiagnostico = { ...diagnostico, Seguimiento: null };
-
-      // Añadimos el objeto clonado con la nueva propiedad al array arraydiagnosticos
-      arraydiagnosticos.push(postDiagnostico);
-      SeguiminetoActivo = postDiagnostico.idPadecimiento;
-
-      console.log(SeguiminetoActivo);
-
-      input.value = "";
-      resultados.innerHTML = "";
-
-      // Crear y añadir la nueva etiqueta con funcionalidad
-      const etiqueta = document.createElement("div");
-      etiqueta.classList.add("Etiqueta", "Activa");
-      const etiquetaText = document.createElement("p");
-      etiquetaText.textContent = diagnostico.Padecimiento;
-      etiqueta.appendChild(etiquetaText);
-
-      const headerTags = document.getElementById("Etiquetas_Actuales");
-      console.log(headerTags);
-
-      // Crear el botón para eliminar la etiqueta
-      const etiquetaBoton = document.createElement("span");
-      etiquetaBoton.classList.add("Eliminar-Etiqueta");
-      etiquetaBoton.textContent = "X";
-      etiquetaBoton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        console.log("Eliminar etiqueta:", diagnostico.Padecimiento);
-
-        console.log(
-          arraydiagnosticos[
-            arraydiagnosticos.findIndex(
-              (e) => e.idPadecimiento == SeguiminetoActivo
-            )
-          ]
-        );
-        const nombrepadecimiento =
-          arraydiagnosticos[
-            arraydiagnosticos.findIndex(
-              (e) => e.idPadecimiento == SeguiminetoActivo
-            )
-          ].Padecimiento;
-
-        if (
-          !confirm(
-            `¿Está seguro de eliminar ${nombrepadecimiento} del seguimiento?`
-          )
-        ) {
-          console.log("Cancelando eliminación");
-          return;
-        }
-
-        // Eliminar el padecimiento del array
-        const index = arraydiagnosticos.findIndex((e) => e.idPadecimiento == SeguiminetoActivo);
-        $.ajax({
-          url: "/Delete_Seguimiento",
-          method: "POST",
-          dataType: "json",
-          data: {
-            idSeguimiento: arraydiagnosticos[index].idSeguimiento,
-          },
-          success: function (data) {
-            console.log(data);
-          },
-          error: function (error) {
-            console.log(error);
-          },
-        });
-
-  
-        if (index !== -1) {
-          // Asegúrate de que se encontró el elemento
-          arraydiagnosticos.splice(index, 1); // Elimina el elemento del array
-        }
-
-        // Eliminar la etiqueta del DOM
-        etiqueta.remove();
-        if (arraydiagnosticos.length != 0) {
-          // Manejamos el aspecto de las etiquetas
-          const etiquetas = document.querySelectorAll(
-            "#Etiquetas_Actuales .Etiqueta"
-          );
-          $(etiquetas).removeClass("Activa");
-          const headerTags = document.getElementById("Etiquetas_Actuales");
-          $(headerTags.lastChild).addClass("Activa");
-          $(headerTags.lastChild)
-            .find(".Eliminar-Etiqueta")
-            .css("display", "block");
-
-          //Asignamos el nuevo seguimiento activo
-          SeguiminetoActivo =
-            arraydiagnosticos[arraydiagnosticos.length - 1].idPadecimiento;
-
-          // Y cambiamos tanto el contenido de p como el textarea
-          const Text = document.querySelector(".Cont_TextSeguimiento");
-          const TextArea = document.getElementById("Seguimiento_Textarea");
-
-          TextArea.value =
-            arraydiagnosticos[
-              arraydiagnosticos.findIndex(
-                (e) => e.idPadecimiento == SeguiminetoActivo
-              )
-            ].Seguimiento;
-          Text.textContent =
-            arraydiagnosticos[
-              arraydiagnosticos.findIndex(
-                (e) => e.idPadecimiento == SeguiminetoActivo
-              )
-            ].Seguimiento;
-        }
-
-        oratrice_mecanique_d_analyse_cardinale();
-      });
-
-      // Manejar clics en la etiqueta para activar/desactivar
-      etiqueta.addEventListener("click", () => {
-        // Desactivar todas las etiquetas
-        document
-          .querySelectorAll("#Etiquetas_Actuales .Etiqueta")
-          .forEach((tag) => {
-            tag.classList.remove("Activa");
-            // tag.querySelector(".Eliminar-Etiqueta").classList.remove("Activa");
-            tag.querySelector(".Eliminar-Etiqueta").style.display = "none";
-          });
-        // Activar la etiqueta y su botón de eliminar clickeados
-        etiqueta.classList.add("Activa");
-        etiquetaBoton.style.display = "block";
-        console.log(arraydiagnosticos);
-
-        // Cambiar el seguimiento activo
-        SeguiminetoActivo = diagnostico.idPadecimiento;
-
-        oratrice_mecanique_d_analyse_cardinale();
-      });
-
-      etiqueta.appendChild(etiquetaBoton);
-      cont_etiqueta.appendChild(etiqueta);
-
-      // Activamos el Tag recien creada
-      document
-        .querySelectorAll("#Etiquetas_Actuales .Etiqueta")
-        .forEach((tag) => {
-          tag.classList.remove("Activa");
-          // tag.querySelector(".Eliminar-Etiqueta").classList.remove("Activa");
-          tag.querySelector(".Eliminar-Etiqueta").style.display = "none";
-        });
-      // Activar la etiqueta y su botón de eliminar clickeados
-      etiqueta.classList.add("Activa");
-      etiquetaBoton.style.display = "block";
-
-      // Ocultamos el input y mostramos el area de seguimiento
-      const Input_Seguimiento = document.getElementById("Seguimiento_Textarea");
-
-      input.style.display = "none";
-      cont_Seguimiento.style.display = "block";
-      botonEditar.style.display = "none";
-
-      Input_Seguimiento.style.display = "block";
-      cont_text.style.display = "none";
-      NuevoDiagnostico.style.display = "none";
-      guardarSeguimiento.style.display = "block";
-      Input_Seguimiento.value = "";
-      Input_Seguimiento.focus();
     });
-
+  
     return divResultado;
   };
+  
 
   const procesarResultados = (filtrados, input, resultados, valorInput) => {
     filtrados.forEach((diagnostico) => {
@@ -725,8 +594,6 @@ function oratrice_mecanique_d_analyse_cardinale() {
   const NuevoDiagnostico = document.querySelector(
     ".Cont_BotonesSeguimiento button:nth-child(3"
   );
-
-  console.log(arraydiagnosticos.length);
 
 
   // Verificamos si existe algun seguimineto, si no, mostramos el buscador de diagnosticos
@@ -836,3 +703,172 @@ function mostrarSeguimientosFiltrados(idPadecimiento) {
     crearInfoItem_HistorialSeguimiento(seguimientosFiltrados)
   );
 }
+
+
+const generarEtiqueta = (diagnostico, cont_etiqueta) => {
+  // Añadimos la propiedad de Seguimiento para llevar control sobre los inserts
+  const postDiagnostico = { ...diagnostico, Seguimiento: null };
+  arraydiagnosticos.push(postDiagnostico);
+  SeguiminetoActivo = postDiagnostico.idPadecimiento;
+
+  // Crear y añadir la nueva etiqueta con funcionalidad
+  const etiqueta = document.createElement("div");
+  etiqueta.classList.add("Etiqueta", "Activa");
+  const etiquetaText = document.createElement("p");
+  etiquetaText.textContent = diagnostico.Padecimiento;
+  etiqueta.appendChild(etiquetaText);
+
+
+  // Crear el botón para eliminar la etiqueta
+  const etiquetaBoton = document.createElement("span");
+  etiquetaBoton.classList.add("Eliminar-Etiqueta");
+  etiquetaBoton.textContent = "X";
+  etiquetaBoton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    eliminarEtiqueta(diagnostico, etiqueta);
+  });
+
+  // Evento de clic para activar/desactivar etiquetas
+  etiqueta.addEventListener("click", () => {
+    activarEtiqueta(diagnostico, etiqueta);
+  });
+
+  etiqueta.appendChild(etiquetaBoton);
+  cont_etiqueta.appendChild(etiqueta);
+
+  // Activamos el Tag recien creada
+  document.querySelectorAll("#Etiquetas_Actuales .Etiqueta").forEach((tag) => {
+    tag.classList.remove("Activa");
+    tag.querySelector(".Eliminar-Etiqueta").style.display = "none";
+  });
+  // Activar la etiqueta y su botón de eliminar clickeados
+  etiqueta.classList.add("Activa");
+  etiquetaBoton.style.display = "block";
+
+  // Ocultamos el input y mostramos el area de seguimiento
+  const Input_Seguimiento = document.getElementById("Seguimiento_Textarea");
+  const cont_Seguimiento = document.getElementById("Cont_Seguimiento");
+  const input = document.querySelector(".info__item__textarea");
+  const cont_text = document.querySelector(".Cont_TextSeguimiento");
+  const botonEditar = document.querySelector(
+    ".Cont_BotonesSeguimiento button:nth-child(1"
+  );
+  const guardarSeguimiento = document.querySelector(
+    ".Cont_BotonesSeguimiento button:nth-child(2"
+  );
+  const NuevoDiagnostico = document.querySelector(
+    ".Cont_BotonesSeguimiento button:nth-child(3"
+  );
+  const Busqueda_Diagnostic = document.getElementById("inputDiagnostic");
+
+  Busqueda_Diagnostic.style.display = "none";
+
+  input.style.display = "none";
+  cont_Seguimiento.style.display = "block";
+  botonEditar.style.display = "none";
+
+  Input_Seguimiento.style.display = "block";
+  cont_text.style.display = "none";
+  NuevoDiagnostico.style.display = "none";
+  guardarSeguimiento.style.display = "block";
+  Input_Seguimiento.value = "";
+  Input_Seguimiento.focus();
+  
+};
+
+
+activarEtiqueta = (diagnostico, etiqueta) => {
+  // Desactivar todas las etiquetas
+  document
+    .querySelectorAll("#Etiquetas_Actuales .Etiqueta")
+    .forEach((tag) => {
+      tag.classList.remove("Activa");
+      // tag.querySelector(".Eliminar-Etiqueta").classList.remove("Activa");
+      tag.querySelector(".Eliminar-Etiqueta").style.display = "none";
+    });
+  // Activar la etiqueta y su botón de eliminar clickeados
+  etiqueta.classList.add("Activa");
+  const etiquetaBoton = etiqueta.querySelector(".Eliminar-Etiqueta");
+  etiquetaBoton.style.display = "block";
+
+  // Cambiar el seguimiento activo
+  SeguiminetoActivo = diagnostico.idPadecimiento;
+
+  oratrice_mecanique_d_analyse_cardinale();
+};
+
+
+
+eliminarEtiqueta = (diagnostico, etiqueta) => {
+  const nombrepadecimiento = diagnostico.Padecimiento;
+  if (
+    !confirm(
+      `¿Está seguro de eliminar ${nombrepadecimiento} del seguimiento?`
+    )
+  ) {
+    console.log("Cancelando eliminación");
+    return;
+  }
+
+ 
+  // Eliminar el padecimiento del array
+  const index = arraydiagnosticos.findIndex((e) => e.idPadecimiento == SeguiminetoActivo);
+  $.ajax({
+    url: "/Delete_Seguimiento",
+    method: "POST",
+    dataType: "json",
+    data: {
+      idSeguimiento: arraydiagnosticos[index].idSeguimiento,
+    },
+    success: function (data) {
+      console.log(data);
+    },
+    error: function (error) {
+      console.log(error);
+    },
+  });
+
+  
+  if (index !== -1) {
+    // Asegúrate de que se encontró el elemento
+    arraydiagnosticos.splice(index, 1); // Elimina el elemento del array
+  }
+
+  // Eliminar la etiqueta del DOM
+  etiqueta.remove();
+  if (arraydiagnosticos.length != 0) {
+    // Manejamos el aspecto de las etiquetas
+    const etiquetas = document.querySelectorAll(
+      "#Etiquetas_Actuales .Etiqueta"
+    );
+    $(etiquetas).removeClass("Activa");
+    const headerTags = document.getElementById("Etiquetas_Actuales");
+    $(headerTags.lastChild).addClass("Activa");
+    $(headerTags.lastChild)
+      .find(".Eliminar-Etiqueta")
+      .css("display", "block");
+
+    //Asignamos el nuevo seguimiento activo
+    SeguiminetoActivo =
+      arraydiagnosticos[arraydiagnosticos.length - 1].idPadecimiento;
+
+    // Y cambiamos tanto el contenido de p como el textarea
+    const Text = document.querySelector(".Cont_TextSeguimiento");
+    const TextArea = document.getElementById("Seguimiento_Textarea");
+
+    TextArea.value =
+      arraydiagnosticos[
+        arraydiagnosticos.findIndex(
+          (e) => e.idPadecimiento == SeguiminetoActivo
+        )
+      ].Seguimiento;
+    Text.textContent =
+      arraydiagnosticos[
+        arraydiagnosticos.findIndex(
+          (e) => e.idPadecimiento == SeguiminetoActivo
+        )
+      ].Seguimiento;
+  }
+
+  oratrice_mecanique_d_analyse_cardinale();
+};

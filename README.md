@@ -83,7 +83,15 @@ Este proyecto y sus derivados están siendo utilizados por:
 
 
 
-## Soporte Tecnico
+## Ayuda / Apollo ❗️
+De momento, a pesar de que el sistema funciona correctamente, existen ciertas areas que pueden mejorar en el sistema, listados a continuacion:
+
+| Archivo       | Problema                                                           |
+| ----------------- | ------------------------------------------------------------------ |
+| /public/js/infoPaciente/General/Seguimiento.js | Se puede aplicar mejor la reutilizacion de codigo, asi como que es necesario reducir verificaciones dobles (como en la linea 74 y 84, que se optó por dejarlo de esa manera debido a que las funciones especificas no se podian aplicar hasta que el elemento "Etiquetas_Actuales" no se insertara en el DOM, y esto no sucedeía si no se completa el elemento de la primera condicional).|
+
+
+## Soporte Tecnico 🛠️
 
 Para soporte tecico o preguntas sobre este proyecto, enviame un correo a martintristan_@outlook.com o contactame directamente a mi [Linkedin](https://www.linkedin.com/in/martín-emmanuel-tristán-méndez-762072229/)
 

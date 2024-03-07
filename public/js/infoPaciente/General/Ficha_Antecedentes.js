@@ -2,8 +2,8 @@
 // Aqui empieza el codigo de la seccion General
 // ========================================================================================================
 function cargarGeneral() {
-  console.log(datosAlmacenados);
   console.log(InfoSesion);
+  console.log(datosAlmacenados);
   console.log(InfoSelects);
   const General = document.querySelector("#infocontenido");
   var htmlString = `

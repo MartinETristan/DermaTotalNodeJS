@@ -191,7 +191,7 @@ export async function InfoPaciente(idPaciente) {
     LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
     LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
     LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
-    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL AND s2.Seguimiento IS NOT NULL
+    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL
     ORDER BY s.InicioDeSesion DESC, p.idArea ASC, p.idPadecimiento ASC;`;
 
     const [rowDiagnosticos, fieldsAntecedentes] = await connection.execute(
@@ -224,42 +224,54 @@ export async function InfoPaciente(idPaciente) {
   // Sesiones Activas del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const querySesionesActivas = ` SELECT S.idSesion, s.idCitas ,s.idDoctor, s.idAsociado, p.idPadecimiento, p.Padecimiento, InicioDeSesion, s2.Seguimiento, c.Nota
-    FROM Sesion s 
+    const querySesionesActivas = `SELECT s.idSesion, s.idCitas, s.idDoctor, s.idAsociado, s.InicioDeSesion, c.Nota
+    FROM Sesion s
     LEFT JOIN Citas c ON c.idCitas = s.idCitas
-    LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
-    LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
-    LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
-    WHERE s.idPaciente = ? AND (s2.Seguimiento IS NULL OR s.FinDeSesion IS NULL)
-    ORDER BY s.idSesion ASC;`;
-
-    const [rowSesiones_A, fieldsAntecedentes] = await connection.execute(
-      querySesionesActivas,
-      [idPaciente]
-    );
-    connection.end();
+    WHERE s.idPaciente = ? AND s.FinDeSesion IS NULL
+    ORDER BY s.InicioDeSesion ASC;`;
+  
+    const [rowSesiones_A] = await connection.execute(querySesionesActivas, [idPaciente]);
+    await connection.end();
+  
     if (rowSesiones_A.length > 0) {
-      SesionesActivas = rowSesiones_A.map((elemento) => {
-        return {
+      for (const elemento of rowSesiones_A) {
+        const connectionSeguimientos = await mysql.createConnection(db);
+        const querySeguimientos = `SELECT ss.idSeguimientos, ss.idSesion, s.idPadecimiento, s.Seguimiento, p.Padecimiento
+        FROM Seguimientos_Sesion ss
+        LEFT JOIN Seguimientos s ON ss.idSeguimientos = s.idSeguimientos
+        LEFT JOIN Padecimientos p ON s.idPadecimiento = p.idPadecimiento
+        WHERE ss.idSesion = ?;`;
+  
+        const [rowSeguimientos] = await connectionSeguimientos.execute(querySeguimientos, [elemento.idSesion]);
+        await connectionSeguimientos.end();
+  
+        // Corrección aquí: Asignar todo el array de seguimientos directamente
+        elemento.Seguimientos = rowSeguimientos.map((elemento) => ({
           idSesion: elemento.idSesion,
-          idCita: elemento.idCitas,
-          idDoctor: elemento.idDoctor,
-          idAsociado: elemento.idAsociado,
+          idSeguimiento: elemento.idSeguimientos,
           idPadecimiento: elemento.idPadecimiento,
-          Padecimiento: elemento.Padecimiento,
-          InicioSesion: elemento.InicioDeSesion,
           Seguimiento: elemento.Seguimiento,
-          Nota: elemento.Nota,
-        };
-      });
+          Padecimiento: elemento.Padecimiento,
+        }));
+      }
+  
+      // Ya que ahora rowSesiones_A contiene los seguimientos, podemos asignarlo directamente
+      SesionesActivas = rowSesiones_A.map((elemento) => ({
+        idSesion: elemento.idSesion,
+        idCita: elemento.idCitas,
+        idDoctor: elemento.idDoctor,
+        idAsociado: elemento.idAsociado,
+        InicioSesion: elemento.InicioDeSesion,
+        Seguimientos: elemento.Seguimientos, // Esto ahora es un array de seguimientos
+        Nota: elemento.Nota,
+      }));
     }
   } catch (error) {
-    console.error(
-      "Ha ocurrido un error obteniendo las sesiones activas del paciente: ",
-      error
-    );
+    console.error("Ha ocurrido un error obteniendo las sesiones activas del paciente: ", error);
     return "Ha ocurrido un error.";
   }
+  
+  
 
 
   const InfoPaciente = {
@@ -274,6 +286,9 @@ export async function InfoPaciente(idPaciente) {
 
   return InfoPaciente;
 }
+
+
+
 
 export async function NuevoPaciente(
   Nombres,
