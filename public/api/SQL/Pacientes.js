@@ -181,37 +181,50 @@ export async function InfoPaciente(idPaciente) {
     return "Ha ocurrido un error.";
   }
   // =================================================
-  // Diagnosticos del paciente
+  // Seguimientos del paciente
   try {
     const connection = await mysql.createConnection(db);
-    const queryDiagnosticos = `SELECT s.idSesion, p.idPadecimiento,p.idArea, p.Padecimiento, s.InicioDeSesion, u.Nombres AS Doctor, s2.Seguimiento
-    FROM Sesion s 
+    const querySeguimientos = `SELECT s.idSesion, s.idSeguimientos, s.Fecha ,s.idDoctor ,u.Nombres AS Doctor, s.Subjetivo, s.Objetivo
+    FROM Seguimientos s
     LEFT JOIN Doctor d ON s.idDoctor = d.idDoctor 
     LEFT JOIN Usuarios u ON d.idUsuario = u.idUsuario 
-    LEFT JOIN Seguimientos_Sesion ss ON s.idSesion = ss.idSesion
-    LEFT JOIN Seguimientos s2 ON ss.idSeguimientos = s2.idSeguimientos
-    LEFT JOIN Padecimientos p ON s2.idPadecimiento = p.idPadecimiento
-    WHERE idPaciente = ? AND s.FinDeSesion IS NOT NULL
-    ORDER BY s.InicioDeSesion DESC, p.idArea ASC, p.idPadecimiento ASC;`;
+	  WHERE s.idPaciente = ?
+    ORDER BY s.Fecha  DESC;`;
 
-    const [rowDiagnosticos, fieldsAntecedentes] = await connection.execute(
-      queryDiagnosticos,
+    const [rowSeguimientos, fieldsAntecedentes] = await connection.execute(
+      querySeguimientos,
       [idPaciente]
     );
-    connection.end();
-    if (rowDiagnosticos.length > 0) {
-      Diagnosticos = rowDiagnosticos.map((elemento) => {
+    // connection.end();
+    if (rowSeguimientos.length > 0) {
+      const queryPadecimientos = `SELECT p.idPadecimiento,p.idArea, p.Padecimiento
+      FROM Padecimientos_Seguimientos ps 
+      LEFT JOIN Padecimientos p ON p.idPadecimiento = ps.idPadecimientos 
+      WHERE  ps.idSeguimientos = ?
+      ORDER BY p.idArea ASC, p.idPadecimiento ASC;`;
+
+      for (const elemento of rowSeguimientos) {
+        const [rowPadecimientos] = await connection.execute(
+          queryPadecimientos,
+          [elemento.idSeguimientos]
+        );
+        elemento.Padecimientos = rowPadecimientos;
+      }
+
+      Diagnosticos = rowSeguimientos.map((elemento) => {
         return {
           idSesion: elemento.idSesion,
-          idPadecimiento: elemento.idPadecimiento,
-          idArea: elemento.idArea,
-          Padecimiento: elemento.Padecimiento,
-          Fecha: elemento.InicioDeSesion,
+          idSeguimientos: elemento.idSeguimientos,
+          idDoctor: elemento.idDoctor,
+          Padecimientos: elemento.Padecimientos,
+          Fecha: elemento.Fecha,
           Doctor: elemento.Doctor,
-          Diagnostico: elemento.Seguimiento,
+          Subjetivo: elemento.Subjetivo,
+          Objetivo: elemento.Objetivo,
         };
       });
     }
+    connection.end();
   } catch (error) {
     console.error(
       "Ha ocurrido un error obteniendo los diagnosticos del paciente: ",
@@ -234,35 +247,12 @@ export async function InfoPaciente(idPaciente) {
     await connection.end();
   
     if (rowSesiones_A.length > 0) {
-      for (const elemento of rowSesiones_A) {
-        const connectionSeguimientos = await mysql.createConnection(db);
-        const querySeguimientos = `SELECT ss.idSeguimientos, ss.idSesion, s.idPadecimiento, s.Seguimiento, p.Padecimiento
-        FROM Seguimientos_Sesion ss
-        LEFT JOIN Seguimientos s ON ss.idSeguimientos = s.idSeguimientos
-        LEFT JOIN Padecimientos p ON s.idPadecimiento = p.idPadecimiento
-        WHERE ss.idSesion = ?;`;
-  
-        const [rowSeguimientos] = await connectionSeguimientos.execute(querySeguimientos, [elemento.idSesion]);
-        await connectionSeguimientos.end();
-  
-        // Corrección aquí: Asignar todo el array de seguimientos directamente
-        elemento.Seguimientos = rowSeguimientos.map((elemento) => ({
-          idSesion: elemento.idSesion,
-          idSeguimiento: elemento.idSeguimientos,
-          idPadecimiento: elemento.idPadecimiento,
-          Seguimiento: elemento.Seguimiento,
-          Padecimiento: elemento.Padecimiento,
-        }));
-      }
-  
-      // Ya que ahora rowSesiones_A contiene los seguimientos, podemos asignarlo directamente
       SesionesActivas = rowSesiones_A.map((elemento) => ({
         idSesion: elemento.idSesion,
         idCita: elemento.idCitas,
         idDoctor: elemento.idDoctor,
         idAsociado: elemento.idAsociado,
         InicioSesion: elemento.InicioDeSesion,
-        Seguimientos: elemento.Seguimientos, // Esto ahora es un array de seguimientos
         Nota: elemento.Nota,
       }));
     }
@@ -271,8 +261,6 @@ export async function InfoPaciente(idPaciente) {
     return "Ha ocurrido un error.";
   }
   
-  
-
 
   const InfoPaciente = {
     BasicInfo: BasicInfo,

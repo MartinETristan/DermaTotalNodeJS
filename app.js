@@ -20,7 +20,17 @@ import * as API_TimeMachine from "./public/api/api_timemachine.js";
 config();
 const app = express();
 const web = http.createServer(app);
-const io = new Server(web);
+// Configuración de opciones de Socket.IO
+const io = new Server(web, {
+  // Habilitar la reconexión automática
+  reconnection: true,
+  // Número máximo de intentos de reconexión
+  reconnectionAttempts: 5,
+  // Intervalo inicial entre intentos de reconexión (en milisegundos)
+  reconnectionDelay: 1000,
+  // Factor de crecimiento para el intervalo entre intentos de reconexión
+  reconnectionDelayMax: 5000,
+});
 
 // En caso de que el puerto local no exista, se usará el puerto de testeo
 const puerto =

@@ -245,6 +245,13 @@ CREATE TABLE `Padecimientos`  (
   PRIMARY KEY (`idPadecimiento`)
 );
 
+CREATE TABLE `Padecimientos_Seguimientos`  (
+  `idPadecimientos_Seguimientos` int NOT NULL AUTO_INCREMENT,
+  `idPadecimientos` int NULL,
+  `idSeguimientos` int NULL,
+  PRIMARY KEY (`idPadecimientos_Seguimientos`)
+);
+
 CREATE TABLE `Pago`  (
   `idPago` int NOT NULL AUTO_INCREMENT,
   `idRecepcionista` int NOT NULL,
@@ -324,8 +331,6 @@ CREATE TABLE `RegistroTratamientos`  (
   `idRegistroTratamientos` int NOT NULL AUTO_INCREMENT,
   `idEquipo` int NULL,
   `idProcedimiento` int NULL,
-  `idZona` int NULL,
-  `SesionesActuales` int NULL DEFAULT 0,
   `SesionesTotales` int NULL DEFAULT 0,
   `Intensidad` int NULL,
   PRIMARY KEY (`idRegistroTratamientos`)
@@ -333,16 +338,13 @@ CREATE TABLE `RegistroTratamientos`  (
 
 CREATE TABLE `Seguimientos`  (
   `idSeguimientos` int NOT NULL AUTO_INCREMENT,
-  `idPadecimiento` int NULL,
-  `Seguimiento` varchar(1500) NULL,
+  `idDoctor` int NULL,
+  `idPaciente` int NULL,
+  `idSesion` int NULL,
+  `Subjetivo` varchar(1500) NULL,
+  `Objetivo` varchar(1500) NULL,
+  `Fecha` datetime NULL,
   PRIMARY KEY (`idSeguimientos`)
-);
-
-CREATE TABLE `Seguimientos_Sesion`  (
-  `idSeguimientos_Sesion` int NOT NULL AUTO_INCREMENT,
-  `idSesion` int NOT NULL,
-  `idSeguimientos` int NOT NULL,
-  PRIMARY KEY (`idSeguimientos_Sesion`)
 );
 
 CREATE TABLE `Sesion`  (
@@ -479,6 +481,14 @@ CREATE TABLE `Zona_Procedimiento`  (
   `idProcedimiento` int NOT NULL
 );
 
+CREATE TABLE `Zona_RegistroTratamientos`  (
+  `idZona_RegistroTratamientos` int NOT NULL AUTO_INCREMENT,
+  `idZona` int NULL,
+  `idRegistroTratamientos` int NULL,
+  `SesionesActuales` int NULL,
+  PRIMARY KEY (`idZona_RegistroTratamientos`)
+);
+
 ALTER TABLE `Admin` ADD CONSTRAINT `fk_Admin_Usuarios_1` FOREIGN KEY (`idUsuario`) REFERENCES `Usuarios` (`idUsuario`);
 ALTER TABLE `Admin` ADD CONSTRAINT `fk_Admin_TipodeUsuario_1` FOREIGN KEY (`idTipoDeUsuario`) REFERENCES `TipodeUsuario` (`idTipoUsuario`);
 ALTER TABLE `Admin` ADD CONSTRAINT `fk_Admin_Status_1` FOREIGN KEY (`idStatus`) REFERENCES `Status` (`idStatus`);
@@ -527,6 +537,8 @@ ALTER TABLE `Pacientes_Pedidos` ADD CONSTRAINT `fk_Pacientes_Pedidos_Citas_1` FO
 ALTER TABLE `Pacientes_Pedidos` ADD CONSTRAINT `fk_Pacientes_Pedidos_Doctor_1` FOREIGN KEY (`idDoctor`) REFERENCES `Doctor` (`idDoctor`);
 ALTER TABLE `Pacientes_Pedidos` ADD CONSTRAINT `fk_Pacientes_Pedidos_Consultorio_1` FOREIGN KEY (`idConsultorio`) REFERENCES `Consultorio` (`idConsultorio`);
 ALTER TABLE `Padecimientos` ADD CONSTRAINT `fk_Padecimientos_Areas_1` FOREIGN KEY (`idArea`) REFERENCES `Areas` (`idAreas`);
+ALTER TABLE `Padecimientos_Seguimientos` ADD CONSTRAINT `fk_Padecimientos_Seguimientos_Seguimientos_1` FOREIGN KEY (`idSeguimientos`) REFERENCES `Seguimientos` (`idSeguimientos`);
+ALTER TABLE `Padecimientos_Seguimientos` ADD CONSTRAINT `fk_Padecimientos_Seguimientos_Padecimientos_1` FOREIGN KEY (`idPadecimientos`) REFERENCES `Padecimientos` (`idPadecimiento`);
 ALTER TABLE `Pago` ADD CONSTRAINT `fk_Pago_Recepcionista_1` FOREIGN KEY (`idRecepcionista`) REFERENCES `Recepcionista` (`idRecepcionista`);
 ALTER TABLE `Pago` ADD CONSTRAINT `fk_Pago_Tipo_de_Pago_1` FOREIGN KEY (`idTipoDePago`) REFERENCES `Tipo_de_Pago` (`idTipoDePago`);
 ALTER TABLE `Procedimiento` ADD CONSTRAINT `fk_Procedimiento_Areas_1` FOREIGN KEY (`idAreas`) REFERENCES `Areas` (`idAreas`);
@@ -550,10 +562,9 @@ ALTER TABLE `Registro_Confirmacion` ADD CONSTRAINT `fk_Registro_Confirmacion_Usu
 ALTER TABLE `Registro_Confirmacion` ADD CONSTRAINT `fk_Registro_Confirmacion_TipodeUsuario_1` FOREIGN KEY (`idTipodeUsuario`) REFERENCES `TipodeUsuario` (`idTipoUsuario`);
 ALTER TABLE `RegistroTratamientos` ADD CONSTRAINT `fk_RegistroTratamientos_Equipo_1` FOREIGN KEY (`idEquipo`) REFERENCES `Equipo` (`idEquipo`);
 ALTER TABLE `RegistroTratamientos` ADD CONSTRAINT `fk_RegistroTratamientos_Procedimiento_1` FOREIGN KEY (`idProcedimiento`) REFERENCES `Procedimiento` (`idProcedimiento`);
-ALTER TABLE `RegistroTratamientos` ADD CONSTRAINT `fk_RegistroTratamientos_Zona_1` FOREIGN KEY (`idZona`) REFERENCES `Zona` (`idZona`);
-ALTER TABLE `Seguimientos` ADD CONSTRAINT `fk_Padecimientos_Sesion_Padecimientos_1` FOREIGN KEY (`idPadecimiento`) REFERENCES `Padecimientos` (`idPadecimiento`);
-ALTER TABLE `Seguimientos_Sesion` ADD CONSTRAINT `fk_Registro_Sesion_Sesion_1` FOREIGN KEY (`idSesion`) REFERENCES `Sesion` (`idSesion`);
-ALTER TABLE `Seguimientos_Sesion` ADD CONSTRAINT `fk_Seguimientos_Sesion_Seguimientos_1` FOREIGN KEY (`idSeguimientos`) REFERENCES `Seguimientos` (`idSeguimientos`);
+ALTER TABLE `Seguimientos` ADD CONSTRAINT `fk_Seguimientos_Sesion_1` FOREIGN KEY (`idSesion`) REFERENCES `Sesion` (`idSesion`);
+ALTER TABLE `Seguimientos` ADD CONSTRAINT `fk_Seguimientos_Doctor_1` FOREIGN KEY (`idDoctor`) REFERENCES `Doctor` (`idDoctor`);
+ALTER TABLE `Seguimientos` ADD CONSTRAINT `fk_Seguimientos_Paciente_1` FOREIGN KEY (`idPaciente`) REFERENCES `Paciente` (`idPaciente`);
 ALTER TABLE `Sesion` ADD CONSTRAINT `fk_Consulta_Citas_1` FOREIGN KEY (`idCitas`) REFERENCES `Citas` (`idCitas`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ALTER TABLE `Sesion` ADD CONSTRAINT `fk_Consulta_Pago_1` FOREIGN KEY (`idPago`) REFERENCES `Pago` (`idPago`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ALTER TABLE `Sesion` ADD CONSTRAINT `fk_Consulta_Consultorio_1` FOREIGN KEY (`idConsultorio`) REFERENCES `Consultorio` (`idConsultorio`) ON DELETE RESTRICT ON UPDATE RESTRICT;
@@ -577,4 +588,6 @@ ALTER TABLE `Ventas` ADD CONSTRAINT `fk_Ventas_VentaCliente_1` FOREIGN KEY (`idV
 ALTER TABLE `Ventas` ADD CONSTRAINT `fk_Ventas_Usuarios_1` FOREIGN KEY (`idUsuario`) REFERENCES `Usuarios` (`idUsuario`);
 ALTER TABLE `Zona_Procedimiento` ADD CONSTRAINT `fk_Zona_Procedimineto 1_Zona_1` FOREIGN KEY (`idZona`) REFERENCES `Zona` (`idZona`);
 ALTER TABLE `Zona_Procedimiento` ADD CONSTRAINT `fk_Zona_Procedimineto 1_Procedimiento_1` FOREIGN KEY (`idProcedimiento`) REFERENCES `Procedimiento` (`idProcedimiento`);
+ALTER TABLE `Zona_RegistroTratamientos` ADD CONSTRAINT `fk_Zona_RegistroTratamientos_Zona_1` FOREIGN KEY (`idZona`) REFERENCES `Zona` (`idZona`);
+ALTER TABLE `Zona_RegistroTratamientos` ADD CONSTRAINT `fk_Zona_RegistroTratamientos_RegistroTratamientos_1` FOREIGN KEY (`idRegistroTratamientos`) REFERENCES `RegistroTratamientos` (`idRegistroTratamientos`);
 

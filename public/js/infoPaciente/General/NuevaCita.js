@@ -242,7 +242,7 @@ async function cargarNuevaCita() {
     }
 
     function CrearCita() {
-      //Hacemos el fetch para crear la cita
+      //Hacemos la peticion ajax para crear la cita
       $.ajax({
         url: "/CrearCita",
         method: "POST",
@@ -325,7 +325,7 @@ let arrayCitasdelDiaElegido = [];
 function obtenerCitas(idDoctor, idAsociado) {
   return new Promise((resolve, reject) => {
     $.ajax({
-      url: "/AgendaMedico",
+      url: "/Agenda_Citas",
       method: "POST",
       dataType: "json",
       data: {

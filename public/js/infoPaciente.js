@@ -111,18 +111,30 @@ function HeaderInfoPaciente(data) {
     const InputApellidoP_Clean = InputApellidoP.value.replace(/\s/g, "");
     const InputApellidoM_Clean = InputApellidoM.value.replace(/\s/g, "");
 
-    fetch("/ActualizarInfoPersonal", {
+    // Datos a enviar en la solicitud Ajax
+    var datos = {
+      CambiosNombre: [
+        { Propiedad: "Nombres", Valor: InputNombre.value, TipoUser: 7 },
+        { Propiedad: "ApellidoP", Valor: InputApellidoP_Clean, TipoUser: 7 },
+        { Propiedad: "ApellidoM", Valor: InputApellidoM_Clean, TipoUser: 7 },
+      ],
+    };
+
+    // Petición Ajax a /ActualizarInfoPersonal
+    $.ajax({
+      url: "/ActualizarInfoPersonal",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+      contentType: "application/json", // Especificamos el tipo de contenido del cuerpo de la solicitud
+      data: JSON.stringify(datos), // Convertimos el objeto a una cadena JSON
+      success: function (response) {
+        console.log(response); // Manejar la respuesta si la solicitud tiene éxito
       },
-      body: JSON.stringify({
-        CambiosNombre: [
-          { Propiedad: "Nombres", Valor: InputNombre.value, TipoUser: 7 },
-          { Propiedad: "ApellidoP", Valor: InputApellidoP_Clean, TipoUser: 7 },
-          { Propiedad: "ApellidoM", Valor: InputApellidoM_Clean, TipoUser: 7 },
-        ],
-      }),
+      error: function (xhr, status, error) {
+        console.error(
+          "Error en la petición Ajax en /ActualizarInfoPersonal:",
+          error
+        );
+      },
     });
 
     // Actualizamos el nombre con los datos del input
@@ -255,7 +267,6 @@ function HeaderInfoPaciente(data) {
       const InfoOpciones = document.querySelector(".InfoOpciones");
       InfoOpciones.innerHTML = "";
 
-
       var Checkout = document.createElement("input");
       Checkout.setAttribute("id", "valorCheckout");
       Checkout.required = true;
@@ -306,7 +317,7 @@ function HeaderInfoPaciente(data) {
         if (!Checkout.checkValidity()) {
           Checkout.reportValidity();
           return;
-        }else{
+        } else {
           console.log("Checkout.value", Checkout.value);
           socket.emit("CambioEstadoPaciente", {
             idCita: datosAlmacenados.SesionesActivas[0].idCita,
@@ -439,7 +450,7 @@ function HeaderInfoPaciente(data) {
 
     //En caso de que existan botones alternos, los ocultamos
     const BotonesAlternos = document.querySelector(".BotonesOpciones");
-    if(BotonesAlternos){
+    if (BotonesAlternos) {
       BotonesAlternos.style.display = "none";
     }
 
@@ -543,16 +554,15 @@ function formatearHora(hora) {
   const fecha = new Date(hora);
   let horas = fecha.getHours();
   let minutos = fecha.getMinutes();
-  const ampm = horas >= 12 ? 'pm' : 'am';
+  const ampm = horas >= 12 ? "pm" : "am";
 
   horas = horas % 12;
   horas = horas ? horas : 12; // La hora '0' debe ser '12'
-  minutos = minutos < 10 ? '0'+minutos : minutos;
+  minutos = minutos < 10 ? "0" + minutos : minutos;
 
-  const horaFormateada = horas + ':' + minutos + ampm;
+  const horaFormateada = horas + ":" + minutos + ampm;
   return horaFormateada;
 }
-
 
 // Funcion para reinciar la contraseña:
 function reiniciarContraseña() {
@@ -563,13 +573,19 @@ function reiniciarContraseña() {
     `);
   if (resultado === true) {
     // Hacemos el reinicio
-    fetch("/PassRestart", {
+    $.ajax({
+      url: "/PassRestart",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+      contentType: "application/json", // Especificamos el tipo de contenido de la solicitud
+      data: JSON.stringify({ usuario: NombreUsuario }),
+      success: function(response) {
+        // Manejar la respuesta si es necesaria
       },
-      body: JSON.stringify({ usuario: NombreUsuario }),
+      error: function(xhr, status, error) {
+        console.error("Error en la petición Ajax en /PassRestart:", error);
+      }
     });
+    
     // Y mostramos la confirmacion Visual
     window.alert("La contraseña de " + NombreUsuario + " cambió con exito.");
   }
@@ -690,21 +706,32 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
+    data: JSON.stringify({
       Propiedad: Clase === 1 ? NombredelCampo : NombreEnSistema,
       Valor: valor,
       TipoUser: Clase === 2 || Clase === 3 ? 7 : undefined,
     }),
   };
-
+  
   const endPoints = {
     1: "/ActualizarAntecedentesPaciente",
     2: "/ActualizarInfoPersonal",
     3: "/ActualizarStatus",
   };
-
+  
   if (endPoints[Clase]) {
-    fetch(endPoints[Clase], fetchConfig);
+    $.ajax({
+      url: endPoints[Clase],
+      method: "POST",
+      contentType: "application/json",
+      data: fetchConfig.data,
+      success: function(response) {
+        // Manejar la respuesta si es necesaria
+      },
+      error: function(xhr, status, error) {
+        console.error("Error en la petición Ajax:", error);
+      }
+    });
   }
 
   // Mostramos la vista de antes para salir del modo de edicion
@@ -736,12 +763,12 @@ function confirmarEdicion(NombredelCampo, NombreEnSistema, Clase) {
         textElement.style.color = "red";
         textElement.style.fontSize = "24px";
         textElement.textContent = "ALERGIAS: ";
-        
+
         // Crear el elemento que contendrá la parte subrayada del texto
         var underlineText = document.createElement("span");
         underlineText.textContent = valor.toUpperCase();
         underlineText.style.textDecoration = "underline";
-        
+
         // Añadir el elemento subrayado al elemento principal
         textElement.appendChild(underlineText);
       }
@@ -805,7 +832,6 @@ function editarDato(NombredelCampo) {
   const contenedor = document.getElementById(`cont${NombredelCampo}`);
   const input = document.getElementById(`input${NombredelCampo}`);
   const texto = document.getElementById(`text${NombredelCampo}`);
-
 
   botoneditar.style.display = "none";
   input.style.display = "flex";
@@ -878,6 +904,15 @@ $(document).ready(async function () {
       var seccion = document.getElementById("Recetas");
       seccion.classList.add("activo");
     });
+
+    if (datosAlmacenados.SesionesActivas.length > 0) {
+      if (
+        InfoSesion.idUsuario != datosAlmacenados.SesionesActivas[0].idDoctor
+      ) {
+        $("#TerminarConsulta").remove();
+        $(".SeguimientoHoy").remove();
+      }
+    }
   } else {
     $("#General").remove();
     $("#Historial").remove();

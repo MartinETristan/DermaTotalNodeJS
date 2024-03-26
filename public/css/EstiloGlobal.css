@@ -194,7 +194,6 @@ h1, h2 {
 
 
 
-
 /* Barra de Navegación */
 .nav-bar {
   display: flex;
@@ -207,9 +206,12 @@ h1, h2 {
 }
 
 .nav-bar>div{
-  cursor: pointer;
+  cursor: pointer; 
 }
 
+.nav-bar>div>h2{
+  font-weight: 400;
+}
 
 .nav-1 {
   transition: margin-right .5s ease;

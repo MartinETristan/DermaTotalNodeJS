@@ -1,8 +1,7 @@
 //========================================================================================================
 // Nueva Receta
 //========================================================================================================
-function cargarNuevaReceta(){
-
+function cargarNuevaReceta() {
   agregarEventListener("botonNuevaReceta", function () {
     // Acciones a realizar cuando se haga clic en el botón
     const formreceta = document.getElementById("NuevaReceta");
@@ -12,15 +11,15 @@ function cargarNuevaReceta(){
     botoncancelar.style.display = "block";
     botonNuevaReceta.style.display = "none";
 
-    if(datosAlmacenados.SesionesActivas.length > 0){
+    if (datosAlmacenados.SesionesActivas.length > 0) {
       const form = document.getElementById("recetaForm");
-      const idSesion =document.createElement("input");
+      const idSesion = document.createElement("input");
       idSesion.type = "hidden";
       idSesion.name = "idSesion";
       idSesion.value = datosAlmacenados.SesionesActivas[0].idSesion;
       form.appendChild(idSesion);
     }
-    
+
     // Creamos los campos de medicamentos e indicaciones con los valores de la ultima receta
     // Si existen recetas
     if (datosAlmacenados.Recetas[0]) {
@@ -49,7 +48,7 @@ function cargarNuevaReceta(){
         // Boton para eliminar el par de Medicamento e Indicación
         const botonQuitar = document.createElement("button");
         botonQuitar.type = "button";
-        botonQuitar.textContent = "Eliminar";
+        botonQuitar.textContent = "X";
         botonQuitar.classList.add("iconbtn--Eliminar");
         botonQuitar.addEventListener("click", () => {
           const divMedicamentos = botonQuitar.parentNode;
@@ -60,7 +59,7 @@ function cargarNuevaReceta(){
         // Boton para crear el par de Medicamento e Indicación
         const botonAñadir = document.createElement("button");
         botonAñadir.type = "button";
-        botonAñadir.textContent = "Añadir";
+        botonAñadir.textContent = "Añadir Campo";
         botonAñadir.classList.add("AñadirMedicamento");
         botonAñadir.addEventListener("click", () => {
           agregarCampos({
@@ -81,9 +80,8 @@ function cargarNuevaReceta(){
         contenedor.appendChild(indicacionInput);
 
         camposMedicamentos.appendChild(contenedor);
-
       });
-    }else{
+    } else {
       // Si no hay recetas, creamos un par de campos de medicamentos e indicaciones
       const contenedor = document.createElement("div");
       contenedor.classList.add("New");
@@ -94,7 +92,7 @@ function cargarNuevaReceta(){
       medicamentoInput.required = true;
       medicamentoInput.classList.add("medicamentoreceta");
       contenedor.appendChild(medicamentoInput);
-    
+
       // Boton para eliminar el par de Medicamento e Indicación
       const botonQuitar = document.createElement("button");
       botonQuitar.type = "button";
@@ -105,7 +103,7 @@ function cargarNuevaReceta(){
         divMedicamentos.parentNode.removeChild(divMedicamentos);
       });
       contenedor.appendChild(botonQuitar);
-    
+
       // Boton para crear el par de Medicamento e Indicación
       const botonAñadir = document.createElement("button");
       botonAñadir.type = "button";
@@ -119,7 +117,7 @@ function cargarNuevaReceta(){
         });
       });
       contenedor.appendChild(botonAñadir);
-    
+
       const indicacionInput = document.createElement("input");
       indicacionInput.type = "text";
       indicacionInput.name = "Indicaciones";
@@ -141,53 +139,60 @@ function cargarNuevaReceta(){
     botonNuevaReceta.style.display = "block";
   });
 
-  
-
   //========================================================================================================
   // Enviar el Formulario para crear una Nueva Receta
   //========================================================================================================
   const recetaForm = document.getElementById("recetaForm");
   const camposMedicamentosDiv = document.getElementById("camposMedicamentos");
-  
+
   recetaForm.addEventListener("submit", (event) => {
     event.preventDefault();
-  
+
     const formdata = [];
-    
+
     // Seleccionar todos los divs que contienen los pares de medicamento e indicación
-    const medicamentoDivs = camposMedicamentosDiv.querySelectorAll('div');
-    
+    const medicamentoDivs = camposMedicamentosDiv.querySelectorAll("div");
+
     medicamentoDivs.forEach((div) => {
       // Encontrar los inputs dentro del div actual
       const inputMedicamento = div.querySelector('input[name="Medicamentos"]');
       const inputIndicacion = div.querySelector('input[name="Indicaciones"]');
-  
+
       // Verificar si ambos inputs existen
       if (inputMedicamento && inputIndicacion) {
         // Añadir el par medicamento-indicación al array formdata
         formdata.push({
           medicamento: inputMedicamento.value,
-          indicacion: inputIndicacion.value
+          indicacion: inputIndicacion.value,
         });
       }
     });
-  
+
     // Ahora formdata contiene los pares medicamento-indicación
-    fetch(recetaForm.action, {
+    $.ajax({
+      url: recetaForm.action,
       method: recetaForm.method,
-      headers: {
-        'Content-Type': 'application/json'
+      contentType: "application/json",
+      data: JSON.stringify({
+        Medicamento_Indicacion: formdata,
+        idSesion: datosAlmacenados.SesionesActivas[0]
+          ? datosAlmacenados.SesionesActivas[0].idSesion
+          : null,
+        Nota: recetaForm.Nota.value,
+      }),
+      success: function (response) {
+        console.log("Petición exitosa:", response);
+
+        // Y recargamos la página
+        location.reload();
+        // Manejar la respuesta exitosa aquí
       },
-      body: JSON.stringify({
-      Medicamento_Indicacion:formdata,
-      idSesion: datosAlmacenados.SesionesActivas[0] ? datosAlmacenados.SesionesActivas[0].idSesion : null,
-      Nota: recetaForm.Nota.value
-    })
+      error: function (xhr, status, error) {
+        console.error("Error en la petición:", error);
+        // Manejar el error aquí
+      },
     });
-    // Y recargamos la página
-    location.reload();
   });
-  
+
   cargarNuevaCita();
 }
-

@@ -161,7 +161,7 @@ export async function DashDoc_OtrosConsultorios(idDoctor, Fecha) {
   let OtrosConsultorios = [];
   try {
     const connection = await mysql.createConnection(db);
-    const consultaOtrosConsultorios = `SELECT p.idPaciente, c.idCitas, c.idStatusPaciente,
+    const consultaOtrosConsultorios = `SELECT p.idPaciente, c.idCitas, c.idStatusPaciente, c.idDoctor,
     up.Nombres, CONCAT(up.ApellidoP, ' ', up.ApellidoM) AS Apellidos,
     CONCAT(ud.Nombres) AS NombreDoctor,
     CONCAT(ua.Nombres) AS NombreAsociado,
@@ -182,7 +182,7 @@ export async function DashDoc_OtrosConsultorios(idDoctor, Fecha) {
 
     UNION
 
-    SELECT p.idPaciente, c.idCitas, c.idStatusPaciente,
+    SELECT p.idPaciente, c.idCitas, c.idStatusPaciente, c.idDoctor,
     up.Nombres, CONCAT(up.ApellidoP, ' ', up.ApellidoM) AS Apellidos,
     CONCAT(ud.Nombres) AS NombreDoctor,
     CONCAT(ua.Nombres) AS NombreAsociado,
@@ -231,6 +231,7 @@ export async function DashDoc_OtrosConsultorios(idDoctor, Fecha) {
           idCita: cita.idCitas,
           idPaciente: cita.idPaciente,
           idStatusPaciente: cita.idStatusPaciente,
+          idDoctor: cita.idDoctor,
           idSucursal: cita.idSucursal,
           Nombres: cita.Nombres,
           Apellidos: cita.Apellidos,
@@ -238,7 +239,7 @@ export async function DashDoc_OtrosConsultorios(idDoctor, Fecha) {
           HoraCita: cita.HoraCita,
           HoraLlegada: cita.HoraLlegada,
           Consultorio: cita.Consultorio,
-          Procedimiento: cita.Procedimiento,
+          Procedimientos: cita.Procedimientos,
           RutaFoto: cita.RutaFoto,
           Nota: cita.Nota,
         });
@@ -303,7 +304,7 @@ export async function DashDoc_CitasFinalizadas(idDoctor, Fecha) {
           NombresPacientes: cita.Nombres,
           ApellidosPacientes: cita.Apellidos,
           HoraCita: cita.HoraCita,
-          Procedimiento: cita.DetallesProcedimientos,
+          Procedimientos: cita.DetallesProcedimientos,
           Consultorio: cita.Consultorio,
           RutaFoto: cita.RutaFoto,
           CheckOut: cita.CheckOut,
@@ -531,50 +532,28 @@ export async function Hoy_Espera(idCita, HoraLlegada) {
   }
 }
 
-export async function PedirPaciente(idCita, idDoctor, idConsultorio) {
+export async function Limpiar_P_Pedidos(idCita) {
   try {
     const connection = await mysql.createConnection(db);
-
-    // Primero, verifica si la entrada ya existe en la base de datos
-    const checkQuery = `
-      SELECT 1 
-      FROM DermaTotalDB.Pacientes_Pedidos
-      WHERE idCitas = ? AND idDoctor = ? AND idConsultorio = ?;
+    const deleteQuery = `
+    DELETE FROM Pacientes_Pedidos
+    WHERE idCitas = ? ;
     `;
-    const [rows] = await connection.execute(checkQuery, [
-      idCita,
-      idDoctor,
-      idConsultorio,
-    ]);
-
-    if (rows.length > 0) {
-      connection.end();
-      return "Sonido"; // Retorna "Sonido" si ya existe una entrada con esas propiedades
-    }
-
-    // Si no existe, inserta la entrada en la base de datos
-    const pedir = `
-      INSERT INTO DermaTotalDB.Pacientes_Pedidos
-      (idCitas, idDoctor, idConsultorio)
-      VALUES(?, ?, ?);
-    `;
-
-    await connection.execute(pedir, [idCita, idDoctor, idConsultorio]);
+    await connection.execute(deleteQuery, [idCita]);
     connection.end();
   } catch (error) {
-    console.error("Ha ocurrido un error pidiendo al paciente:", error);
+    console.error("Ha ocurrido un error limpiando a pacientes pedidos:", error);
     return "Ha ocurrido un error.";
   }
 }
 
 //Aqui asi como se elimina todas las citas de la tabla de PedirPaciente, se crea ua nueva sesion para el paciente
 //y se avanza un status en la cita
-export async function AsignarP_Pedido(
+export async function CrearSesion(
   idCita,
   idConsultorio,
   idDoctor,
   idAsociado,
-  idProcedimiento,
   idPaciente,
   HoraInicio
 ) {
@@ -582,40 +561,39 @@ export async function AsignarP_Pedido(
     const connection = await mysql.createConnection(db);
     await connection.beginTransaction();
 
-    // elimina la entrada de la tabla
-    const deleteQuery = `
-        DELETE FROM Pacientes_Pedidos
-        WHERE idCitas = ? ;
-      `;
-    await connection.execute(deleteQuery, [idCita]);
-
     // Crea una nueva sesión para el paciente
     // Si la sesion es con un Doctor
     if (idDoctor) {
+      // Mostramos en recepcion el paciente pedido
+      const pedir = `
+      INSERT INTO Pacientes_Pedidos
+      (idCitas, idDoctor, idConsultorio)
+      VALUES(?, ?, ?);
+    `;
+
+      await connection.execute(pedir, [idCita, idDoctor, idConsultorio]);
+
       const insertSesion = `
         INSERT INTO Sesion
-        (idCitas, idConsultorio, idDoctor, idProcedimiento, idPaciente, InicioDeSesion)
-        VALUES(?, ?, ?, ?, ?, CONCAT(CURDATE()," ", ?));
-      `;
+        (idCitas, idConsultorio, idDoctor, idPaciente, InicioDeSesion)
+        VALUES(?, ?, ?, ?, CONCAT(CURDATE()," ", ?));`;
       await connection.execute(insertSesion, [
         idCita,
         idConsultorio,
         idDoctor,
-        idProcedimiento,
         idPaciente,
         HoraInicio,
       ]);
     } else {
       const insertSesion = `
         INSERT INTO Sesion
-        (idCitas, idConsultorio, idAsociado, idProcedimiento, idPaciente, InicioDeSesion)
-        VALUES(?, ?, ?, ?, ?, CONCAT(CURDATE()," ", ?)));
+        (idCitas, idConsultorio, idAsociado, idPaciente, InicioDeSesion)
+        VALUES(?, ?, ?, ?, CONCAT(CURDATE()," ", ?)));
       `;
       await connection.execute(insertSesion, [
         idCita,
         idConsultorio,
         idAsociado,
-        idProcedimiento,
         idPaciente,
         HoraInicio,
       ]);

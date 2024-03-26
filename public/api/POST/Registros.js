@@ -22,6 +22,8 @@ import * as API_Auth from "../SQL/Aut&Usuarios.js";
 import * as API_Registros from "../SQL/Registros.js";
 // Informacion de Pacientes
 import * as API_Pacientes from "../SQL/Pacientes.js";
+// Tiempo
+import * as API_TimeMachine from "../api_timemachine.js";
 
 // ==================================================================================================
 // Rutas Post
@@ -293,7 +295,7 @@ router.post("/NuevoPadecimiento", async (req, res) => {
     req.body.idArea,
     req.body.Padecimiento
   );
-  return res.status(200).json({ idPadecimiento: idPadecimiento });
+  return res.status(200).json(idPadecimiento);
 });
 
 router.post("/Buscar_Padecimiento", async (req, res) => {
@@ -332,23 +334,45 @@ router.post("/Buscar_Padecimiento", async (req, res) => {
 
 
 
+// En caso de que el seguimiento tenga un id de sesion, se va a pasar el paramentro de tiempo cob base a la cita
+// adjunta a la sesion para determinar cual es la hora correcta, de lo contrario, unicamente se va a pasar la fecha No1
+// que es la fecha HoraS1
+
+// console.log(req.body);
 router.post("/Crear_Seguimiento", async (req, res) => {
-  const idSeguimiento = await API_Registros.Crear_Seguimiento(req.body.idSesion,req.body.Seguimiento, req.body.idPadecimiento);
-  return res.status(200).json({ idSeguimiento: idSeguimiento });
+  try {
+    // Llama a la función para crear el seguimiento
+    await API_Registros.Crear_Seguimiento(req.body, API_TimeMachine.FechaHora().HoraS1, API_TimeMachine.FechaHora().HoraS2);
+    
+    // Si la función se ejecuta correctamente, envía una respuesta con el estado 200 y un mensaje de éxito
+    return res.status(200).json({ mensaje: "Seguimiento creado exitosamente" });
+  } catch (error) {
+    // Si hay un error al crear el seguimiento, envía una respuesta con el estado 500 y un mensaje de error que incluye el detalle del error
+    return res.status(500).json({ mensaje: "Error al crear el seguimiento", error: error.message });
+  }
 });
+
 
 
 router.post("/Update_Seguimiento", async (req, res) => {
-  const update = await API_Registros.Update_Seguimiento(req.body.idSeguimiento,req.body.Seguimiento);
-  return res.json(update);
+  try {
+    switch (req.body.tipo) {
+      case "(S)Subjetivo":
+        await API_Registros.Update_Subjetivo(req.body.idSeguimiento, req.body.contenido);
+        return res.status(200).send("Actualización Subjetiva exitosa");
+      case "(O)Objetivo":
+        await API_Registros.Update_Objetivo(req.body.idSeguimiento, req.body.contenido);
+        return res.status(200).send("Actualización Objetiva exitosa");
+      default:
+        console.log("No se ha encontrado el tipo de seguimiento");
+        return res.status(400).send("Tipo de seguimiento no válido");
+    }
+  } catch (error) {
+    console.error("Error al actualizar el seguimiento:", error);
+    return res.status(500).send("Error interno del servidor");
+  }
 });
 
-
-router.post("/Delete_Seguimiento", async (req, res) => {
-  const del_log = await API_Registros.Delete_Seguimiento(req.body.idSeguimiento);
-  return res.json(del_log);
-
-});
 
 
 

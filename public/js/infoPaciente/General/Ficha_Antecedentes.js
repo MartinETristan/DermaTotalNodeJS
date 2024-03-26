@@ -2,9 +2,9 @@
 // Aqui empieza el codigo de la seccion General
 // ========================================================================================================
 function cargarGeneral() {
-  console.log(InfoSesion);
-  console.log(datosAlmacenados);
-  console.log(InfoSelects);
+  console.log("InfoSesion:",InfoSesion);
+  console.log("datosAlmacenados:",datosAlmacenados);
+  console.log("InfoSelects:",InfoSelects);
   const General = document.querySelector("#infocontenido");
   var htmlString = `
       <div class="region__content" id="region__content">
@@ -190,7 +190,7 @@ function cargarGeneral() {
         <div class="info__item">
           <div class="info__item__content">
             <header class="info__item__header">
-              <h2>Nueva Receta:</h2>
+              <h2>(P)Plan:</h2>
               <button type="button" id="cancelarReceta" style="display:none;">Cancelar</button>
               <button type="button" id="botonNuevaReceta">Nueva Receta</button>
             </header>

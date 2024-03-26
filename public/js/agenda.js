@@ -22,6 +22,15 @@ $(window).scroll(function () {
 // Creacion de Calendario
 // ====================================================================================================
 
+const InfoSesion = $.ajax({
+  url: "/InfoSesion",
+  method: "POST",
+  dataType: "json",
+  async: false,
+}).responseJSON;
+
+console.log(InfoSesion);
+
 $(document).ready(function () {
   var calendarEl = document.getElementById("calendar");
 
@@ -87,9 +96,13 @@ $(document).ready(function () {
 
     events: function (fetchInfo, successCallback, failureCallback) {
       $.ajax({
-        url: "/AgendaDoctor",
+        url: "/Agenda_Citas",
         method: "POST",
         dataType: "json",
+        data: {
+          idDoctor: InfoSesion.idUsuario,
+          idAsociado: null,
+        },
         success: function (data) {
           const colores = {
             1: "#249DD9",
@@ -97,11 +110,11 @@ $(document).ready(function () {
             3: "green",
             4: "#ACACAC",
           };
-    
+          console.log(data);
           var eventos = data.map(function (evento) {
             var startTime = moment.utc(evento.HoraCita).local().format("HH:mm");
             var endTime = moment.utc(evento.FinCita).local().format("HH:mm");
-    
+
             // Filtrar eventos que cumplan la condición de edición (idStatusPaciente igual a 1)
             if (evento.idStatusPaciente === 1) {
               return {
@@ -135,7 +148,7 @@ $(document).ready(function () {
               };
             }
           });
-    
+
           successCallback(eventos);
         },
         error: function (error) {
@@ -144,7 +157,6 @@ $(document).ready(function () {
         },
       });
     },
-    
 
     // Crea los eventos con base a la informacion de la base de datos
     eventContent: function (arg) {
@@ -157,7 +169,7 @@ $(document).ready(function () {
         title: info.event._def.extendedProps.Procedimiento,
         placement: "top",
         trigger: "hover",
-        container: "body",
+       
       });
     },
 

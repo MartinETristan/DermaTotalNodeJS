@@ -582,7 +582,6 @@ h1 {
     resize: vertical;
     margin-top: 10px;
     padding: 10px;
-    width: 98%;
     min-height: 50px;
     max-height: 160px;
     border: 2px solid #84c0ff94;
@@ -590,9 +589,43 @@ h1 {
     margin-bottom: 10px;
 }
 
+.Contenedor__SOAP{
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #84c0ff94;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.Contenedor__SOAP__Header,.Contenedor__SOAP__Botones{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+}
+
+.Contenedor__SOAP__Botones > button{
+    padding: 5px 10px;
+}
+
+.Contenedor__SOAP__Header>h2,.Contenedor__SOAP>h2{
+    margin: 0;
+    padding: 0;
+}
+
+.SOAP .select2-selection.select2-selection--multiple{
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #84c0ff94;
+    border-radius: 8px;
+}
+
 .info__item__title {
     margin: 0;
-    font-weight: bold;
+    font-weight: 400;
     font-size: 24px;
 }
 
@@ -692,7 +725,7 @@ h1 {
 }
 
 .medicamentoreceta {
-    font-weight: bold;
+    /* font-weight: bold; */
     font-size: 25px;
     padding: 10px;
     margin-bottom: 10px;
@@ -873,6 +906,7 @@ dd {
     border-radius: 15px;
     background: #959ea9;
     margin-top: 20px;
+    margin-bottom: 20px;
     padding: 10px;
 }
 
@@ -882,8 +916,8 @@ dd {
 
 .Contenedor__Diagnosticos {
     padding-right: 15px;
-    height: 100px;
-    overflow-y: auto;
+    /* height: 100px; */
+    /* overflow-y: auto; */
     border-radius: 5px;
 }
 
@@ -925,8 +959,11 @@ dd {
     max-width: 335.5px;
 }
 
-#Etiquetas_Actuales,
-#Etiquetas ,
+
+#Titulo_Receta{
+    padding-top: 0;
+}
+
 #contHeaderSeguimientos,
 #HeaderTags{
     display: flex;
@@ -950,44 +987,6 @@ dd {
     padding: 5px;
 }
 
-.Etiqueta {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
-    /* background-color: #249DD9; */
-    background-color: #004368;
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    gap: 5px;
-    cursor: pointer;
-}
-
-.Etiqueta.Activa {
-    /* background-color: #004368; */
-    background-color: #249DD9;
-}
-
-.Etiqueta p {
-    margin: 0;
-    white-space: nowrap;
-    /* Evita el salto de línea */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.Etiqueta p {
-    margin: 0;
-}
-
-.Eliminar-Etiqueta {
-    cursor: pointer;
-    background-color: hsl(0, 100%, 50%);
-    padding: 2px 6px 2px 6px;
-    font-size: 12px;
-    border-radius: 2px;
-}
 
 .Crear_padecimiento {
     display: flex;
@@ -1258,7 +1257,7 @@ form>h3 {
     margin-left: 45px;
 
 }
-.Historial_Seguimientos,.SeguimientoHoy{
+.Historial_Seguimientos,.SOAP{
     border-radius: 8px;
 }
 

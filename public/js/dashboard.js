@@ -1,3 +1,11 @@
+InfoSesion = $.ajax({
+  url: "/InfoSesion",
+  method: "POST",
+  dataType: "json",
+}).then(function (response) {
+  return response;
+});
+
 //==================================================================================================
 // Funciones Auxiliares
 //==================================================================================================
@@ -53,6 +61,7 @@ function getPacientePath(ruta, relativa) {
 
 // Funcion para crear la seccion de informacion
 function createInfoSection(infoArr, parentDiv) {
+  // Formato Array: [{TituloInfo: "Titulo", SourceInfo: [...]}, ...]
   infoArr.forEach((Info) => {
     const CitaInfo = document.createElement("div");
     CitaInfo.classList.add("CitaInfo");
@@ -60,6 +69,116 @@ function createInfoSection(infoArr, parentDiv) {
     const TituloInfoPaciente = document.createElement("span");
     TituloInfoPaciente.classList.add("TituloInfoCita");
     TituloInfoPaciente.textContent = Info.TituloInfo;
+
+    if (Info.TituloInfo == "Consultorio" && Array.isArray(Info.SourceInfo)) {
+      const DatoInfoPaciente = document.createElement("span");
+      DatoInfoPaciente.classList.add("DatoInfoCita");
+      const select = document.createElement("select");
+      select.classList.add("SelectConsultorios");
+      select.id = "SelectConsultorios";
+      Info.SourceInfo.forEach((opcion) => {
+        var option = document.createElement("option");
+        option.value = opcion.idConsultorio;
+        option.text = opcion.NombreConsultorio;
+        select.appendChild(option);
+      });
+
+      DatoInfoPaciente.appendChild(select);
+      CitaInfo.appendChild(TituloInfoPaciente);
+      CitaInfo.appendChild(DatoInfoPaciente);
+      parentDiv.appendChild(CitaInfo);
+
+      return;
+    }
+
+    if (Array.isArray(Info.SourceInfo)) {
+      if (Info.SourceInfo.length >= 2) {
+        const boton = document.createElement("div");
+        boton.textContent = "Ver más";
+        boton.classList.add("tooltip-button");
+
+        const tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        Info.SourceInfo.forEach((element) => {
+          const dato = document.createElement("li");
+
+          if (
+            Info.SourceInfo.every((elemento) => typeof elemento === "string")
+          ) {
+            dato.textContent = element;
+          } else if (
+            Info.SourceInfo.every((elemento) => typeof elemento === "object")
+          ) {
+            dato.textContent = element.Procedimiento;
+          }
+
+          tooltip.appendChild(dato);
+        });
+
+        // Establecer los estilos del tooltip
+        tooltip.style.background = "#333";
+        tooltip.style.color = "white";
+        tooltip.style.padding = "4px 8px";
+        tooltip.style.fontWeight = "bold";
+        tooltip.style.borderRadius = "4px";
+        tooltip.style.display = "none";
+        tooltip.style.zIndex = "3";
+
+        const popperInstance = Popper.createPopper(boton, tooltip, {
+          placement: "bottom",
+          modifiers: [
+            {
+              name: "arrow",
+              options: {
+                element: "[data-popper-arrow]",
+                padding: 8,
+              },
+            },
+          ],
+        });
+        function show() {
+          tooltip.style.display = "block";
+          popperInstance.update();
+        }
+
+        function hide() {
+          tooltip.style.display = "none";
+        }
+
+        const showEvents = ["mouseenter", "focus"];
+        const hideEvents = ["mouseleave", "blur"];
+
+        showEvents.forEach((event) => {
+          boton.addEventListener(event, show);
+        });
+
+        hideEvents.forEach((event) => {
+          boton.addEventListener(event, hide);
+        });
+        CitaInfo.appendChild(TituloInfoPaciente);
+        CitaInfo.appendChild(boton);
+        CitaInfo.appendChild(tooltip);
+        parentDiv.appendChild(CitaInfo);
+        return;
+      }else{
+        const DatoInfoPaciente = document.createElement("span");
+        DatoInfoPaciente.classList.add("DatoInfoCita");
+        if (
+          Info.SourceInfo.every((elemento) => typeof elemento === "string")
+        ) {
+          DatoInfoPaciente.textContent = Info.SourceInfo;
+        } else if (
+          Info.SourceInfo.every((elemento) => typeof elemento === "object")
+        ) {
+
+          DatoInfoPaciente.textContent = Info.SourceInfo[0].Procedimiento;
+        }
+        CitaInfo.appendChild(TituloInfoPaciente);
+        CitaInfo.appendChild(DatoInfoPaciente);
+        parentDiv.appendChild(CitaInfo);
+        return;
+      }
+    }
 
     const DatoInfoPaciente = document.createElement("span");
     DatoInfoPaciente.classList.add("DatoInfoCita");
@@ -76,24 +195,24 @@ function createInfoSection(infoArr, parentDiv) {
 function CrearBotonDeAccion(Paciente) {
   // console.log(Paciente);
   const Boton = document.createElement("button");
-  
+
   let claseBoton;
   if (!Paciente.idSesion) {
-    claseBoton = Paciente.StatusPaciente === 3 ? "BotonFinalizar" : "BotonPedir";
+    claseBoton =
+      Paciente.StatusPaciente === 3 ? "BotonFinalizar" : "BotonPedir";
   } else {
     claseBoton = "BotonFinalizar";
   }
   Boton.classList.add(claseBoton);
-  
+
   if (Paciente.idSesion) {
     Boton.textContent = "Finalizar";
   } else {
     Boton.textContent = Paciente.StatusPaciente === 3 ? "Finalizar" : "Pedir";
   }
-  
+
   return Boton;
 }
-
 
 //==================================================================================================
 // Funcion para el menu de opciones
@@ -106,7 +225,6 @@ function Accion_Paciente(datos) {
   const protocoloTitulo = {
     Pedir: "Pedir Paciente",
     Finalizar: "Finalizar Paciente",
-    Asignar: "Asignar Paciente",
     CheckIn: "Confirmar CheckIn",
     UpdateFinalizar: "Actualizar CheckOut",
   };
@@ -118,7 +236,6 @@ function Accion_Paciente(datos) {
   const protocoloMensajes = {
     Pedir: `Estas a punto de pedir a ${datos.Nombre} para realizarle una ${datos.Procedimiento}.`,
     Finalizar: `Este es el checkout de ${datos.Nombre} por la ${datos.Procedimiento} (de requerirse, por favor indica cargos adicionales).`,
-    Asignar: `Estas a punto de asignar a ${datos.NombreP} a un consultorio con ${datos.NombreD} para su cita de las ${datos.HoraCita}.`,
     CheckIn: `Confirmacion de asistencia de ${datos.Nombre}. ¿Quieres confirmar su asistencia?`,
     UpdateFinalizar: `Actualiza el Checkout de ${datos.Nombre} por la ${datos.Procedimiento} (de requerirse, por favor indica cargos adicionales).`,
   };
@@ -174,14 +291,7 @@ function Accion_Paciente(datos) {
   ImagenPaciente.src = datos.RutaFoto;
   // Cambiar por datos.Apellidos
   ApellidosPaciente.textContent = datos.Apellido;
-  if (datos.Protocolo === "Asignar") {
-    // Cambiar por datos.Nombre
-    NombrePaciente.textContent = datos.NombreP;
-    // Cambiar por datos.RutaFoto
-    ImagenPaciente.src = datos.RutaFotoP;
-    // Cambiar por datos.Apellidos
-    ApellidosPaciente.textContent = datos.ApellidoP;
-  }
+
 
   HeaderInfoPaciente.appendChild(NombrePaciente);
   HeaderInfoPaciente.appendChild(ApellidosPaciente);
@@ -212,12 +322,12 @@ function Accion_Paciente(datos) {
       break;
 
     case "CheckIn":
-      if (datos.idDoctor){
+      if (datos.idDoctor) {
         InfoLlegadaPaciente.push({
           TituloInfo: "Doctor",
           SourceInfo: datos.Doctor || "- -",
         });
-      }else{
+      } else {
         InfoLlegadaPaciente.push({
           TituloInfo: "Asociado",
           SourceInfo: datos.Asociado || "- -",
@@ -225,17 +335,6 @@ function Accion_Paciente(datos) {
       }
       break;
 
-    case "Asignar":
-      InfoLlegadaPaciente.pop();
-      InfoLlegadaPaciente.push({
-        TituloInfo: "Doctor",
-        SourceInfo: datos.NombreD || "- -",
-      });
-      InfoLlegadaPaciente.push({
-        TituloInfo: "Consultorio Pedido",
-        SourceInfo: datos.Consultorio || "- -",
-      });
-      break;
 
     case "UpdateFinalizar":
       InfoLlegadaPaciente.push({
@@ -250,41 +349,9 @@ function Accion_Paciente(datos) {
 
   console.log("Datos pasados a la funcion");
   console.log(datos);
+  console.log(InfoLlegadaPaciente);
 
-  InfoLlegadaPaciente.forEach((Info) => {
-    var CitaInfo = document.createElement("div");
-    CitaInfo.classList.add("CitaInfo");
-
-    var TituloInfoPaciente = document.createElement("span");
-    TituloInfoPaciente.classList.add("TituloInfoCita");
-    TituloInfoPaciente.textContent = Info.TituloInfo;
-
-    var DatoInfoPaciente = document.createElement("span");
-    DatoInfoPaciente.classList.add("DatoInfoCita");
-
-    if (Array.isArray(Info.SourceInfo)) {
-      // Si SourceInfo es un array, crea una lista desplegable
-      var select = document.createElement("select");
-      select.classList.add("SelectConsultorios");
-      select.id = "SelectConsultorios";
-      Info.SourceInfo.forEach((opcion) => {
-        var option = document.createElement("option");
-        option.value = opcion.idConsultorio;
-        option.text = opcion.NombreConsultorio;
-        select.appendChild(option);
-      });
-
-      DatoInfoPaciente.appendChild(select);
-    } else {
-      // Si SourceInfo no es un array, muestra el valor directamente
-      DatoInfoPaciente.textContent = Info.SourceInfo;
-    }
-
-    CitaInfo.appendChild(TituloInfoPaciente);
-    CitaInfo.appendChild(DatoInfoPaciente);
-
-    ElementoPaciente.appendChild(CitaInfo);
-  });
+  createInfoSection(InfoLlegadaPaciente, ElementoPaciente);
 
   const Opciones = document.getElementById("Opciones");
 
@@ -325,31 +392,23 @@ function Accion_Paciente(datos) {
       case "Pedir":
         // Asi se obtiene el valor del consultorio elegido
         var idConsultorio = document.getElementById("SelectConsultorios").value;
-        console.log(idConsultorio);
-        socket.emit("PedirPaciente", {
-          Cita: datos.idCita,
-          idConsultorio: idConsultorio,
-        });
-        // Y limpiamos la vista
-        contenedor.style.visibility = "hidden";
-        contenedor.style.opacity = "0";
-        // Cambiamos el color del paciente en la lista de espera a verde (ya fue pedido o en consulta)
-        // esto lo hacemos con el id del paciente y realizando la busqueda en un area determinada
-        // para evitar problemas con pacientes que tengan el mismo id
-        const cont_p_espera = document.querySelector(".PacientesEnEspera");
-        const idPacienteString = String(datos.idPaciente); // Convertir a cadena
-        const idEscapado = idPacienteString.replace(/^(\d)/, '\\3$1 '); // Escapar si comienza con un número
-        const elemento = cont_p_espera.querySelector("#" + idEscapado);
 
-        elemento.classList.remove("ATiempo", "Tarde");
-        elemento.classList.add("EnConsulta");
-        
+        socket.emit("CambioEstadoPaciente", {
+          idCita: datos.idCita,
+          idStatus: 2,
+          idConsultorio: idConsultorio,
+          idDoctor: datos.idDoctor,
+          idPaciente: datos.idPaciente,
+        });
+
+        window.location.href = "/InfoPaciente/" + datos.idPaciente;
+
         break;
       case "Finalizar":
         // Asi se obtiene el valor del checkout
         var valorCheckout = document.getElementById("valorCheckout").value;
         console.log(valorCheckout);
-        if(valorCheckout !=""){
+        if (valorCheckout != "") {
           socket.emit("CambioEstadoPaciente", {
             idCita: datos.idCita,
             idStatus: 3,
@@ -361,7 +420,7 @@ function Accion_Paciente(datos) {
           // Y limpiamos la vista
           contenedor.style.visibility = "hidden";
           contenedor.style.opacity = "0";
-        }else{
+        } else {
           alert("Por favor ingresa un valor en el checkout");
         }
         break;
@@ -377,41 +436,18 @@ function Accion_Paciente(datos) {
         contenedor.style.visibility = "hidden";
         contenedor.style.opacity = "0";
         break;
-      case "Asignar":
-        if(datos.idDoctor){
-          socket.emit("CambioEstadoPaciente", {
-            idCita: datos.idCita,
-            idStatus: 2,
-            idConsultorio: datos.idConsultorio,
-            idDoctor: datos.idDoctor,
-            idProcedimiento: datos.idProcedimiento,
-            idPaciente: datos.idPaciente,
-          });
-        }else{
-          socket.emit("CambioEstadoPaciente", {
-            idCita: datos.idCita,
-            idStatus: 2,
-            idConsultorio: idConsultorio,
-            idAsociado: datos.idAsociado,
-            idProcedimiento: datos.idProcedimiento,
-            idPaciente: datos.idPaciente,
-          });
-        }
-        // Y limpiamos la vista
-        contenedor.style.visibility = "hidden";
-        contenedor.style.opacity = "0";
-        break;
+
       case "UpdateFinalizar":
         // Asi se obtiene el valor del checkout
         var valorCheckout = document.getElementById("valorCheckout").value;
         console.log("Se actualizó el checkout de", datos.Nombre, "a:");
         console.log(valorCheckout);
-        if(valorCheckout !=""){
+        if (valorCheckout != "") {
           socket.emit("Update_Checkout", {
             idSesion: datos.idSesion,
             CheckOut: valorCheckout,
           });
-        }else{
+        } else {
           alert("Por favor ingresa un valor en el checkout");
         }
         // Y limpiamos la vista

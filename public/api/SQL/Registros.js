@@ -154,6 +154,8 @@ export async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
       busqueda = busqueda.slice(0, -3);
     }
 
+    busqueda += ` LIMIT 15;`;
+
     // Ejecuta la consulta SQL con los parámetros
     const [resBusqueda] = await connection.execute(busqueda, params);
 
@@ -191,7 +193,7 @@ export async function NuevoPadecimiento(idArea, Padecimiento) {
     const query = `INSERT INTO Padecimientos (idArea,Padecimiento) VALUES (?,?)`;
     const [result] = await connection.execute(query, [idArea, Padecimiento]);
     connection.end();
-    return result.insertId;
+    return { id: result.insertId, text: Padecimiento };
   } catch (error) {
     console.error("Ha ocurrido un error creando el padecimiento: ", error);
     return "Ha ocurrido un error.";
@@ -201,7 +203,12 @@ export async function NuevoPadecimiento(idArea, Padecimiento) {
 export async function Buscar_Padecimiento(Padecimiento) {
   try {
     const connection = await mysql.createConnection(db);
-    const query = `SELECT * FROM Padecimientos WHERE Padecimiento LIKE ?`;
+    const query = `SELECT p.idPadecimiento,p.idArea,p.Padecimiento, a.Area  
+    FROM Padecimientos p
+    LEFT JOIN Areas a ON p.idArea = a.idAreas 
+    WHERE p.Padecimiento LIKE ?
+    LIMIT 5;
+    `;
     const [result] = await connection.execute(query, [`%${Padecimiento}%`]);
 
     connection.end();
@@ -239,46 +246,120 @@ export async function Buscar_Padecimiento(Padecimiento) {
 //   }
 // }
 
-
-
-export async function Crear_Seguimiento(idSesion,Seguimiento, idPadecimiento) {
+export async function Crear_Seguimiento(Body, HoraS1, HoraS2) {
   try {
     const connection = await mysql.createConnection(db);
 
-    const query = `INSERT INTO Seguimientos
-    (idPadecimiento,Seguimiento)
-    VALUES(?, ?);`;
+    // Definimos la hora de seguimiento
+    let HoraSeguimiento = HoraS1;
+    // En caso de que exista una sesion acitva, se obtiene la sucursal de la cita
+    // y se pone la hora de seguimiento correspondiente
+    if (Body.idSesion) {
+      const querySucursal = `SELECT c.idSucursal
+      FROM Sesion s
+      LEFT JOIN Citas c ON c.idCitas = s.idCitas
+      WHERE s.idSesion = ?;`;
+      // Obtenemos la Sucursal de la cita
+      const [Sucursal] = await connection.execute(querySucursal, [
+        Body.idSesion,
+      ]);
+      console.log("Sucursal:", Sucursal);
+      console.log("Sucursal[0].idSucursal:", Sucursal[0].idSucursal);
+      switch (Sucursal[0].idSucursal) {
+        case 1:
+          HoraSeguimiento = HoraS1;
+          break;
+        case 2:
+          HoraSeguimiento = HoraS2;
+          break;
+        default:
+          HoraSeguimiento = HoraS1;
+          break;
+      }
+    }
 
-    const [result] = await connection.execute(query, [idPadecimiento,Seguimiento]);
-    const idSeguimiento = result.insertId;
 
-    const query2 = `INSERT INTO Seguimientos_Sesion
-    (idSesion, idSeguimientos)
-    VALUES(?, ?);`;
+    var date = new Date();
+    const formatDate = (date) => {
+      let formatted_date =
+        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+      return formatted_date;
+    };
 
+    const HoraFinal = formatDate(date) + " " + HoraSeguimiento;
 
-    await connection.execute(query2, [idSesion, idSeguimiento]);
+    // Insertamos el seguimiento
+    const queryCrear_Seguimiento = `INSERT INTO Seguimientos
+    ( idDoctor, idPaciente, idSesion, Subjetivo, Objetivo, Fecha)
+    VALUES(?, ?, ?, ?, ?, ?);`;
+    const [result] = await connection.execute(queryCrear_Seguimiento, [
+      Body.idDoctor,
+      Body.idPaciente,
+      Body.idSesion || null,
+      Body.Subjetivo,
+      Body.Objetivo,
+      HoraFinal,
+    ]);
+
+    const queryInsertPadecimientos = `INSERT INTO Padecimientos_Seguimientos
+    (idPadecimientos, idSeguimientos)
+    VALUES( ?, ?);`;
+
+    // Accede a la propiedad idPadecimientos[]
+    const Padecimientos = Body["idPadecimientos[]"];
+    console.log("Padecimientos:", Padecimientos);
+    // Se tiene que evaluar si es un array o un valor único
+    if (!Array.isArray(Padecimientos)) {
+      // Si es un valor único, hacemos solo una inserción
+      await connection.execute(queryInsertPadecimientos, [
+        Padecimientos,
+        result.insertId,
+      ]);
+    } else {
+      // Si es un array, hacemos un foreach para insertar cada padecimiento
+      Padecimientos.forEach(async (idPadecimiento) => {
+        await connection.execute(queryInsertPadecimientos, [
+          idPadecimiento,
+          result.insertId,
+        ]);
+      });
+    }
 
     connection.end();
 
-    return idSeguimiento;
+    return "Se ha creado el seguimiento.";
   } catch (error) {
     console.error("Ha ocurrido un error creando el seguimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
+// export async function Update_Seguimiento(idSeguimiento,Seguimiento) {
+//   try {
+//     const connection = await mysql.createConnection(db);
 
+//     const query = `UPDATE Seguimientos
+//     SET Seguimiento = ?
+//     WHERE idSeguimientos = ?;`;
 
-export async function Update_Seguimiento(idSeguimiento,Seguimiento) {
+//     await connection.execute(query, [Seguimiento,idSeguimiento]);
+//     connection.end();
+//     return "Se ha actualizado el seguimiento.";
+//   } catch (error) {
+//     console.error("Ha ocurrido un error creando el seguimiento: ", error);
+//     return "Ha ocurrido un error.";
+//   }
+// }
+
+export async function Update_Subjetivo(idSeguimiento, Valor) {
   try {
     const connection = await mysql.createConnection(db);
 
     const query = `UPDATE Seguimientos
-    SET Seguimiento = ?
+    SET Subjetivo = ?
     WHERE idSeguimientos = ?;`;
 
-    await connection.execute(query, [Seguimiento,idSeguimiento]);
+    await connection.execute(query, [Valor, idSeguimiento]);
     connection.end();
     return "Se ha actualizado el seguimiento.";
   } catch (error) {
@@ -287,41 +368,25 @@ export async function Update_Seguimiento(idSeguimiento,Seguimiento) {
   }
 }
 
-export async function Delete_Seguimiento(idSeguimiento) {
+export async function Update_Objetivo(idSeguimiento, Valor) {
   try {
     const connection = await mysql.createConnection(db);
 
-    const query = `DELETE FROM Seguimientos
+    const query = `UPDATE Seguimientos
+    SET Objetivo = ?
     WHERE idSeguimientos = ?;`;
 
-    const query2 = `DELETE FROM Seguimientos_Sesion
-    WHERE idSeguimientos = ?;
-    `;
-
-    await connection.execute(query2, [idSeguimiento]);
-    await connection.execute(query, [idSeguimiento]);
+    await connection.execute(query, [Valor, idSeguimiento]);
     connection.end();
-    return "Se ha eliminado el seguimiento.";
+    return "Se ha actualizado el seguimiento.";
   } catch (error) {
     console.error("Ha ocurrido un error creando el seguimiento: ", error);
     return "Ha ocurrido un error.";
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 //==================================================================================================
-// Updates estados Pacientes 
+// Updates estados Pacientes
 //==================================================================================================
 
 export async function ActualizarAntecedentesPaciente(
@@ -342,7 +407,12 @@ export async function ActualizarAntecedentesPaciente(
   }
 }
 
-export async function ActualizarDatosGenerales( id, Propiedad, Valor, TipodeUsuario) {
+export async function ActualizarDatosGenerales(
+  id,
+  Propiedad,
+  Valor,
+  TipodeUsuario
+) {
   // Actualiza la informacion del usuario basados en el tipo de usuario
   const tablas = [
     "SuperAdmin",
@@ -356,7 +426,11 @@ export async function ActualizarDatosGenerales( id, Propiedad, Valor, TipodeUsua
   // Validación de TipodeUsuario
   const tipoUsuarioIndex = parseInt(TipodeUsuario) - 2;
 
-  if (isNaN(tipoUsuarioIndex) || tipoUsuarioIndex < 0 || tipoUsuarioIndex >= tablas.length) {
+  if (
+    isNaN(tipoUsuarioIndex) ||
+    tipoUsuarioIndex < 0 ||
+    tipoUsuarioIndex >= tablas.length
+  ) {
     console.error("Tipo de usuario inválido.");
     return "Tipo de usuario inválido.";
   }

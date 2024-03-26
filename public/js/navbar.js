@@ -3,6 +3,14 @@
 // ================================================================================
 let socket = io();
 
+// Configuración de opciones de Socket.IO del lado del cliente
+socket.io.opts.reconnection = true;
+socket.io.opts.reconnectionAttempts = 5;
+socket.io.opts.reconnectionDelay = 1000;
+socket.io.opts.reconnectionDelayMax = 5000;
+
+
+
 // ================================================================================
 // Logo Carga
 $(window).on("load", function () {
@@ -235,7 +243,6 @@ async function CrearItemsNavBar(ClaseUsuario) {
 // ==================================================================================================
 // Una vez que se cree con exito el documeto se ejecutara el codigo
 // ==================================================================================================
-
 $(document).ready(function () {
   // Crear el contenido HTML que se insertará en el div DropMenu
   var contenidoHTML = `
@@ -263,55 +270,50 @@ $(document).ready(function () {
   dropMenu.innerHTML = contenidoHTML;
 
 
-// ==================================================================================================
-// Realizamos peticiones para llenar en contenido del Sitio Web
-// ==================================================================================================
-  // Pedimos los datos del sistema
-  fetch("/DatosSistema", {
-    method: "POST", // Especificamos que la petición sea de tipo POST
-  })
-    .then((response) => response.json())
-    .then((dataSistema) => {
-      // Y pedimos los datos de la sesion
-      fetch("/InfoSesion", {
-        method: "POST", // Especificamos que la petición sea de tipo POST
-      })
-        .then((response) => response.json())
-        .then((dataSession) => {
-          // Generacion  del saludo para todos los usuarios
-          const saludo = document.querySelector(".saludo");
-          if (saludo) {
-            saludo.textContent = "¡"+dataSistema.Saludo+" "+dataSession.Nombre+"!";
-          }
-          // Actualizar el h2 con el Nombre del Usuario
-          var NombreH2 = document.getElementById("Nombre");
-          NombreH2.textContent = dataSession.Nombre;
-          // Actualizar el h2 con el Nombre del Usuario
-          var TipUserB = document.getElementById("TipUser");
-          TipUserB.textContent = dataSession.TipUser;
-        })
-        .catch((error) => {
-          console.error("Error en la petición Ajax en /InfoSesion:", error);
-        });
-
-      // Actualizar el contenido del span con el Nombre de la Empresa
-      var empresaSpan = document.getElementById("Empresa");
-      empresaSpan.textContent = dataSistema.Empresa;
-      //Y creamos el Footer
-      const Footer = document.querySelector(".footer");
-      if (Footer) {
-        const b = document.createElement("b");
-        const text = document.createTextNode(
-          dataSistema.Copy + " " + dataSistema.Empresa + " " + dataSistema.Año + " " + dataSistema.Ver
-        );
-        b.appendChild(text);
-        Footer.appendChild(b);
+  // Primera petición Ajax a /DatosSistema
+$.ajax({
+  url: "/DatosSistema",
+  method: "POST",
+  dataType: "json",
+  success: function(dataSistema) {
+    // Segunda petición Ajax a /InfoSesion
+    $.ajax({
+      url: "/InfoSesion",
+      method: "POST",
+      dataType: "json",
+      success: function(dataSession) {
+        // Generacion del saludo para todos los usuarios
+        const saludo = $(".saludo");
+        if (saludo.length) {
+          saludo.text("¡" + dataSistema.Saludo + " " + dataSession.Nombre + "!");
+        }
+        // Actualizar el h2 con el Nombre del Usuario
+        $("#Nombre").text(dataSession.Nombre);
+        // Actualizar el h2 con el Tipo de Usuario
+        $("#TipUser").text(dataSession.TipUser);
+      },
+      error: function(xhr, status, error) {
+        console.error("Error en la petición Ajax en /InfoSesion:", error);
       }
-    })
-    .catch((error) => {
-      console.error("Error en la petición Ajax en /DatosSistema:", error);
     });
 
+    // Actualizar el contenido del span con el Nombre de la Empresa
+    $("#Empresa").text(dataSistema.Empresa);
+
+    // Crear el Footer
+    const footer = $(".footer");
+    if (footer.length) {
+      const b = $("<b>").text(dataSistema.Copy + " " + dataSistema.Empresa + " " + dataSistema.Año + " " + dataSistema.Ver);
+      footer.append(b);
+    }
+  },
+  error: function(xhr, status, error) {
+    console.error("Error en la petición Ajax en /DatosSistema:", error);
+  }
+});
+
+  
+    
 
 
   // ==================================================================================================
@@ -353,37 +355,37 @@ $(document).ready(function () {
   // Sesiones del Socket.IO
   // ==================================================================================================
 
-  // Nos aseguramos de que se cierre sesion en el socket al cerrar sesion en el sitio web
-  const BotonEnd = document.getElementById("CerrarSesion");
-  if (BotonEnd) {
-    BotonEnd.addEventListener("click", (event) => {
-      event.preventDefault();
-      socket.disconnect(); // Desconecta el socket
-      console.log("Sesión de Socket.IO cerrada");
-      // Para posterioremente borrar las Cookies de la sesion
-      window.location.href = "/logout";
-    });
-  }
+  // // Nos aseguramos de que se cierre sesion en el socket al cerrar sesion en el sitio web
+  // const BotonEnd = document.getElementById("CerrarSesion");
+  // if (BotonEnd) {
+  //   BotonEnd.addEventListener("click", (event) => {
+  //     event.preventDefault();
+  //     socket.disconnect(); // Desconecta el socket
+  //     console.log("Sesión de Socket.IO cerrada");
+  //     // Para posterioremente borrar las Cookies de la sesion
+  //     window.location.href = "/logout";
+  //   });
+  // }
 
-  // Cerramos la sesion temporalmente al crear un nuevo usuario
-  const NuevoPaciente = document.getElementById("NuevoPaciente");
-  if (NuevoPaciente) {
-    NuevoPaciente.addEventListener("click", (event) => {
-      window.location.href = "/NuevoPaciente";
-    });
-  }
+  // // Cerramos la sesion temporalmente al crear un nuevo usuario
+  // const NuevoPaciente = document.getElementById("NuevoPaciente");
+  // if (NuevoPaciente) {
+  //   NuevoPaciente.addEventListener("click", (event) => {
+  //     window.location.href = "/NuevoPaciente";
+  //   });
+  // }
 });
 
 // Y desconcectamos al usuario del socket al cerrar la ventana
-window.addEventListener("beforeunload", function (event) {
-  socket.disconnect();
-});
+// window.addEventListener("beforeunload", function (event) {
+//   socket.disconnect();
+// });
 
-// Verificar si estamos en la página /Dashboard o en alguna página que comience con /InfoPaciente/ seguido de un número
-if (window.location.href.indexOf("/Dashboard") === -1 && !window.location.href.match(/\/InfoPaciente\/\d+$/)) {
-  // Si no estamos en ninguna de esas páginas, desconectar el socket
-  socket.disconnect();
-}
+// // Verificar si estamos en la página /Dashboard o en alguna página que comience con /InfoPaciente/ seguido de un número
+// if (window.location.href.indexOf("/Dashboard") === -1 && !window.location.href.match(/\/InfoPaciente\/\d+$/)) {
+//   // Si no estamos en ninguna de esas páginas, desconectar el socket
+//   socket.disconnect();
+// }
 
 
 

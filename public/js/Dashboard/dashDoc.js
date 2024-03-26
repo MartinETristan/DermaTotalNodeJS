@@ -33,11 +33,9 @@ function PacientesEnEspera(datos) {
 
         // Condicionales para determinar la clase del paciente
         ElementoPaciente.classList.add("Paciente");
-        if (Paciente.HoraLlegada) {
-          ElementoPaciente.classList.add(
-            Paciente.HoraCita >= Paciente.HoraLlegada ? "ATiempo" : "Tarde"
-          );
-        }
+      
+        Paciente.HoraCita >= Paciente.HoraLlegada ? ElementoPaciente.classList.add("ATiempo") : ElementoPaciente.classList.add("Tarde");
+
         if (Paciente.StatusPaciente === 3) {
           ElementoPaciente.classList.remove("ATiempo", "Tarde");
           ElementoPaciente.classList.add("EnConsulta");
@@ -70,6 +68,8 @@ function PacientesEnEspera(datos) {
         ContenedorBotones.appendChild(Boton);
         ElementoPaciente.appendChild(ContenedorBotones);
 
+        console.log(Paciente);
+
         // Event listeners para el boton de accion
         Boton.addEventListener("click", function (event) {
           if (Paciente.StatusPaciente === 3 ||Paciente.idSesion) {
@@ -85,7 +85,7 @@ function PacientesEnEspera(datos) {
               Nombre: Paciente.NombresPacientes,
               Apellido: Paciente.ApellidosPacientes,
               HoraCita: Paciente.HoraCita,
-              Procedimiento: Paciente.Procedimiento,
+              Procedimiento: Paciente.Procedimientos,
               RutaFoto: rutaRelativa,
               Consultorio: Paciente.Consultorio,
               PrecioSugerido: Paciente.PrecioProcedimineto,
@@ -100,11 +100,12 @@ function PacientesEnEspera(datos) {
               idPaciente: Paciente.idPaciente,
               idStatusPaciente: Paciente.idStatusPaciente,
               idCita: Paciente.idCita,
+              idDoctor: Paciente.idDoctor,
               idSucursal: Paciente.idSucursal,
               Nombre: Paciente.NombresPacientes,
               Apellido: Paciente.ApellidosPacientes,
               HoraCita: Paciente.HoraCita,
-              Procedimiento: Paciente.Procedimiento,
+              Procedimiento: Paciente.Procedimientos,
               RutaFoto: rutaRelativa,
               Nota: Paciente.Nota,
             };
@@ -181,7 +182,7 @@ function CitasHoy(datos) {
 
         var InfoLlegadaPaciente = [
           { TituloInfo: "Hora Cita", SourceInfo: Paciente.HoraCita },
-          { TituloInfo: "Procedimiento", SourceInfo: Paciente.Procedimiento },
+          { TituloInfo: "Procedimiento", SourceInfo: Paciente.Procedimientos },
         ];
 
         ElementoPaciente.dataset.idPaciente = Paciente.idPaciente;
@@ -282,11 +283,12 @@ function OtrosConsultorios(datos) {
               Protocolo: "Pedir",
               idStatusPaciente: Paciente.idStatusPaciente,
               idCita: Paciente.idCita,
+              idDoctor: Paciente.idDoctor,
               idSucursal: Paciente.idSucursal,
               Nombre: Paciente.Nombres,
               Apellido: Paciente.Apellidos,
               HoraCita: Paciente.HoraCita,
-              Procedimiento: Paciente.Procedimiento,
+              Procedimiento: Paciente.Procedimientos,
               RutaFoto: rutaRelativa,
               Nota: Paciente.Nota,
             };
@@ -391,7 +393,7 @@ function CitasFinalizadas(datos) {
             Nombre: Paciente.NombresPacientes,
             Apellido: Paciente.ApellidosPacientes,
             HoraCita: Paciente.HoraCita,
-            Procedimiento: Paciente.Procedimiento,
+            Procedimiento: Paciente.Procedimientos,
             RutaFoto: rutaRelativa,
             Consultorio: Paciente.Consultorio,
             PrecioSugerido: Paciente.PrecioProcedimineto,
@@ -435,6 +437,7 @@ $.ajax({
   method: "POST",
   dataType: "json",
   success: function (respuesta) {
+    console.log(respuesta);
     PacientesEnEspera(respuesta.PacientesEspera);
     CitasHoy(respuesta.CitasHoy);
     OtrosConsultorios(respuesta.OtrosConsultorios);
@@ -488,6 +491,7 @@ function Actualizar_OC_Espera() {
     dataType: "json",
     success: function (respuesta) {
       PacientesEnEspera(respuesta.PacientesEspera);
+      OtrosConsultorios(respuesta.OtrosConsultorios);
     },
     error: function (error) {
       console.error(error);
@@ -631,6 +635,12 @@ socket.on("Consulta_CheckOut", function (data) {
 // Actualizar Otros consultorios
 socket.on("OtrosConsultorios", function (data) {
   Actualizar_OC();
+});
+
+// Actualizar Otros consultorios y Espera
+socket.on("OC_Espera", function (data) {
+  Actualizar_OC_Espera();
+  NuevoAudio(2);
 });
 
 // Actualizar El CheckOut

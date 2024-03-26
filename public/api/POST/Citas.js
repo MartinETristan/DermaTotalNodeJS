@@ -50,7 +50,7 @@ router.post("/ActualizarCita", async (req, res) => {
 });
 
 // Ver la agenda del medico en especifico (idDoctor o idAsociado)
-router.post("/AgendaMedico", async (peticion, respuesta) => {
+router.post("/Agenda_Citas", async (peticion, respuesta) => {
   if (peticion.session.idusuario) {
     const Agenda = await API_Citas.CitasMedico(
       peticion.body.idDoctor,

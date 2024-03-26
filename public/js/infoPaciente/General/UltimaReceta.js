@@ -7,12 +7,13 @@ function cargarUltimaReceta() {
     // Activamos el DranNDrop
     DragNDrop();
   } else {
-    document.getElementById("Receta_actual").innerHTML = "";
-    const doctor = document.getElementById("Doctor");
-    doctor.style.display = "block";
-    doctor.textContent = "No hay recetas registradas.";
-    const botones = document.querySelector(".Botones");
-    botones.style.display = "none";
+    document.getElementById("RA").style.display = "none";
+    // document.getElementById("Receta_actual").innerHTML = "";
+    // const doctor = document.getElementById("Doctor");
+    // doctor.style.display = "block";
+    // doctor.textContent = "No hay recetas registradas.";
+    // const botones = document.querySelector(".Botones");
+    // botones.style.display = "none";
   }
 
   agregarEventListener("EditarUltimaReceta", function () {
@@ -401,16 +402,28 @@ function compareData(original, form) {
       "¿Estas seguro de guardar los cambios? Estos cambios pueden alterar el orden, medicamentos o indicaciones para el paciente."
     );
     if (respuesta) {
-      fetch("/CambiosReceta", {
+      $.ajax({
+        url: "/CambiosReceta",
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        contentType: "application/json",
+        data: JSON.stringify({
           Cambios: changes,
         }),
+        success: function(response) {
+          console.log("Petición exitosa:", response);
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          console.error("Error en la petición:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error al guardar los cambios",
+            text: `Por favor, intente de nuevo. Error: ${error}`,
+          });
+          // Manejar el error aquí
+        }
       });
-      location.reload();
+      
     } else {
       resetUI();
       return null;

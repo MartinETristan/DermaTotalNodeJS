@@ -3,8 +3,6 @@
 //==================================================================================================
 
 function PacientesHoy(datos) {
-  console.log("Datos de Pacientes Hoy");
-  console.log(datos);
   const elementosPorPagina = 3;
 
   const CitasHoy = document.querySelector(".CitasHoy");
@@ -60,8 +58,6 @@ function PacientesHoy(datos) {
           Boton.classList.add("BotonPedir");
           Boton.textContent = "CheckIn";
           Boton.addEventListener("click", function (event) {
-            console.log("Informacion del Paciente Clickado:");
-            console.log(Paciente);
             DatosPaciente = {
               Protocolo: "CheckIn",
               idStatusPaciente: 1,
@@ -74,7 +70,7 @@ function PacientesHoy(datos) {
               Nombre: Paciente.NombresPacientes,
               Apellido: Paciente.ApellidosPacientes,
               HoraCita: Paciente.HoraCita,
-              Procedimiento: Paciente.Procedimiento,
+              Procedimiento: Paciente.Procedimientos,
               RutaFoto: rutaRelativa,
             };
             Accion_Paciente(DatosPaciente);
@@ -128,9 +124,6 @@ function PacientesHoy(datos) {
 //==================================================================================================
 
 function PacientesPedidos(datos) {
-  console.log("Datos de Pacientes Pedidos");
-  console.log(datos);
-
   const PacientesPedidosDiv = document.querySelector(".Pedidos");
   if (PacientesPedidosDiv) {
     PacientesPedidosDiv.innerHTML = "";
@@ -184,30 +177,13 @@ function PacientesPedidos(datos) {
         ContenedorBotones.classList.add("BotonesDeAccion");
         const Boton = document.createElement("button");
         Boton.classList.add("BotonPedir");
-        Boton.textContent = "Asignar";
+        Boton.textContent = "Descartar";
         Boton.addEventListener("click", function (event) {
           console.log("Informacion del Paciente Clickado:");
           console.log(Paciente);
-          DatosPaciente = {
-            Protocolo: "Asignar",
-            idStatusPaciente: 2,
-            idSucursal: Paciente.idSucursal,
-            idPaciente: Paciente.idPaciente,
-            idProcedimiento: Paciente.idProcedimiento,
-            idDoctor: Paciente.idDoctor,
+          socket.emit("Descartar_P_Pedido", {
             idCita: Paciente.idCitas,
-            idConsultorio: Paciente.idConsultorio,
-            NombreD: Paciente.NombreD,
-            NombreP: Paciente.NombreP,
-            ApellidoP: Paciente.ApellidoP,
-            ApellidoD: Paciente.ApellidoD,
-            HoraCita: Paciente.HoraCita,
-            Consultorio: Paciente.Cosultorio,
-            RutaFotoP: rutaRelativaPaciente,
-            RutaFotoD: rutaRelativaDoctor,
-            Procedimiento: Paciente.Procedimiento,
-          };
-          Accion_Paciente(DatosPaciente);
+          });
           event.stopPropagation();
         });
         ContenedorBotones.appendChild(Boton);
@@ -228,8 +204,6 @@ function PacientesPedidos(datos) {
 //==================================================================================================
 
 function PacientesFinalizados(datos) {
-  console.log("Datos de Pacientes Finalizados");
-  console.log(datos);
   const elementosPorPagina = 3; // Número de elementos por página
 
   // Vaciar el contenido anterior en el contenedor "PacientesFinalizados"
@@ -427,13 +401,13 @@ socket.on("P_Pedidos", function (data) {
   NuevoAudio(2);
 });
 
+//Limpiar Pedidos
+socket.on("Clean_P_Pedidos", function (data) {
+  ActualizarPedidos();
+});
+
 //Checkout
 socket.on("CheckOut", function (data) {
   ActualizarFinalizados();
   NuevoAudio(3);
-});
-
-//Sonido espera
-socket.on("Sonido", function (data) {
-  NuevoAudio(2);
 });
