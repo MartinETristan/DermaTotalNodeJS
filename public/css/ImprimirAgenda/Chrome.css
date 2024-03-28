@@ -1,0 +1,145 @@
+body {
+    margin: 0px 20px 0px 20px;
+    font-family: LouisGeorgeCafé, LiberationSerif, sans-serif;
+    /* background-color: red; */
+}
+
+
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 30px;
+    color: #a2a2a2;
+    margin-bottom: 10px;
+}
+
+.contLogo {
+    display: flex;
+    align-items: center;
+    width: 35%;
+    height: 75px;
+    overflow: hidden;
+}
+
+.Logo {
+    width: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+}
+
+
+
+.contTextHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: center;
+
+}
+
+.contTextHeader h1 {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+
+}
+
+.contTextHeader h2 {
+    font-size: 0.85em;
+    margin: 0;
+    padding: 0;
+
+}
+
+.contTextHeader h1,
+.contTextHeader h2 {
+    /* font-size: 1.5em; */
+    margin: 0;
+    padding: 0;
+}
+
+
+.contenido {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    /* background-color: BLUE; */
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    /* color: red; */
+    border-collapse: collapse;
+    border-spacing: 40px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.TituloTabla{
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
+    background-color: #191e2b;
+    border: 1px solid  #191e2b;
+    color: white;
+}
+
+table tr{
+    border: 1px solid #f2f2f2;
+}
+
+
+table th {
+    background-color: #f2f2f2;
+    color: #000;
+    padding: 8px;
+    font-size: 0.8em;
+}
+
+table td {
+    padding: 8px;
+    border: 3px solid #f2f2f2;
+    font-size: 0.8em;
+    
+}
+
+.Config{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    gap: 20px;
+}
+#EstadosCitas{
+    text-align: center;
+    width: 10%;
+}
+
+#PrintButton{
+    background: #29abe2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px 10px;
+  }
+  
+
+@media print {
+    .Config{
+        display: none;
+    }
+
+}

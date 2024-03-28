@@ -1,3 +1,22 @@
+// Obtencion de la informacion de las variables globales
+const InfoSesion = $.ajax({
+  url: "/InfoSesion",
+  method: "POST",
+  dataType: "json",
+  async: false,
+}).responseJSON;
+
+console.log(InfoSesion);
+
+const InfoSelects = $.ajax({
+  url: "/InfoRegistros",
+  type: "POST",
+  dataType: "json",
+  async: false,
+}).responseJSON;
+
+console.log(InfoSelects);
+
 //Animacion del NavBar para que desaparezca en cuanto baja el scroll
 var $navBar = $(".nav-bar");
 
@@ -19,17 +38,212 @@ $(window).scroll(function () {
 });
 
 // ====================================================================================================
-// Creacion de Calendario
+// Llenado de los selects de los doctores seleccionables
 // ====================================================================================================
 
-const InfoSesion = $.ajax({
-  url: "/InfoSesion",
-  method: "POST",
-  dataType: "json",
-  async: false,
-}).responseJSON;
+const SelectMedico = document.getElementById("SelectMedico");
 
-console.log(InfoSesion);
+// Creamos un objeto con las opciones de los doctores Disponibles
+const Medicos = {
+  Doctores: {},
+  Asociados: {},
+};
+// Realizamos un forEach para agregar las opciones de los doctores
+InfoSelects.Doctores.forEach((doctor) => {
+  Medicos.Doctores[doctor.idDoctor] = doctor.Nombres;
+});
+// Y los asociados
+InfoSelects.Asociados.forEach((asociado) => {
+  Medicos.Asociados[asociado.idAsociado] = asociado.Nombres;
+});
+// Generamos las opciones de los doctores y asociados
+OpcionesGrupos(Medicos.Doctores, "Doctores", SelectMedico);
+OpcionesGrupos(Medicos.Asociados, "Asociados", SelectMedico);
+
+function OpcionesGrupos(categoria, nombreCategoria, selectElement) {
+  const optgroup = document.createElement("optgroup");
+  optgroup.label = nombreCategoria;
+
+  for (const id in categoria) {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = categoria[id];
+    optgroup.appendChild(option);
+  }
+
+  selectElement.appendChild(optgroup);
+}
+
+function encontrarGrupoDeOpcionSeleccionada(SelectElement) {
+  var optgroups = SelectElement.getElementsByTagName("optgroup");
+  for (var i = 0; i < optgroups.length; i++) {
+    var opciones = optgroups[i].getElementsByTagName("option");
+    for (var j = 0; j < opciones.length; j++) {
+      if (opciones[j].selected) {
+        return optgroups[i].label || "Grupo sin etiqueta";
+      }
+    }
+  }
+
+  return "Ninguna opción seleccionada";
+}
+// ====================================================================================================
+// Configuracion de Select2
+// ====================================================================================================
+
+$("#SelectMedico").select2({
+  language: "es",
+  minimumResultsForSearch: Infinity,
+  placeholder: "Elige a un especialista...",
+});
+
+// Si el que está realizando la cita es un doctor
+if (InfoSesion.EsDoctor) {
+  //Se selecciona automaticamente su nombre
+  $("#SelectMedico").val(InfoSesion.ID).trigger("change");
+  // Se deshabilita el select para que no se pueda cambiar
+  $("#SelectMedico").prop("disabled", true);
+  // Y se oculta de la vista
+  $(".contSelect").hide();
+  $(".PrintArea").hide();
+
+} else {
+  // Si no es doctor, solo puede ser recepcionista
+  //Elegimos el primer doctor de la lista
+  $("#SelectMedico").val("1").trigger("change");
+}
+// ====================================================================================================
+// Configuracion de Impresion de la Agenda
+// ====================================================================================================
+
+$("#PrintRango").select2({
+  language: "es",
+  minimumResultsForSearch: Infinity,
+  placeholder: "Elige un rango de fechas...",
+});
+
+function convertirFormatoFecha(fechaString) {
+  // Parseamos la fecha
+  const fecha = new Date(fechaString);
+
+  // Obtenemos los componentes de la fecha
+  const año = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // Añadimos ceros a la izquierda si es necesario
+  const dia = String(fecha.getDate()).padStart(2, "0"); // Añadimos ceros a la izquierda si es necesario
+
+  // Construimos la cadena con el formato deseado
+  const formatoDeseado = `${año}-${mes}-${dia}`;
+
+  return formatoDeseado;
+}
+
+const flatpickrConfig = {
+  // Cambiar el idioma a español
+  locale: {
+    firstDayOfWeek: 1,
+    weekdays: {
+      shorthand: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+      longhand: [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+      ],
+    },
+    months: {
+      shorthand: [
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dic",
+      ],
+      longhand: [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+      ],
+    },
+    rangeSeparator: " a ",
+  },
+  dateFormat: "Y-m-d",
+  mode: "range", // Establece el modo de selección de fecha en rango
+  minDate: new Date().fp_incr(-14), // Establece la fecha mínima en 14 días antes de la fecha actual
+  maxDate: new Date().fp_incr(14), // Establece la fecha máxima en 14 días
+};
+
+$("#PrintFecha").hide();
+
+const fp = $("#PrintFecha").flatpickr(flatpickrConfig);
+
+$("#PrintRango").on("select2:select", function (e) {
+  // Obtenemos el rango de fechas seleccionado
+  const rango = e.params.data.id;
+  if (rango == "Hoy") {
+    $("#PrintFecha").hide();
+    fp.clear();
+  } else {
+    $("#PrintFecha").show();
+  }
+});
+
+$("#PrintButton").on("click", function (e) {
+  // En caso de que se haya seleccionado "Rango"
+  if ($("#PrintRango").val() == "Rango") {
+    // Verificamos que se haya seleccionado un rango de fechas
+    if (fp.selectedDates.length != 2) {
+      alert("Por favor, selecciona un rango de fechas.");
+      return;
+    }
+  }
+  // Convertimos las fechas seleccionadas al formato deseado
+  let fechaInicio = convertirFormatoFecha(fp.selectedDates[0]);
+  let fechaFin = convertirFormatoFecha(fp.selectedDates[1]);
+
+  // En caso de que se haya seleccionado "Hoy"
+  if ($("#PrintRango").val() == "Hoy") {
+    // Obtenemos la fecha actual
+    const fechaActual = new Date();
+    // Convertimos la fecha actual al formato deseado
+    fechaInicio = convertirFormatoFecha(fechaActual);
+    fechaFin = convertirFormatoFecha(fechaActual);
+  }
+
+  // Abrimos una nueva ventana con la URL de impresión de la agenda
+  window.open(
+    `/ImprimirAgenda?Tipo=${encontrarGrupoDeOpcionSeleccionada(
+      SelectMedico
+    )}&id=${$(
+      "#SelectMedico"
+    ).val()}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`,
+    "_blank"
+  );
+  // URL:
+  // /ImprimirAgenda?Tipo=Doctor&id=1&fechaInicio=2021-08-01&fechaFin=2021-08-01
+});
+
+// ====================================================================================================
+// Creacion de Calendario
+// ====================================================================================================
 
 $(document).ready(function () {
   var calendarEl = document.getElementById("calendar");
@@ -44,21 +258,21 @@ $(document).ready(function () {
     locale: "es-MX",
     // Tiempos Maximos y minimos
 
-    slotMinTime: "08:30:00",
-    slotMaxTime: "19:00:00",
+    slotMinTime: "08:00:00",
+    slotMaxTime: "20:00:00",
     // Duracion de los eventos
-    slotDuration: "00:10:00",
+    slotDuration: "00:05:00",
     // Ocultamos los eventos del domingo
     hiddenDays: [0],
     //Ocultamos los eventos de todo el dia
     views: {
       timeGridWeek: {
         // Establecemos el tamano del calendario para que no aparezcan los scrollbars
-        contentHeight: "1538px",
+        contentHeight: "3485px",
         allDaySlot: false, // Ocultar la pestaña "all-day" en la vista semanal
       },
       timeGridDay: {
-        contentHeight: "1538px",
+        contentHeight: "3485px",
         allDaySlot: false, // Ocultar la pestaña "all-day" en la vista diaria
       },
       dayGridMonth: {
@@ -100,8 +314,14 @@ $(document).ready(function () {
         method: "POST",
         dataType: "json",
         data: {
-          idDoctor: InfoSesion.idUsuario,
-          idAsociado: null,
+          idDoctor:
+            encontrarGrupoDeOpcionSeleccionada(SelectMedico) == "Doctores"
+              ? $("#SelectMedico").val()
+              : null,
+          idAsociado:
+            encontrarGrupoDeOpcionSeleccionada(SelectMedico) == "Asociados"
+              ? $("#SelectMedico").val()
+              : null,
         },
         success: function (data) {
           const colores = {
@@ -169,7 +389,6 @@ $(document).ready(function () {
         title: info.event._def.extendedProps.Procedimiento,
         placement: "top",
         trigger: "hover",
-       
       });
     },
 
@@ -281,4 +500,9 @@ $(document).ready(function () {
   });
 
   calendar.render();
+
+  $("#SelectMedico").on("select2:select", async function (e) {
+    // En cuanto se seleccione un medico, se va a recargar el calendario
+    calendar.refetchEvents();
+  });
 });

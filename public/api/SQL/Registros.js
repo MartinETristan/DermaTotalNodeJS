@@ -108,7 +108,7 @@ export async function InfoRegistros() {
   }
 }
 
-export async function Busqueda(Nombre, Apellidos, Telefono_Correo) {
+export async function BusquedaPacientes(Nombre, Apellidos, Telefono_Correo) {
   let connection;
   try {
     connection = await mysql.createConnection(db);

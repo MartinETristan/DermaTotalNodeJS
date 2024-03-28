@@ -45,6 +45,7 @@ function cargarNuevaReceta() {
         medicamentoInput.value = item.Medicamento;
         contenedor.appendChild(medicamentoInput);
 
+
         // Boton para eliminar el par de Medicamento e Indicación
         const botonQuitar = document.createElement("button");
         botonQuitar.type = "button";
@@ -81,7 +82,9 @@ function cargarNuevaReceta() {
 
         camposMedicamentos.appendChild(contenedor);
       });
-    } else {
+    } else if (document.getElementById("camposMedicamentos").children.length == 0){
+      console.log(document.getElementById("camposMedicamentos").children.length);
+      
       // Si no hay recetas, creamos un par de campos de medicamentos e indicaciones
       const contenedor = document.createElement("div");
       contenedor.classList.add("New");
@@ -96,7 +99,7 @@ function cargarNuevaReceta() {
       // Boton para eliminar el par de Medicamento e Indicación
       const botonQuitar = document.createElement("button");
       botonQuitar.type = "button";
-      botonQuitar.textContent = "Eliminar";
+      botonQuitar.textContent = "X";
       botonQuitar.classList.add("iconbtn--Eliminar");
       botonQuitar.addEventListener("click", () => {
         const divMedicamentos = botonQuitar.parentNode;
@@ -107,7 +110,7 @@ function cargarNuevaReceta() {
       // Boton para crear el par de Medicamento e Indicación
       const botonAñadir = document.createElement("button");
       botonAñadir.type = "button";
-      botonAñadir.textContent = "Añadir";
+      botonAñadir.textContent = "Añadir Campo";
       botonAñadir.classList.add("AñadirMedicamento");
       botonAñadir.addEventListener("click", () => {
         agregarCampos({
@@ -126,6 +129,9 @@ function cargarNuevaReceta() {
       indicacionInput.required = true;
       contenedor.appendChild(indicacionInput);
       camposMedicamentosDiv.appendChild(contenedor);
+    }else{
+      const NuevaReceta = document.getElementById("NuevaReceta");
+      NuevaReceta.style.display = "block";
     }
   });
 

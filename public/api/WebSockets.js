@@ -70,11 +70,6 @@ export default function (io) {
           // console.log(params);
 
           API_Dashboard.CrearSesion(...params).then(() => {
-            // if (data.idDoctor) {
-            //   // Mandamos actualizar la tabla de espera para el doctor
-            //   io.to("Doctor" + data.idDoctor).emit("Espera_Consulta");
-            // }
-            // socket.except("Doctor" + data.idDoctor).emit("OtrosConsultorios");
             io.emit("OC_Espera");
             console.log("Se ha asignado la consulta");
             io.to("Recepcion").emit("P_Pedidos");

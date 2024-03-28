@@ -279,11 +279,13 @@ function OtrosConsultorios(datos) {
           const Boton = CrearBotonDeAccion(Paciente);
           Boton.textContent = "Pedir";
           Boton.addEventListener("click", function (event) {
+            console.log(Paciente);
             DatosPaciente = {
               Protocolo: "Pedir",
               idStatusPaciente: Paciente.idStatusPaciente,
               idCita: Paciente.idCita,
               idDoctor: Paciente.idDoctor,
+              idPaciente: Paciente.idPaciente,
               idSucursal: Paciente.idSucursal,
               Nombre: Paciente.Nombres,
               Apellido: Paciente.Apellidos,
@@ -292,6 +294,7 @@ function OtrosConsultorios(datos) {
               RutaFoto: rutaRelativa,
               Nota: Paciente.Nota,
             };
+            // console.log(DatosPaciente);
             Accion_Paciente(DatosPaciente);
             event.stopPropagation();
           });

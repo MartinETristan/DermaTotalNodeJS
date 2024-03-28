@@ -8,12 +8,7 @@ function cargarUltimaReceta() {
     DragNDrop();
   } else {
     document.getElementById("RA").style.display = "none";
-    // document.getElementById("Receta_actual").innerHTML = "";
-    // const doctor = document.getElementById("Doctor");
-    // doctor.style.display = "block";
-    // doctor.textContent = "No hay recetas registradas.";
-    // const botones = document.querySelector(".Botones");
-    // botones.style.display = "none";
+
   }
 
   agregarEventListener("EditarUltimaReceta", function () {
@@ -222,7 +217,7 @@ function mostrarReceta(data) {
     // Boton para eliminar el par de Medicamento e Indicación
     const botonQuitar = document.createElement("button");
     botonQuitar.type = "button";
-    botonQuitar.textContent = "Eliminar";
+    botonQuitar.textContent = "X";
     botonQuitar.classList.add("iconbtn--Eliminar");
     botonQuitar.addEventListener("click", () => {
       const divMedicamentos = botonQuitar.parentNode;
@@ -233,7 +228,7 @@ function mostrarReceta(data) {
     // Boton para crear el par de Medicamento e Indicación
     const botonAñadir = document.createElement("button");
     botonAñadir.type = "button";
-    botonAñadir.textContent = "Añadir";
+    botonAñadir.textContent = "Añadir Campo";
     botonAñadir.classList.add("AñadirMedicamento");
     botonAñadir.addEventListener("click", () => {
       // console.log("Añadir");

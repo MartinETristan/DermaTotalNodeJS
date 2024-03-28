@@ -78,10 +78,9 @@ export async function CitasMedico(idDoctor, idAsociado) {
     return "Ha ocurrido un error.";
   }
 }
-
 export async function NuevaCita(
   idSucursal,
-  idProcedimiento,
+  idProcedimientos,
   idDoctor,
   idAsociado,
   idPaciente,
@@ -91,12 +90,12 @@ export async function NuevaCita(
 ) {
   try {
     const connection = await mysql.createConnection(db);
+
     const consulta = `INSERT INTO Citas
-    (idSucursal, idProcedimiento, idDoctor, idAsociado, idPaciente, HoraCita, FinCita, Nota)
-    VALUES(?,?,?,?,?,?,?,?);`;
+    (idSucursal, idDoctor, idAsociado, idPaciente, HoraCita, FinCita, Nota)
+    VALUES(?,?,?,?,?,?,?);`;
     const idCita = await connection.execute(consulta, [
       idSucursal,
-      idProcedimiento,
       idDoctor != "" ? idDoctor : null,
       idAsociado != "" ? idAsociado : null,
       idPaciente,
@@ -104,11 +103,33 @@ export async function NuevaCita(
       FinCita,
       NotasCita != "" ? NotasCita : null,
     ]);
+
+    const consultaProcedimientos = `INSERT INTO Procedimiento_Citas
+    (idCitas, idProcedimiento)
+    VALUES(?,?);`;
+
+    if (!Array.isArray(idProcedimientos)) {
+      // Si es un valor único, hacemos solo una inserción
+      await connection.execute(consultaProcedimientos, [
+        idCita[0].insertId,
+        idProcedimientos,
+      ]);
+    } else {
+      // Si es un array, hacemos un foreach para insertar cada padecimiento
+      idProcedimientos.forEach(async (idProcedimiento) => {
+        await connection.execute(queryInsertPadecimientos, [
+          idProcedimiento,
+          result.insertId,
+        ]);
+      });
+    }
+
     connection.end();
+
     return idCita[0].insertId;
   } catch (error) {
     console.error("Ha ocurrido un error creando la cita: ", error);
-    return "Ha ocurrido un error.";
+    throw error; // Lanzar la excepción
   }
 }
 
@@ -143,4 +164,72 @@ export async function Update_Checkout(idSesion, CheckOut) {
     return "Ha ocurrido un error.";
   }
 }
+export async function Info_ImprimirAgenda(
+  idDoctor,
+  idAsociado,
+  fechaInicio,
+  fechaFin
+) {
+  try {
+    const connection = await mysql.createConnection(db);
+    let query = `SELECT c.idEstadoCita, ec.Estado, c.idCitas, c.HoraCita, 
+    c.FinCita, CONCAT(u.Nombres, " ",u.ApellidoP, " ",u.ApellidoM)AS NombrePaciente,
+    CONCAT(u2.Nombres, " ",u2.ApellidoP, " ",u2.ApellidoM) AS Doctor, u3.Nombres AS Asociado, c.Nota
+    FROM Citas c 
+    LEFT JOIN Paciente p ON c.idPaciente = p.idPaciente 
+    LEFT JOIN Usuarios u ON p.idUsuario = u.idUsuario 
+    LEFT JOIN Doctor d ON d.idDoctor = c.idDoctor 
+    LEFT JOIN Asociado a ON a.idAsociado = c.idAsociado 
+    LEFT JOIN Usuarios u2 ON d.idUsuario = u2.idUsuario 
+    LEFT JOIN Usuarios u3 ON a.idUsuario = u3.idUsuario 
+    LEFT JOIN Estado_Citas ec ON ec.idEstadoCita = c.idEstadoCita
+    WHERE DATE(c.HoraCita) >= ? AND DATE(c.HoraCita) <= ? `;
 
+    let idBusqueda = null;
+
+    // En caso de que sea un doctor, se completa el Query como un doctor
+    if (idDoctor != null && idAsociado == "") {
+      query += `AND c.idDoctor = ? `;
+      idBusqueda = idDoctor;
+    }
+    // En caso de que sea un asociado, se completa el Query con asociado
+    if (idAsociado != null && idDoctor == "") {
+      query += `AND c.idAsociado = ? `;
+      idBusqueda = idAsociado;
+    }
+
+    query += `ORDER BY c.HoraCita ASC;`;
+
+    const [rows] = await connection.execute(query, [
+      fechaInicio,
+      fechaFin,
+      idBusqueda,
+    ]);
+
+    const queryCreacionCita = `SELECT cc.Fecha, u2.Nombres AS Recepcionista, u.Nombres AS Doctor
+    FROM Creacion_Citas cc 
+    LEFT JOIN Doctor d ON d.idDoctor = cc.idDoctor 
+    LEFT JOIN Usuarios u ON d.idUsuario = u.idUsuario 
+    LEFT JOIN Recepcionista r ON r.idRecepcionista = cc.idRecepcionista 
+    LEFT JOIN Usuarios u2 ON r.idUsuario = u2.idUsuario  
+    WHERE cc.idCitas = ?;`;
+
+    for (let cita of rows) {
+      const [rowCreacionCita] = await connection.execute(queryCreacionCita, [
+        cita.idCitas,
+      ]);
+      cita.FechaCreacion = rowCreacionCita[0].Fecha;
+      cita.CreacionCita =
+        rowCreacionCita[0].Doctor != null
+          ? rowCreacionCita[0].Doctor
+          : rowCreacionCita[0].Recepcionista;
+    }
+
+    // console.log(rows);
+    connection.end();
+    return rows;
+  } catch (error) {
+    console.error("Error en la función Info_ImprimirAgenda: ", error);
+    throw error;
+  }
+}

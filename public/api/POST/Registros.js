@@ -121,7 +121,7 @@ router.post("/InfoPaciente", async function (peticion, respuesta) {
 // Busqueda de pacientes
 router.post("/BusquedaPacientes", async function (req, res) {
   if (req.session.idusuario) {
-    const resBusqueda = await API_Registros.Busqueda(
+    const resBusqueda = await API_Registros.BusquedaPacientes(
       req.body.nombre,
       req.body.apellido,
       req.body.telefono_correo
@@ -372,8 +372,6 @@ router.post("/Update_Seguimiento", async (req, res) => {
     return res.status(500).send("Error interno del servidor");
   }
 });
-
-
 
 
 

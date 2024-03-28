@@ -1,10 +1,18 @@
-InfoSesion = $.ajax({
+let InfoSesion = null;
+
+$.ajax({
   url: "/InfoSesion",
   method: "POST",
   dataType: "json",
-}).then(function (response) {
-  return response;
+  success: function(response) {
+    InfoSesion = response;
+    console.log(InfoSesion); // Aquí se accede a los datos después de recibir la respuesta
+  },
+  error: function(xhr, status, error) {
+    console.error("Error en la solicitud Ajax:", error);
+  }
 });
+
 
 //==================================================================================================
 // Funciones Auxiliares
@@ -392,12 +400,11 @@ function Accion_Paciente(datos) {
       case "Pedir":
         // Asi se obtiene el valor del consultorio elegido
         var idConsultorio = document.getElementById("SelectConsultorios").value;
-
         socket.emit("CambioEstadoPaciente", {
           idCita: datos.idCita,
           idStatus: 2,
           idConsultorio: idConsultorio,
-          idDoctor: datos.idDoctor,
+          idDoctor: InfoSesion.ID,
           idPaciente: datos.idPaciente,
         });
 

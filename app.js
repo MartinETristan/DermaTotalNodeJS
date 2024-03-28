@@ -263,6 +263,42 @@ app.get("/Receta/:idPaciente/:idReceta", function (req, res) {
   }
 });
 
+
+app.get("/ImprimirAgenda", function (req, res) {
+  // if (req.session.idusuario) {
+    console.log(req.session.Navegador);
+    // Determinar la hoja de estilos basada en el navegador
+    let stylesheet = "/css/ImprimirAgenda/Chrome.css";
+    switch (req.navegador) {
+      case "Safari":
+        stylesheet = "/css/ImprimirAgenda/Safari.css";
+        break;
+      case "Chrome":
+        stylesheet = "/css/ImprimirAgenda/Chrome.css";
+        break;
+      case "Opera":
+        stylesheet = "/css/ImprimirAgenda/Opera.css";
+        break;
+      case "Firefox":
+        stylesheet = "/css/ImprimirAgenda/Firefox.css";
+        break;
+      case "Edge":
+        stylesheet = "/css/ImprimirAgenda/Edge.css";
+        break;
+      default:
+        stylesheet = "/css/ImprimirAgenda/Brave.css";
+        break;
+    }
+
+    // Y renderizamos la vista pasando el nombre de la hoja de estilos como variable
+    res.render("ImprimirAgenda.ejs", { Navegador: stylesheet });
+  // } else {
+  //   res.redirect("/");
+  // }
+});
+
+
+
 // Y un Middleware para Cualquier otro sitio no encontrado (página 404)
 app.use((req, res) => {
 

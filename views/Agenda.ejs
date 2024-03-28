@@ -9,14 +9,33 @@
     <link rel="stylesheet" href="/css/Agenda.css" />
     <link rel="stylesheet" href="/css/EstiloGlobal.css" />
     <% //FullCalendar %>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <%// Iconos de Bootstrap%>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <% //Bootstrap %>
     <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
     <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
-    <link rel="icon" href="/img/favicon.ico" />
+    <% // JQuery%>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <%// Esta es una libreria para darle formato a la fecha%>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script> -->
+    <%// Esta es una libreria para los selects para cita%>
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="icon" href="/img/favicon.ico" />
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/navbar.js"></script>
   </head>
@@ -46,24 +65,38 @@
       <% //Aqui se generan los elementos del nav dependiendo del tipo de usuario
       %>
     </section>
-    <% 
+    <%
     //==================================================================================================
-    // Contenido Creacion de Paciente --> 
+    // Contenido Creacion de Paciente -->
     //==================================================================================================
     %>
 
+    <div class="HeaderAgenda">
+      <div class="ControlView">
+        <h1>Agenda</h1>
+        <div class="contSelect">
+          <h1>de</h1>
+          <select id="SelectMedico"></select>
+        </div>
+      </div>
+      <div class="PrintArea">
+        <h1>Imprimir</h1>
+        <select id="PrintRango">
+          <option value="Hoy">Hoy</option>
+          <option value="Rango">Rango</option>
+        </select>
+        <input type="date" id="PrintFecha" placeholder="Elegir rango de fechas..."/>
+        <!-- <input type="date" id="PrintFechaFin" /> -->
+        <button id="PrintButton"> <i class="bi bi-printer" ></i> Imprimir</button>
+      </div>
+    </div>
 
+    <div id="calendar-container">
+      <div id="calendar"></div>
+    </div>
 
-<h1>Agenda</h1>
+    <div class="footer"><% // Aqui va el contenido del Footer%></div>
 
-<div id="calendar-container">
-  <div id="calendar"></div>
-</div>
-
-<div class="footer">
-  <% // Aqui va el contenido del Footer%>
-</div>
-
-<script type="module" src="/js/agenda.js"></script>
+    <script type="module" src="/js/agenda.js"></script>
   </body>
-  </html>
+</html>

@@ -647,7 +647,7 @@ function agregarCampos({
   // Boton para eliminar el par de Medicamento e Indicación
   const botonQuitar = document.createElement("button");
   botonQuitar.type = "button";
-  botonQuitar.textContent = "Eliminar";
+  botonQuitar.textContent = "X";
   botonQuitar.classList.add("iconbtn--Eliminar");
   botonQuitar.addEventListener("click", () => {
     const divMedicamentos = botonQuitar.parentNode;
@@ -658,7 +658,7 @@ function agregarCampos({
   // Boton para crear el par de Medicamento e Indicación
   const botonAñadir = document.createElement("button");
   botonAñadir.type = "button";
-  botonAñadir.textContent = "Añadir";
+  botonAñadir.textContent = "Añadir Campo";
   botonAñadir.classList.add("AñadirMedicamento");
   botonAñadir.addEventListener("click", () => {
     agregarCampos({
@@ -676,6 +676,13 @@ function agregarCampos({
   indicacionInput.classList.add("indicacionreceta");
   indicacionInput.required = true;
   contenedor.appendChild(indicacionInput);
+
+  console.log("zona", zona);
+
+  
+    // const BotonEliminar = document.querySelectorAll("#camposMedicamentos .iconbtn--Eliminar");
+    // console.log(BotonEliminar);
+  
 
   zona.insertAdjacentElement("afterend", contenedor);
 }

@@ -115,7 +115,42 @@
   margin-right: 0;
 }
 
+.contSelect,.ControlView,.PrintArea{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.HeaderAgenda{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
 
+#SelectMedico{
+    width: 200px;
+    height: 30px;
+}
+
+#PrintRango{
+    width: 90px;
+    height: 30px;
+}
+
+#PrintFecha{
+  border: 1px solid #29abe2;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+#PrintButton{
+  background: #29abe2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 5px 10px;
+}
 
 
 

@@ -252,6 +252,7 @@ async function cargarNuevaCita() {
           R_ID: InfoSesion.ID,
           idSucursal: SelectSucursal.value,
           idProcedimiento: SelectProcedimiento.value,
+          idPaciente: datosAlmacenados.BasicInfo[0].idPaciente,
           idDoctor:
             encontrarGrupoDeOpcionSeleccionada(SelectMedico) == "Doctores"
               ? SelectMedico.value
